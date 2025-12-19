@@ -42,6 +42,8 @@ knitr::write_bib(c(
 library(bookdown)
 library(rsconnect)
  
+bookdown::render_book("index.Rmd")
+
 bookdown::render_book()
 
 #  # view locally
