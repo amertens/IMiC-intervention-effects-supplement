@@ -1,6 +1,16 @@
-bookdown::html_document2:
-  toc: true
-  toc_depth: 3
-  number_sections: true
-  self_contained: false
+bookdown::gitbook:
+  css: style.css
+  config:
+    toc:
+      collapse: section
+      before: |
+        <li><a href="./">IMiC Intervention Supplement</a></li>
+      after: |
+        <li><a href="https://bookdown.org" target="_blank">Published with bookdown</a></li>
 
+bookdown::pdf_book:
+  latex_engine: xelatex
+  citation_package: natbib
+  keep_tex: true
+
+bookdown::epub_book: default
