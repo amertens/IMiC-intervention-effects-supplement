@@ -1,0 +1,187 @@
+
+# Unadjusted estimate forest plots
+
+
+For each milk modality, the intervention effects are shown in forest plots, faceted by study and visit. Significant effects after FDR correction are shown with solid circles. Intervention average treatment effects are first shown for combined intervention arms (pooling post-natal nutritional intervention arms), and then the effects are shown contrasting each randomized arm against the control arms. Effects are estimated using TMLE, unadjusted for baseline prognistic factors.
+
+```{r, include=FALSE}
+tableau10 <- c("#1F77B4","#FF7F0E","#2CA02C","#D62728",
+               "#9467BD","#8C564B","#E377C2","#7F7F7F","#BCBD22","#17BECF")
+
+library(tidyverse)
+library(DT)
+library(here)
+
+
+forest_plot <- function(tab, arm_strat=F){
+  
+    tab$study <- as.character(tab$study)
+  tab$study[tab$study == "Vital"] <- "Mumta-LW"
+  
+  tab$label_f[tab$label_f == "Total Carbohydrate"] <- "Total Carbohydrates"
+  tab$sigFDR <- factor(tab$sigFDR, levels=c(0,1))
+  tab$sig <- factor(tab$sig, levels=c(0,1))
+  tab$study <- factor(tab$study, levels=c("Misame", "Mumta-LW","Elicit"))
+  tab$visit <- factor(tab$visit, levels=c( "14-21 days", "1-2 mo.","3-4 mo.", "1.5 mo.","2 mo.","1 mo.","5 mo."))
+  tab=tab %>% mutate(sigcat=case_when(
+    sigFDR == 1 & sig == 1 ~ "Sig",
+    sigFDR == 0 & sig == 1 ~ "Sig before FDR",
+    sigFDR == 0 & sig == 0 ~ "Not Significant"
+  ))
+  unique(tab$visit)
+  unique(tab$study)
+
+  if(arm_strat){
+    ggplot(tab, aes(x = reorder(label_f, -est), y = est, color=contrast, shape=sigcat, group=contrast)) +
+      geom_point(position = position_dodge(width = 0.5), size = 2) +
+      geom_errorbar(aes(ymin = cil, ymax = ciu), width = 0.2, position = position_dodge(width = 0.5)) +
+      geom_hline(yintercept = 0, linetype = "dashed", color = "grey") +
+      coord_flip() +
+      scale_shape_manual(values = c(1, 19, 17), 
+                         labels = c("Not Significant","Sig before FDR", "Sig")) +
+      scale_color_manual(values = c(tableau10)) +
+      facet_wrap(study~visit) +
+      labs(title = "Forest Plot of Estimates",
+           x = "Variable",
+           y = "Estimate") +
+      theme_minimal() + theme(legend.position = "right")
+  }else{
+    ggplot(tab, aes(x = reorder(label_f, -est), y = est, color=sigFDR, shape=sig, group=contrast)) +
+      geom_point(position = position_dodge(width = 0.5), size = 2) +
+      geom_errorbar(aes(ymin = cil, ymax = ciu), width = 0.2, position = position_dodge(width = 0.5)) +
+      geom_hline(yintercept = 0, linetype = "dashed", color = "grey") +
+      coord_flip() +
+      scale_shape_manual(values = c(1, 19), 
+                         labels = c("Not Significant", "Significant")) +
+      scale_color_manual(values = c("grey60", tableau10[2]), 
+                         labels = c("Not Significant", "Significant")) +
+      facet_wrap(study~visit) +
+      labs(title = "Forest Plot of Estimates",
+           x = "Variable",
+           y = "Estimate") +
+      theme_minimal() + theme(legend.position = "none")
+  }
+
+
+}
+
+res = readRDS(here("results/unadjusted_combined_arms_intervention_effects_results_clean.RDS"))
+res_strat = readRDS(here("results/unadjusted_combined_arms_intervention_effects_results_clean.RDS"))
+
+res <- res %>% filter(measure=="ATE")
+res = res %>% select(study, visit, contrast, category , biomarker, label_f,  est, cil, ciu, pval, pval_adj, sig, sigFDR)
+res$biomarker = str_to_lower(res$biomarker)
+
+res_strat <- res_strat %>% filter(measure=="ATE")
+res_strat = res_strat %>% select(study, visit, contrast, category , biomarker, label_f,  est, cil, ciu, pval, pval_adj, sig, sigFDR)
+res_strat$biomarker = str_to_lower(res_strat$biomarker)
+
+
+  load(here("metadata/milk_component.Rdata"))
+
+  
+res_macro = res %>% filter(biomarker %in% c(all_milk_components$macro, "total carbohydrate"))
+res_micro = res %>% filter(biomarker %in% c(all_milk_components$micro))
+res_bvit = res %>% filter(biomarker %in% c(all_milk_components$bvit))
+res_hmo = res %>% filter(biomarker %in% c(all_milk_components$hmo))
+res_bioactives = res %>% filter(biomarker %in% c(all_milk_components$protein))
+res_metabolomics = res %>% filter(biomarker %in% c(all_milk_components$metabolomics))
+
+
+res_strat_macro = res_strat %>% filter(biomarker %in% c(all_milk_components$macro, "total carbohydrate"))
+res_strat_micro = res_strat %>% filter(biomarker %in% c(all_milk_components$micro))
+res_strat_bvit = res_strat %>% filter(biomarker %in% c(all_milk_components$bvit))
+res_strat_hmo = res_strat %>% filter(biomarker %in% c(all_milk_components$hmo))
+res_strat_bioactives = res_strat %>% filter(biomarker %in% c(all_milk_components$protein))
+res_strat_metabolomics = res_strat %>% filter(biomarker %in% c(all_milk_components$metabolomics))
+
+
+```
+
+
+
+#### Macronutrients - combined arms
+
+```{r, echo=FALSE}
+
+forest_plot(res_macro)
+
+```
+
+#### Macronutrients - stratified arms
+
+```{r, echo=FALSE}
+
+forest_plot(res_strat_macro)
+
+```
+
+
+#### Micronutrients - combined arms
+
+```{r, echo=FALSE, fig.height=12}
+
+forest_plot(res_micro)
+
+```
+
+#### Micronutrients - stratified arms
+
+```{r, echo=FALSE, fig.height=12}
+
+forest_plot(res_strat_micro)
+
+```
+
+#### B-vitamins - combined arms
+
+```{r, echo=FALSE, fig.height=12}
+
+forest_plot(res_bvit)
+
+```
+
+#### B-vitamins - stratified arms
+
+```{r, echo=FALSE, fig.height=12}
+
+forest_plot(res_strat_bvit)
+
+```
+
+
+#### HMOs - combined arms
+
+```{r, echo=FALSE, fig.height=12}
+
+forest_plot(res_hmo)
+
+```
+
+
+#### HMOs - stratified arms
+
+```{r, echo=FALSE, fig.height=12}
+
+forest_plot(res_strat_hmo)
+
+```
+
+#### Bioactives - combined arms
+
+```{r, echo=FALSE, fig.height=12}
+
+forest_plot(res_bioactives)
+
+```
+
+
+
+#### Bioactives - stratified arms
+
+```{r, echo=FALSE, fig.height=12}
+
+forest_plot(res_strat_bioactives)
+
+```
+

@@ -1,0 +1,45 @@
+# Baseline characteristics by study and intervention arm
+
+
+
+```{r, echo=FALSE, message=FALSE, out.width="100%", fig.cap="", warning=FALSE}
+
+library(tidyverse)
+library(here)
+library(table1)
+
+
+raw_df <- readRDS(paste0(here::here(),"/data/merged_analysis_datasets.RDS"))
+
+
+
+
+
+
+```
+
+
+## Misame
+
+```{r, echo=FALSE}
+
+table1(~ sex + mage + meducyrs + mhtcm + parity + nperson + nrooms + imp_water_src + impfloor + cookplac + dvseason + dlvloc + hhwealth + hhfoodsecure | arm, data=raw_df %>% filter(studyid=="MISAME-3", visit==1), transpose=FALSE)
+
+```
+
+
+## Mumta
+
+```{r, echo=FALSE}
+
+table1(~ sex + mage + meducyrs + mhtcm + parity + nperson + nrooms + imp_water_src + impfloor + cookplac + dvseason + dlvloc + hhwealth + hhfoodsecure | arm, data=raw_df %>% filter(studyid=="VITAL-Lactation", visit==40), transpose=FALSE)
+
+```
+
+## Elicit
+
+```{r, echo=FALSE}
+
+table1(~ sex + mage + meducyrs + mhtcm + parity + nperson + nrooms + imp_water_src + impfloor + cookplac + dvseason + dlvloc + hhwealth + hhfoodsecure | arm, data=raw_df %>% filter(studyid=="ELICIT", visit==1), transpose=FALSE)
+
+```

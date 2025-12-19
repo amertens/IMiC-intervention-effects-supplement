@@ -1,0 +1,916 @@
+--- 
+title: "IMiC supplementary material"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib, packages.bib]
+# url: your book url like https://bookdown.org/yihui/bookdown
+# cover-image: path to the social sharing image like images/cover.jpg
+description: |
+  Supplementary material for "The impact of nutritional interventions on human milk in low resource settings: findings from the International Milk Composition (IMiC) Consortium"
+link-citations: yes
+github-repo: rstudio/bookdown-demo
+---
+
+
+# Supplementary Material for IMiC Intervention Effects Manuscript
+
+The online supplement provides the complete analytical outputs from all stages of the study, organized into nine chapters that can be navigated via the Table of Contents on the left. Each chapter corresponds to a major component of the analysis workflow:
+
+  *  01_baseline_characteristics presents detailed maternal and infant baseline data across trials and intervention arms
+  *  02_descriptive_statistics summarizes unadjusted distributions of all milk composition variables
+  *  04_forest_plots and 05_forest_plots_unadjusted display adjusted and unadjusted intervention effect estimates for each milk constituent across studies
+  *  06_exploratory_outcomes extends analyses to untargeted metabolomics, proteomics, and microbiome data
+  *  07_subgroup_estimates provides stratified results (e.g., by maternal BMI, parity, or infant sex)
+  *  08_sensitivity_results documents robustness checks including per-protocol and model specification tests and
+  *  09_trajectory_plots visualizes longitudinal changes in milk components over lactation.
+
+
+test 4
+
+
+
+```{r include=FALSE}
+# automatically create a bib database for R packages
+knitr::write_bib(c(
+  .packages(), 'bookdown', 'knitr', 'rmarkdown', 'tidyverse', 'here'
+), 'packages.bib')
+```
+
+```{r, eval=F, include=F}
+
+#to create the book
+library(bookdown)
+library(rsconnect)
+ 
+bookdown::render_book()
+
+#  # view locally
+#  render_book("index.Rmd")
+#  
+#  # Remove the rsconnect folder to clear cached deployment info
+# #unlink("rsconnect", recursive = TRUE)
+#  
+#  
+# 
+# 
+# # #rebuild and publish
+# # bookdown::publish_book(
+# #   render  = "local",
+# #   account = "amertens",
+# #   server  = "bookdown.org"#,
+# #   #appName = "imic_intervention_supplement"
+# # )
+# 
+#  unlink("_book", recursive = TRUE)
+# bookdown::render_book(".", "bookdown::gitbook")
+# 
+# 
+# rsconnect::deployApp( appDir = "_book", account = "amertens", server = "bookdown.org", appName = "imic_intervention_effects_supplement" )
+
+ 
+
+
+```
+
+
+
+<!--chapter:end:index.Rmd-->
+
+# Baseline characteristics by study and intervention arm
+
+
+
+```{r, echo=FALSE, message=FALSE, out.width="100%", fig.cap="", warning=FALSE}
+
+library(tidyverse)
+library(here)
+library(table1)
+
+
+raw_df <- readRDS(paste0(here::here(),"/data/merged_analysis_datasets.RDS"))
+
+
+
+
+
+
+```
+
+
+## Misame
+
+```{r, echo=FALSE}
+
+table1(~ sex + mage + meducyrs + mhtcm + parity + nperson + nrooms + imp_water_src + impfloor + cookplac + dvseason + dlvloc + hhwealth + hhfoodsecure | arm, data=raw_df %>% filter(studyid=="MISAME-3", visit==1), transpose=FALSE)
+
+```
+
+
+## Mumta
+
+```{r, echo=FALSE}
+
+table1(~ sex + mage + meducyrs + mhtcm + parity + nperson + nrooms + imp_water_src + impfloor + cookplac + dvseason + dlvloc + hhwealth + hhfoodsecure | arm, data=raw_df %>% filter(studyid=="VITAL-Lactation", visit==40), transpose=FALSE)
+
+```
+
+## Elicit
+
+```{r, echo=FALSE}
+
+table1(~ sex + mage + meducyrs + mhtcm + parity + nperson + nrooms + imp_water_src + impfloor + cookplac + dvseason + dlvloc + hhwealth + hhfoodsecure | arm, data=raw_df %>% filter(studyid=="ELICIT", visit==1), transpose=FALSE)
+
+```
+
+<!--chapter:end:01_baseline_characteristics.Rmd-->
+
+
+# Intervention effects forest plots and results tables
+
+For each milk modality, the intervention effects are shown in forest plots, faceted by study and visit. Significant effects after FDR correction are shown with solid circles. Intervention average treatment effects are first shown for combined intervention arms (pooling post-natal nutritional intervention arms), and then the effects are shown contrasting each randomized arm against the control arms. Effects are estimated using TMLE, adjusting for baseline prognistic factors. Tables of results are shown below each forest plot, which also include unscaled estimates (in original units of measurement).
+
+```{r, include=FALSE}
+tableau10 <- c("#1F77B4","#FF7F0E","#2CA02C","#D62728",
+               "#9467BD","#8C564B","#E377C2","#7F7F7F","#BCBD22","#17BECF")
+
+library(tidyverse)
+library(DT)
+library(here)
+
+forest_plot <- function(tab, arm_strat=F){
+  
+  tab$study <- as.character(tab$study)
+  tab$study[tab$study == "Vital"] <- "Mumta-LW"
+  
+  tab$label_f[tab$label_f == "Total Carbohydrate"] <- "Total Carbohydrates"
+  tab$sigFDR <- factor(tab$sigFDR, levels=c(0,1))
+  tab$sig <- factor(tab$sig, levels=c(0,1))
+  tab$study <- factor(tab$study, levels=c("Misame", "Mumta-LW","Elicit"))
+  tab$visit <- factor(tab$visit, levels=c( "14-21 days", "1-2 mo.","3-4 mo.", "1.5 mo.","2 mo.","1 mo.","5 mo."))
+  tab=tab %>% mutate(sigcat=case_when(
+    sigFDR == 1 & sig == 1 ~ "Sig",
+    sigFDR == 0 & sig == 1 ~ "Sig before FDR",
+    sigFDR == 0 & sig == 0 ~ "Not Significant"
+  ), sigcat=factor(sigcat, levels=c("Not Significant", "Sig before FDR", "Sig")))
+  unique(tab$visit)
+  unique(tab$study)
+
+  if(arm_strat){
+    ggplot(tab, aes(x = reorder(label_f, -est), y = est, color=contrast, shape=sigcat, group=contrast)) +
+      geom_point(position = position_dodge(width = 0.5), size = 2) +
+      geom_errorbar(aes(ymin = cil, ymax = ciu), width = 0.2, position = position_dodge(width = 0.5)) +
+      geom_hline(yintercept = 0, linetype = "dashed", color = "grey") +
+      coord_flip() +
+      scale_shape_manual(values = c(1, 19, 17), 
+                         labels = c("Not Significant","Sig before FDR", "Sig")) +
+      scale_color_manual(values = c(tableau10)) +
+      facet_wrap(study~visit) +
+      labs(title = "Forest Plot of Estimates",
+           x = "Variable",
+           y = "Estimate") +
+      theme_minimal() + theme(legend.position = "right")
+  }else{
+    ggplot(tab, aes(x = reorder(label_f, -est), y = est, color=sigFDR, shape=sig, group=contrast)) +
+      geom_point(position = position_dodge(width = 0.5), size = 2) +
+      geom_errorbar(aes(ymin = cil, ymax = ciu), width = 0.2, position = position_dodge(width = 0.5)) +
+      geom_hline(yintercept = 0, linetype = "dashed", color = "grey") +
+      coord_flip() +
+      scale_shape_manual(values = c(1, 19), 
+                         labels = c("Not Significant", "Significant")) +
+      scale_color_manual(values = c("grey60", tableau10[2]), 
+                         labels = c("Not Significant", "Significant")) +
+      facet_wrap(study~visit) +
+      labs(title = "Forest Plot of Estimates",
+           x = "Variable",
+           y = "Estimate") +
+      theme_minimal() + theme(legend.position = "none")
+  }
+
+
+}
+
+clean_tab <- function(tab){
+  rownames(tab)=NULL
+  
+    tab$study <- as.character(tab$study)
+  tab$study[tab$study == "Vital"] <- "Mumta-LW"
+  
+  if(!any(colnames(tab)=="perc_imp")){
+    tab$perc_imp=NA
+  }
+
+  tab <- tab %>% 
+    mutate(ATE = paste0(round(est, 2), " (", round(cil, 2), ", ", round(ciu, 2), ")"),
+           ATE_unscaled = paste0(round(est_unscaled, 2), " (", round(cil_unscaled, 2), ", ", round(ciu_unscaled, 2), ")"),
+           pval_cat=case_when(
+             pval < 0.001 ~ "***",
+             pval < 0.01 ~ "**",
+             pval < 0.05 ~ "*",
+             TRUE ~ ""
+           ),
+           pval_adj_cat=case_when(
+             pval_adj < 0.001 ~ "***",
+             pval_adj < 0.01 ~ "**",
+             pval_adj < 0.05 ~ "*",
+             TRUE ~ ""
+           ),
+          pval_adj_cat_unscaled=case_when(
+             pval_adj_unscaled < 0.001 ~ "***",
+             pval_adj_unscaled < 0.01 ~ "**",
+             pval_adj_unscaled < 0.05 ~ "*",
+             TRUE ~ ""
+           ),
+           pval=paste0(round(pval, 3),pval_cat), 
+          perc_imp = round(perc_imp, 2),
+          pval_adj = paste0(round(pval_adj, 3),pval_adj_cat),
+          pval_adj_unscaled = paste0(round(pval_adj_unscaled, 3),pval_adj_cat_unscaled)
+           ) %>%
+    subset(., select = -c(X, cil, ciu)) %>%
+    select(study, visit, contrast, label_f, perc_imp, ATE, ATE_unscaled, pval, pval_adj,pval_adj_unscaled)
+
+  tab = datatable(tab) %>%
+  formatStyle(columns = colnames(tab), fontSize = '11px')
+
+  return(tab)
+  
+}
+
+
+```
+
+
+
+#### Macronutrients - combined arms
+
+```{r, echo=FALSE}
+
+df <- read.csv(here("results/subsetted results/primary_macro.csv"))
+forest_plot(df)
+
+clean_tab(df)
+
+```
+
+#### Macronutrients - stratified arms
+
+```{r, echo=FALSE}
+
+df <- read.csv(here("results/subsetted results/primary_macro_arm_strat.csv"))
+forest_plot(df, arm_strat=T)
+
+clean_tab(df)
+
+```
+
+
+#### Micronutrients - combined arms
+
+Includes fat-soluble vitamins
+
+```{r, echo=FALSE, fig.height=12}
+
+df <- read.csv(here("results/subsetted results/primary_micro.csv"))
+forest_plot(df)
+clean_tab(df)
+
+```
+
+#### Micronutrients - stratified arms
+
+```{r, echo=FALSE, fig.height=12}
+
+df <- read.csv(here("results/subsetted results/primary_micro_arm_strat.csv"))
+forest_plot(df, arm_strat=T)
+clean_tab(df)
+
+```
+
+#### B-vitamins - combined arms
+
+```{r, echo=FALSE, fig.height=12}
+
+df <- read.csv(here("results/subsetted results/primary_bvit.csv"))
+forest_plot(df)
+clean_tab(df)
+
+```
+
+#### B-vitamins - stratified arms
+
+```{r, echo=FALSE, fig.height=12}
+
+df <- read.csv(here("results/subsetted results/primary_bvit_arm_strat.csv"))
+forest_plot(df, arm_strat=T)
+clean_tab(df)
+
+```
+
+
+#### HMOs - combined arms
+
+```{r, echo=FALSE, fig.height=12}
+
+df <- read.csv(here("results/subsetted results/secondary_hmo.csv"))
+forest_plot(df)
+clean_tab(df)
+
+```
+
+
+#### HMOs - stratified arms
+
+```{r, echo=FALSE, fig.height=12}
+
+df <- read.csv(here("results/subsetted results/secondary_hmo_arm_strat.csv"))
+forest_plot(df, arm_strat=T)
+clean_tab(df)
+
+```
+
+#### Bioactives - combined arms
+
+```{r, echo=FALSE, fig.height=12}
+
+df <- read.csv(here("results/subsetted results/secondary_bioactives.csv"))
+forest_plot(df)
+clean_tab(df)
+
+```
+
+
+
+#### Bioactives - stratified arms
+
+```{r, echo=FALSE, fig.height=12}
+
+df <- read.csv(here("results/subsetted results/secondary_bioactives_arm_strat.csv"))
+forest_plot(df, arm_strat=T)
+clean_tab(df)
+
+```
+
+
+<!--chapter:end:04_forest_plots.Rmd-->
+
+
+# Unadjusted estimate forest plots
+
+
+For each milk modality, the intervention effects are shown in forest plots, faceted by study and visit. Significant effects after FDR correction are shown with solid circles. Intervention average treatment effects are first shown for combined intervention arms (pooling post-natal nutritional intervention arms), and then the effects are shown contrasting each randomized arm against the control arms. Effects are estimated using TMLE, unadjusted for baseline prognistic factors.
+
+```{r, include=FALSE}
+tableau10 <- c("#1F77B4","#FF7F0E","#2CA02C","#D62728",
+               "#9467BD","#8C564B","#E377C2","#7F7F7F","#BCBD22","#17BECF")
+
+library(tidyverse)
+library(DT)
+library(here)
+
+
+forest_plot <- function(tab, arm_strat=F){
+  
+    tab$study <- as.character(tab$study)
+  tab$study[tab$study == "Vital"] <- "Mumta-LW"
+  
+  tab$label_f[tab$label_f == "Total Carbohydrate"] <- "Total Carbohydrates"
+  tab$sigFDR <- factor(tab$sigFDR, levels=c(0,1))
+  tab$sig <- factor(tab$sig, levels=c(0,1))
+  tab$study <- factor(tab$study, levels=c("Misame", "Mumta-LW","Elicit"))
+  tab$visit <- factor(tab$visit, levels=c( "14-21 days", "1-2 mo.","3-4 mo.", "1.5 mo.","2 mo.","1 mo.","5 mo."))
+  tab=tab %>% mutate(sigcat=case_when(
+    sigFDR == 1 & sig == 1 ~ "Sig",
+    sigFDR == 0 & sig == 1 ~ "Sig before FDR",
+    sigFDR == 0 & sig == 0 ~ "Not Significant"
+  ))
+  unique(tab$visit)
+  unique(tab$study)
+
+  if(arm_strat){
+    ggplot(tab, aes(x = reorder(label_f, -est), y = est, color=contrast, shape=sigcat, group=contrast)) +
+      geom_point(position = position_dodge(width = 0.5), size = 2) +
+      geom_errorbar(aes(ymin = cil, ymax = ciu), width = 0.2, position = position_dodge(width = 0.5)) +
+      geom_hline(yintercept = 0, linetype = "dashed", color = "grey") +
+      coord_flip() +
+      scale_shape_manual(values = c(1, 19, 17), 
+                         labels = c("Not Significant","Sig before FDR", "Sig")) +
+      scale_color_manual(values = c(tableau10)) +
+      facet_wrap(study~visit) +
+      labs(title = "Forest Plot of Estimates",
+           x = "Variable",
+           y = "Estimate") +
+      theme_minimal() + theme(legend.position = "right")
+  }else{
+    ggplot(tab, aes(x = reorder(label_f, -est), y = est, color=sigFDR, shape=sig, group=contrast)) +
+      geom_point(position = position_dodge(width = 0.5), size = 2) +
+      geom_errorbar(aes(ymin = cil, ymax = ciu), width = 0.2, position = position_dodge(width = 0.5)) +
+      geom_hline(yintercept = 0, linetype = "dashed", color = "grey") +
+      coord_flip() +
+      scale_shape_manual(values = c(1, 19), 
+                         labels = c("Not Significant", "Significant")) +
+      scale_color_manual(values = c("grey60", tableau10[2]), 
+                         labels = c("Not Significant", "Significant")) +
+      facet_wrap(study~visit) +
+      labs(title = "Forest Plot of Estimates",
+           x = "Variable",
+           y = "Estimate") +
+      theme_minimal() + theme(legend.position = "none")
+  }
+
+
+}
+
+res = readRDS(here("results/unadjusted_combined_arms_intervention_effects_results_clean.RDS"))
+res_strat = readRDS(here("results/unadjusted_combined_arms_intervention_effects_results_clean.RDS"))
+
+res <- res %>% filter(measure=="ATE")
+res = res %>% select(study, visit, contrast, category , biomarker, label_f,  est, cil, ciu, pval, pval_adj, sig, sigFDR)
+res$biomarker = str_to_lower(res$biomarker)
+
+res_strat <- res_strat %>% filter(measure=="ATE")
+res_strat = res_strat %>% select(study, visit, contrast, category , biomarker, label_f,  est, cil, ciu, pval, pval_adj, sig, sigFDR)
+res_strat$biomarker = str_to_lower(res_strat$biomarker)
+
+
+  load(here("metadata/milk_component.Rdata"))
+
+  
+res_macro = res %>% filter(biomarker %in% c(all_milk_components$macro, "total carbohydrate"))
+res_micro = res %>% filter(biomarker %in% c(all_milk_components$micro))
+res_bvit = res %>% filter(biomarker %in% c(all_milk_components$bvit))
+res_hmo = res %>% filter(biomarker %in% c(all_milk_components$hmo))
+res_bioactives = res %>% filter(biomarker %in% c(all_milk_components$protein))
+res_metabolomics = res %>% filter(biomarker %in% c(all_milk_components$metabolomics))
+
+
+res_strat_macro = res_strat %>% filter(biomarker %in% c(all_milk_components$macro, "total carbohydrate"))
+res_strat_micro = res_strat %>% filter(biomarker %in% c(all_milk_components$micro))
+res_strat_bvit = res_strat %>% filter(biomarker %in% c(all_milk_components$bvit))
+res_strat_hmo = res_strat %>% filter(biomarker %in% c(all_milk_components$hmo))
+res_strat_bioactives = res_strat %>% filter(biomarker %in% c(all_milk_components$protein))
+res_strat_metabolomics = res_strat %>% filter(biomarker %in% c(all_milk_components$metabolomics))
+
+
+```
+
+
+
+#### Macronutrients - combined arms
+
+```{r, echo=FALSE}
+
+forest_plot(res_macro)
+
+```
+
+#### Macronutrients - stratified arms
+
+```{r, echo=FALSE}
+
+forest_plot(res_strat_macro)
+
+```
+
+
+#### Micronutrients - combined arms
+
+```{r, echo=FALSE, fig.height=12}
+
+forest_plot(res_micro)
+
+```
+
+#### Micronutrients - stratified arms
+
+```{r, echo=FALSE, fig.height=12}
+
+forest_plot(res_strat_micro)
+
+```
+
+#### B-vitamins - combined arms
+
+```{r, echo=FALSE, fig.height=12}
+
+forest_plot(res_bvit)
+
+```
+
+#### B-vitamins - stratified arms
+
+```{r, echo=FALSE, fig.height=12}
+
+forest_plot(res_strat_bvit)
+
+```
+
+
+#### HMOs - combined arms
+
+```{r, echo=FALSE, fig.height=12}
+
+forest_plot(res_hmo)
+
+```
+
+
+#### HMOs - stratified arms
+
+```{r, echo=FALSE, fig.height=12}
+
+forest_plot(res_strat_hmo)
+
+```
+
+#### Bioactives - combined arms
+
+```{r, echo=FALSE, fig.height=12}
+
+forest_plot(res_bioactives)
+
+```
+
+
+
+#### Bioactives - stratified arms
+
+```{r, echo=FALSE, fig.height=12}
+
+forest_plot(res_strat_bioactives)
+
+```
+
+
+<!--chapter:end:05_forest_plots_unadjusted.Rmd-->
+
+# Exploratory outcomes (microbiome, proteomics, untargeted metabolomics)
+
+
+```{r, include=FALSE}
+library(tidyverse)
+library(DT)
+library(here)
+```
+
+## Microbiome
+
+Intervention effects on microbiome diversity measures
+
+Combined arms:
+
+```{r, echo=FALSE, out.width="80%", fig.cap=""}
+
+knitr::include_graphics("figures/forest_plot_microbiome_diversity.png")
+
+```
+
+Stratified arms:
+
+```{r, echo=FALSE, out.width="80%", fig.cap=""}
+
+knitr::include_graphics("figures/forest_plot_microbiome_diversity_arm_strat.png")
+
+```
+
+Intervention effects on individual microbiome components
+
+Combined arms:
+
+
+```{r, echo=FALSE, out.width="80%", fig.cap=""}
+
+knitr::include_graphics("figures/volcano_plot_microbiome.png")
+
+```
+
+
+Stratified arms:
+
+
+```{r, echo=FALSE, out.width="80%", fig.cap=""}
+
+knitr::include_graphics("figures/volcano_plot_microbiome_arm_strat.png")
+
+```
+
+## Proteomics
+
+Note- proteomics were taken in a subset of mother-child dyads, and was only taken in the control arm of the Elicit trial, and so intervention effects were not estimatable.
+
+No specific pattern of effects was noted, and the proportion of significant was consisten with false postives under a global null hypothesis.
+
+
+### Combined-arms
+
+
+```{r, echo=FALSE, out.width="80%", fig.cap=""}
+
+knitr::include_graphics("figures/volcano_plot_proteomics.png")
+
+```
+
+### Arm-stratified
+
+```{r, echo=FALSE, out.width="80%", fig.cap=""}
+
+
+knitr::include_graphics("figures/volcano_plot_proteomics_arm_strat.png")
+
+
+
+```
+
+
+## Untargeted Metabolomics
+
+```{r, echo=FALSE, out.width="80%", fig.cap=""}
+
+knitr::include_graphics("figures/volcano_plot_metabolomics.png")
+
+
+```
+
+
+
+<!--chapter:end:06_exploratory_outcomes.Rmd-->
+
+# Subgroup estimates
+
+
+```{r, echo=FALSE, out.width="80%", fig.cap="", message=FALSE}
+
+library(here)
+library(tidyverse)
+
+knitr::include_graphics(here("figures/subgroup_plot_primary.png"))
+knitr::include_graphics(here("figures/subgroup_plot_tertiary.png"))
+
+tab=readRDS(here("figure-data/subgroup_results.RDS")) %>% mutate(across(where(is.numeric), ~ round(.x, 2)))
+
+DT::datatable(tab)
+
+```
+
+<!--chapter:end:07_subgroup_estimates.Rmd-->
+
+
+# Reductions in deficiency of nutrients based on MILQ standards
+
+-below the 10th percentile
+-note sparse estimates
+-TMLE estimates
+-add citations
+-add tabulation of cutoffs (including sparse)
+
+```{r, echo=FALSE}
+library(tidyverse)
+library(DT)
+
+tableau10=c("#1F77B4", "#FF7F0E", "#2CA02C", "#D62728", "#9467BD", "#8C564B", 
+            "#E377C2", "#7F7F7F", "#BCBD22", "#17BECF")
+
+clean_tab_milq <- function(tab){
+  rownames(tab)=NULL
+  
+
+  tab <- tab %>% rename(pval=pvalue) %>%
+    mutate(RR = paste0(round(  RR, 2), " (", round(ci.lb, 2), ", ", round(ci.ub, 2), ")"),
+           pval_cat=case_when(
+             pval < 0.001 ~ "***",
+             pval < 0.01 ~ "**",
+             pval < 0.05 ~ "*",
+             TRUE ~ ""
+           ),
+           pval_adj_cat=case_when(
+             pval_adj < 0.001 ~ "***",
+             pval_adj < 0.01 ~ "**",
+             pval_adj < 0.05 ~ "*",
+             TRUE ~ ""),
+        
+           pval=paste0(round(pval, 3),pval_cat), 
+          pval_adj = paste0(round(pval_adj, 3),pval_adj_cat)
+           ) %>%
+    subset(., select = -c(ci.lb, ci.ub)) %>%
+    select(biomarker, study, visit, contrast, RR, pval, pval_adj)
+
+  tab = datatable(tab) %>%
+  formatStyle(columns = colnames(tab), fontSize = '11px')
+
+  return(tab)
+  
+}
+
+
+
+plot_df = readRDS(paste0(here::here(),"/figure-data/fig-milq-deficiency-reduction-data.RDS"))
+
+
+p <- ggplot(plot_df, aes(x=biomarker, y=RR, color=factor(sigcat), alpha=factor(sigcat))) + 
+  geom_linerange(aes(ymin=ci.lb, ymax=ci.ub)) +
+  geom_point() +
+  geom_hline(yintercept = 1, linetype="dashed") +
+  facet_wrap(~studytime, scale="free", nrow=2) +
+  #facet_grid(~studytime) +
+  scale_y_log10() +
+  coord_flip() +
+  ggtitle("") +
+  theme_minimal() +
+  scale_alpha_manual(values=c(0.3,0.5,0.8)) +
+  scale_color_manual(values=c("grey50",tableau10)) +
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.85,0.1),
+        axis.text = element_text(size = 8),
+        legend.title = element_blank(),
+        #panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.text = element_text(size = 8)) + 
+  ylab("RR") + xlab("Milk component")
+p
+
+clean_tab_milq(plot_df)
+
+
+
+```
+
+(Add figure legend)
+
+<!--chapter:end:08_milq_adequecy.Rmd-->
+
+
+# Unscaled estimate forest plots
+
+```{r, include=FALSE}
+tableau10 <- c("#1F77B4","#FF7F0E","#2CA02C","#D62728",
+               "#9467BD","#8C564B","#E377C2","#7F7F7F","#BCBD22","#17BECF")
+
+library(tidyverse)
+library(DT)
+
+source("functions.R")
+
+
+
+
+res = readRDS(here("results/adjusted_combined_arms_intervention_effects_unscaled_results_clean.RDS"))
+res <- res %>% filter(measure=="ATE")
+res = res %>% select(study, visit, contrast, category , biomarker, label_f,  est, cil, ciu, pval, pval_adj, sig, sigFDR)
+res$biomarker = str_to_lower(res$biomarker)
+
+
+  load(here("metadata/milk_component.Rdata"))
+
+  
+res_macro = res %>% filter(biomarker %in% c(all_milk_components$macro, "total carbohydrate"))
+res_micro = res %>% filter(biomarker %in% c(all_milk_components$micro))
+res_bvit = res %>% filter(biomarker %in% c(all_milk_components$bvit))
+res_hmo = res %>% filter(biomarker %in% c(all_milk_components$hmo))
+res_bioactives = res %>% filter(biomarker %in% c(all_milk_components$protein))
+res_metabolomics = res %>% filter(biomarker %in% c(all_milk_components$metabolomics))
+
+
+res_strat = readRDS(here("results/adjusted_intervention_effects_unscaled_results_clean.RDS"))
+res_strat <- res_strat %>% filter(measure=="ATE")
+res_strat = res_strat %>% select(study, visit, contrast, category , biomarker, label_f,  est, cil, ciu, pval, pval_adj, sig, sigFDR)
+res_strat$biomarker = str_to_lower(res_strat$biomarker)
+
+res_strat_macro = res_strat %>% filter(biomarker %in% c(all_milk_components$macro, "total carbohydrate"))
+res_strat_micro = res_strat %>% filter(biomarker %in% c(all_milk_components$micro))
+res_strat_bvit = res_strat %>% filter(biomarker %in% c(all_milk_components$bvit))
+res_strat_hmo = res_strat %>% filter(biomarker %in% c(all_milk_components$hmo))
+res_strat_bioactives = res_strat %>% filter(biomarker %in% c(all_milk_components$protein))
+res_strat_metabolomics = res_strat %>% filter(biomarker %in% c(all_milk_components$metabolomics))
+
+
+
+```
+
+
+
+#### Macronutrients - combined arms
+
+```{r, echo=FALSE}
+
+forest_plot(res_macro)
+clean_tab(res_macro)
+```
+
+#### Macronutrients - stratified arms
+
+```{r, echo=FALSE}
+
+forest_plot(res_strat_macro)
+clean_tab(res_strat_macro)
+
+```
+
+
+#### Micronutrients - combined arms
+
+```{r, echo=FALSE, fig.height=12}
+
+forest_plot(res_micro)
+clean_tab(res_micro)
+
+```
+
+#### Micronutrients - stratified arms
+
+```{r, echo=FALSE, fig.height=12}
+
+#forest_plot(read.csv(here("results/subsetted results/primary_micro_arm_strat.csv"), arm_strat=T)
+
+```
+
+#### B-vitamins - combined arms
+
+```{r, echo=FALSE, fig.height=12}
+
+forest_plot(res_bvit)
+clean_tab(res_bvit)
+
+
+```
+
+#### B-vitamins - stratified arms
+
+```{r, echo=FALSE, fig.height=12}
+
+#forest_plot(read.csv(here("results/subsetted results/primary_bvit_arm_strat.csv"), arm_strat=T)
+
+```
+
+
+#### HMOs - combined arms
+
+```{r, echo=FALSE, fig.height=12}
+
+forest_plot(res_hmo)
+clean_tab(res_hmo)
+```
+
+
+#### HMOs - stratified arms
+
+```{r, echo=FALSE, fig.height=12}
+
+#forest_plot(read.csv(here("results/subsetted results/secondary_hmo_arm_strat.csv"), arm_strat=T)
+
+```
+
+#### Bioactives - combined arms
+
+```{r, echo=FALSE, fig.height=12}
+
+forest_plot(res_bioactives)
+clean_tab(res_bioactives)
+
+```
+
+
+
+#### Bioactives - stratified arms
+
+```{r, echo=FALSE, fig.height=12}
+
+#forest_plot(read.csv(here("results/subsetted results/secondary_bioactives_arm_strat.csv"), arm_strat=T)
+
+```
+
+
+<!--chapter:end:09_forest_plots_unscaled.Rmd-->
+
+# Trajectory analyses
+
+
+```{r, echo=FALSE, out.width="80%", fig.cap=""}
+library(here)
+
+knitr::include_graphics(here("figures/volcano_plot_traj_primary.png"))
+knitr::include_graphics(here("figures/volcano_plot_traj_secondary.png"))
+knitr::include_graphics(here("figures/volcano_plot_traj_tertiary.png"))
+
+```
+
+
+## Tables
+
+```{r, echo=FALSE, out.width="80%", fig.cap=""}
+
+DT::datatable(readRDS(here("results/adjusted_intervention_effects_traj_results_clean.RDS")) %>% mutate(across(where(is.numeric), ~ round(.x, 2))))
+DT::datatable(readRDS(here("results/adjusted_combined_arms_intervention_effects_traj_results_clean.RDS")) %>% mutate(across(where(is.numeric), ~ round(.x, 2))))
+
+
+```
+
+
+## Trajectory lineplots
+
+```{r, echo=FALSE, out.width="80%", fig.cap=""}
+
+p_s5 <- readRDS(here("figure-data/figure_s4_trajectory_plots.RDS"))
+
+p_s5
+```
+
+<!--chapter:end:10_trajectory_plots.Rmd-->
+

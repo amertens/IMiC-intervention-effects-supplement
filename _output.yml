@@ -1,0 +1,6 @@
+bookdown::html_document2:
+  toc: true
+  toc_depth: 3
+  number_sections: true
+  self_contained: false
+
