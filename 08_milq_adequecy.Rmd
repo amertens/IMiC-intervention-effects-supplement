@@ -1,0 +1,81 @@
+
+# Reductions in deficiency of nutrients based on MILQ standards
+
+-below the 10th percentile
+-note sparse estimates
+-TMLE estimates
+-add citations
+-add tabulation of cutoffs (including sparse)
+
+```{r, echo=FALSE}
+library(tidyverse)
+library(DT)
+
+tableau10=c("#1F77B4", "#FF7F0E", "#2CA02C", "#D62728", "#9467BD", "#8C564B", 
+            "#E377C2", "#7F7F7F", "#BCBD22", "#17BECF")
+
+clean_tab_milq <- function(tab){
+  rownames(tab)=NULL
+  
+
+  tab <- tab %>% rename(pval=pvalue) %>%
+    mutate(RR = paste0(round(  RR, 2), " (", round(ci.lb, 2), ", ", round(ci.ub, 2), ")"),
+           pval_cat=case_when(
+             pval < 0.001 ~ "***",
+             pval < 0.01 ~ "**",
+             pval < 0.05 ~ "*",
+             TRUE ~ ""
+           ),
+           pval_adj_cat=case_when(
+             pval_adj < 0.001 ~ "***",
+             pval_adj < 0.01 ~ "**",
+             pval_adj < 0.05 ~ "*",
+             TRUE ~ ""),
+        
+           pval=paste0(round(pval, 3),pval_cat), 
+          pval_adj = paste0(round(pval_adj, 3),pval_adj_cat)
+           ) %>%
+    subset(., select = -c(ci.lb, ci.ub)) %>%
+    select(biomarker, study, visit, contrast, RR, pval, pval_adj)
+
+  tab = datatable(tab) %>%
+  formatStyle(columns = colnames(tab), fontSize = '11px')
+
+  return(tab)
+  
+}
+
+
+
+plot_df = readRDS(paste0(here::here(),"/figure-data/fig-milq-deficiency-reduction-data.RDS"))
+
+
+p <- ggplot(plot_df, aes(x=biomarker, y=RR, color=factor(sigcat), alpha=factor(sigcat))) + 
+  geom_linerange(aes(ymin=ci.lb, ymax=ci.ub)) +
+  geom_point() +
+  geom_hline(yintercept = 1, linetype="dashed") +
+  facet_wrap(~studytime, scale="free", nrow=2) +
+  #facet_grid(~studytime) +
+  scale_y_log10() +
+  coord_flip() +
+  ggtitle("") +
+  theme_minimal() +
+  scale_alpha_manual(values=c(0.3,0.5,0.8)) +
+  scale_color_manual(values=c("grey50",tableau10)) +
+  theme(legend.position = "inside",
+        legend.position.inside = c(0.85,0.1),
+        axis.text = element_text(size = 8),
+        legend.title = element_blank(),
+        #panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        strip.text = element_text(size = 8)) + 
+  ylab("RR") + xlab("Milk component")
+p
+
+clean_tab_milq(plot_df)
+
+
+
+```
+
+(Add figure legend)

@@ -1,0 +1,75 @@
+--- 
+title: "IMiC supplementary material"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib, packages.bib]
+# url: your book url like https://bookdown.org/yihui/bookdown
+# cover-image: path to the social sharing image like images/cover.jpg
+description: |
+  Supplementary material for "The impact of nutritional interventions on human milk in low resource settings: findings from the International Milk Composition (IMiC) Consortium"
+link-citations: yes
+github-repo: rstudio/bookdown-demo
+---
+
+
+# Supplementary Material for IMiC Intervention Effects Manuscript
+
+The online supplement provides the complete analytical outputs from all stages of the study, organized into nine chapters that can be navigated via the Table of Contents on the left. Each chapter corresponds to a major component of the analysis workflow:
+
+  *  01_baseline_characteristics presents detailed maternal and infant baseline data across trials and intervention arms
+  *  02_descriptive_statistics summarizes unadjusted distributions of all milk composition variables
+  *  04_forest_plots and 05_forest_plots_unadjusted display adjusted and unadjusted intervention effect estimates for each milk constituent across studies
+  *  06_exploratory_outcomes extends analyses to untargeted metabolomics, proteomics, and microbiome data
+  *  07_subgroup_estimates provides stratified results (e.g., by maternal BMI, parity, or infant sex)
+  *  08_sensitivity_results documents robustness checks including per-protocol and model specification tests and
+  *  09_trajectory_plots visualizes longitudinal changes in milk components over lactation.
+
+
+test 4
+
+
+
+```{r include=FALSE}
+# automatically create a bib database for R packages
+knitr::write_bib(c(
+  .packages(), 'bookdown', 'knitr', 'rmarkdown', 'tidyverse', 'here'
+), 'packages.bib')
+```
+
+```{r, eval=F, include=F}
+
+#to create the book
+library(bookdown)
+library(rsconnect)
+ 
+bookdown::render_book()
+
+#  # view locally
+#  render_book("index.Rmd")
+#  
+#  # Remove the rsconnect folder to clear cached deployment info
+# #unlink("rsconnect", recursive = TRUE)
+#  
+#  
+# 
+# 
+# # #rebuild and publish
+# # bookdown::publish_book(
+# #   render  = "local",
+# #   account = "amertens",
+# #   server  = "bookdown.org"#,
+# #   #appName = "imic_intervention_supplement"
+# # )
+# 
+#  unlink("_book", recursive = TRUE)
+# bookdown::render_book(".", "bookdown::gitbook")
+# 
+# 
+# rsconnect::deployApp( appDir = "_book", account = "amertens", server = "bookdown.org", appName = "imic_intervention_effects_supplement" )
+
+ 
+
+
+```
+
+

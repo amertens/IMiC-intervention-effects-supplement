@@ -1,0 +1,14 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+_book/
+data
+results
+figures
+boxplot_files/
+/data
+/results
+/figures
+/boxplot_files/
+02_descriptive_statistics.Rmd

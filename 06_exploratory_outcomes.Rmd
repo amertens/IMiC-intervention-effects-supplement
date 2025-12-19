@@ -1,0 +1,88 @@
+# Exploratory outcomes (microbiome, proteomics, untargeted metabolomics)
+
+
+```{r, include=FALSE}
+library(tidyverse)
+library(DT)
+library(here)
+```
+
+## Microbiome
+
+Intervention effects on microbiome diversity measures
+
+Combined arms:
+
+```{r, echo=FALSE, out.width="80%", fig.cap=""}
+
+knitr::include_graphics("figures/forest_plot_microbiome_diversity.png")
+
+```
+
+Stratified arms:
+
+```{r, echo=FALSE, out.width="80%", fig.cap=""}
+
+knitr::include_graphics("figures/forest_plot_microbiome_diversity_arm_strat.png")
+
+```
+
+Intervention effects on individual microbiome components
+
+Combined arms:
+
+
+```{r, echo=FALSE, out.width="80%", fig.cap=""}
+
+knitr::include_graphics("figures/volcano_plot_microbiome.png")
+
+```
+
+
+Stratified arms:
+
+
+```{r, echo=FALSE, out.width="80%", fig.cap=""}
+
+knitr::include_graphics("figures/volcano_plot_microbiome_arm_strat.png")
+
+```
+
+## Proteomics
+
+Note- proteomics were taken in a subset of mother-child dyads, and was only taken in the control arm of the Elicit trial, and so intervention effects were not estimatable.
+
+No specific pattern of effects was noted, and the proportion of significant was consisten with false postives under a global null hypothesis.
+
+
+### Combined-arms
+
+
+```{r, echo=FALSE, out.width="80%", fig.cap=""}
+
+knitr::include_graphics("figures/volcano_plot_proteomics.png")
+
+```
+
+### Arm-stratified
+
+```{r, echo=FALSE, out.width="80%", fig.cap=""}
+
+
+knitr::include_graphics("figures/volcano_plot_proteomics_arm_strat.png")
+
+
+
+```
+
+
+## Untargeted Metabolomics
+
+```{r, echo=FALSE, out.width="80%", fig.cap=""}
+
+knitr::include_graphics("figures/volcano_plot_metabolomics.png")
+
+
+```
+
+

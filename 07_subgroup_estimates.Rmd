@@ -1,0 +1,16 @@
+# Subgroup estimates
+
+
+```{r, echo=FALSE, out.width="80%", fig.cap="", message=FALSE}
+
+library(here)
+library(tidyverse)
+
+knitr::include_graphics(here("figures/subgroup_plot_primary.png"))
+knitr::include_graphics(here("figures/subgroup_plot_tertiary.png"))
+
+tab=readRDS(here("figure-data/subgroup_results.RDS")) %>% mutate(across(where(is.numeric), ~ round(.x, 2)))
+
+DT::datatable(tab)
+
+```
