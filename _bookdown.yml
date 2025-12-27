@@ -9,12 +9,11 @@ rmd_files:
   - index.Rmd
   - 01_baseline_characteristics.Rmd
   - 02_descriptive_statistics.Rmd
-  - 07_subgroup_estimates.Rmd
+  - 03_forest_plots.Rmd
+  - 04_forest_plots_unadjusted.Rmd
+  - 05_forest_plots_unscaled.Rmd
   - 06_exploratory_outcomes.Rmd
-  - 08_milq_adequecy.Rmd
-  - 04_forest_plots.Rmd
-  - 05_forest_plots_unadjusted.Rmd
-  - 09_forest_plots_unscaled.Rmd
-  - 10_trajectory_plots.Rmd
+  - 07_subgroup_estimates.Rmd
+  - 08_trajectory_plots.Rmd
   #- 11_pathway_analysis_tables.Rmd
   # - extra_plots.Rmd

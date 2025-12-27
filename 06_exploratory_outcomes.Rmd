@@ -1,4 +1,16 @@
-# Exploratory outcomes (microbiome, proteomics, untargeted metabolomics)
+# Exploratory Outcomes: Microbiome, Proteomics, and Untargeted Metabolomics
+
+This chapter presents exploratory analyses of human milk components that were not designated as primary or secondary outcomes, including the milk microbiome, untargeted proteomics, and untargeted metabolomics. These analyses are intended to provide a comprehensive view of potential intervention-related signals across high-dimensional data modalities and to support hypothesis generation.
+
+All results in this chapter should be interpreted cautiously. Estimates are subject to substantial multiple-testing burden, variable measurement error, and, in some cases, limited sample size or incomplete intervention contrasts. Formal inference and primary conclusions are therefore based on prespecified outcomes presented in earlier chapters.
+
+## Microbiome
+
+### Intervention effects on microbiome diversity
+
+This section summarizes intervention effects on milk microbiome alpha diversity metrics. Forest plots display average treatment effect estimates for standard diversity measures, stratified by study and milk collection visit.
+
+Results are shown first for pooled postnatal nutritional intervention arms, followed by arm-stratified contrasts against the control condition. Across studies and visits, no consistent intervention-related changes in microbiome diversity were observed. The magnitude and direction of estimated effects varied across time points and studies, and confidence intervals generally overlapped the null, consistent with limited sensitivity of milk microbiome diversity to maternal nutritional supplementation.
 
 
 ```{r, include=FALSE}
@@ -7,11 +19,7 @@ library(DT)
 library(here)
 ```
 
-## Microbiome
-
-Intervention effects on microbiome diversity measures
-
-Combined arms:
+#### Combined arms:
 
 ```{r, echo=FALSE, out.width="80%", fig.cap=""}
 
@@ -19,7 +27,7 @@ knitr::include_graphics("figures/forest_plot_microbiome_diversity.png")
 
 ```
 
-Stratified arms:
+#### Stratified arms:
 
 ```{r, echo=FALSE, out.width="80%", fig.cap=""}
 
@@ -27,9 +35,13 @@ knitr::include_graphics("figures/forest_plot_microbiome_diversity_arm_strat.png"
 
 ```
 
-Intervention effects on individual microbiome components
+### Intervention effects on individual microbial features
 
-Combined arms:
+Volcano plots summarize intervention effects on individual microbial taxa and sequence variants. Results are shown for pooled intervention arms and for arm-stratified contrasts.
+
+Across analyses, the distribution of effect estimates and p-values was consistent with a global null hypothesis, with no enrichment of statistically significant features beyond what would be expected by chance after accounting for multiple testing. No taxa exhibited reproducible intervention-associated shifts across studies or visits.
+
+#### Combined arms:
 
 
 ```{r, echo=FALSE, out.width="80%", fig.cap=""}
@@ -39,7 +51,7 @@ knitr::include_graphics("figures/volcano_plot_microbiome.png")
 ```
 
 
-Stratified arms:
+#### Stratified arms:
 
 
 ```{r, echo=FALSE, out.width="80%", fig.cap=""}
@@ -50,12 +62,12 @@ knitr::include_graphics("figures/volcano_plot_microbiome_arm_strat.png")
 
 ## Proteomics
 
-Note- proteomics were taken in a subset of mother-child dyads, and was only taken in the control arm of the Elicit trial, and so intervention effects were not estimatable.
+Untargeted proteomic analyses were conducted in a subset of mother–infant dyads and were subject to important design constraints. Proteomics data were available for a limited number of samples and, in the ELICIT trial, were collected only in the control arm. As a result, formal estimation of randomized intervention effects was not possible for this modality.
 
-No specific pattern of effects was noted, and the proportion of significant was consisten with false postives under a global null hypothesis.
+Volcano plots are presented for completeness and descriptive purposes only. Across both pooled and arm-stratified visualizations, the proportion of nominally significant protein-level associations was consistent with false positives expected under a global null distribution. No coherent pattern of protein-level changes attributable to intervention exposure was observed.
 
 
-### Combined-arms
+#### Combined-arms
 
 
 ```{r, echo=FALSE, out.width="80%", fig.cap=""}
@@ -64,7 +76,7 @@ knitr::include_graphics("figures/volcano_plot_proteomics.png")
 
 ```
 
-### Arm-stratified
+#### Arm-stratified
 
 ```{r, echo=FALSE, out.width="80%", fig.cap=""}
 
@@ -77,6 +89,12 @@ knitr::include_graphics("figures/volcano_plot_proteomics_arm_strat.png")
 
 
 ## Untargeted Metabolomics
+
+This section summarizes exploratory intervention effects on untargeted milk metabolites. Volcano plots display effect estimates and significance levels for thousands of metabolite features, aggregated across studies and visits.
+
+Compared with the microbiome and proteomics analyses, untargeted metabolomics exhibited a higher density of features with nominal evidence of intervention association. However, signals were heterogeneous across studies and time points, and only a small fraction of features remained significant after correction for multiple testing. These results indicate the presence of weak, distributed metabolic shifts rather than large, discrete intervention effects on individual metabolites.
+
+Pathway-level summaries and targeted metabolite analyses, which provide a more interpretable and biologically coherent view of metabolic changes, are presented elsewhere in the supplement and in the main manuscript.
 
 ```{r, echo=FALSE, out.width="80%", fig.cap=""}
 

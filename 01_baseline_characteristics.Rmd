@@ -1,4 +1,11 @@
-# Baseline characteristics by study and intervention arm
+# Study Baseline Characteristics
+
+
+This chapter summarizes baseline maternal, infant, and household characteristics for the IMiC subsamples drawn from the three randomized trials included in the intervention effects analysis: MISAME-III (Burkina Faso), Mumta-LW (Pakistan), and ELICIT (Tanzania). Baseline characteristics are presented separately by study and stratified by randomized intervention arm, using the earliest available postnatal visit corresponding to milk sample collection in each trial.
+
+Tables report key demographic, anthropometric, socioeconomic, and household variables that are plausibly associated with maternal nutritional status, breastfeeding context, or infant outcomes, including infant sex, maternal age, education, height, parity, household composition, housing characteristics, water source, season and location of delivery, household wealth index, and food security. These variables were harmonized across studies as part of the IMiC data curation process and are described in detail in the Supplementary Methods.
+
+The purpose of this chapter is descriptive: to characterize the analytic populations contributing milk samples in each trial and to assess baseline balance across intervention arms following randomization. No statistical tests of between-arm differences are performed here, consistent with best practices for randomized trials. These tables provide contextual information for interpreting intervention effect estimates presented in subsequent chapters.
 
 
 
@@ -12,10 +19,29 @@ library(table1)
 raw_df <- readRDS(paste0(here::here(),"/data/merged_analysis_datasets.RDS"))
 
 
+# Apply human-readable labels used by table1
+label(raw_df$sex)           <- "Infant sex"
+label(raw_df$mage)          <- "Maternal age (years)"
+label(raw_df$meducyrs)      <- "Maternal education (years)"
+label(raw_df$mbmi)          <- "Maternal BMI (kg/m²)"
+label(raw_df$mmuaccm)       <- "Maternal MUAC (cm)"
+label(raw_df$parity)        <- "Parity"
+label(raw_df$nperson)       <- "Household size (persons)"
+label(raw_df$nrooms)        <- "Number of rooms in household"
+label(raw_df$imp_water_src) <- "Improved water source"
+label(raw_df$impfloor)      <- "Improved flooring"
+label(raw_df$cookplac)      <- "Separate cooking space"
+label(raw_df$dvseason)      <- "Season of delivery"
+label(raw_df$dlvloc)        <- "Place of delivery"
+label(raw_df$hhwealth)      <- "Household wealth index"
+label(raw_df$hhfoodsecure)  <- "Household food security"
+label(raw_df$arm)           <- "Intervention arm"
 
 
-
-
+drop_empty_levels <- function(df) {
+  df %>%
+    mutate(across(where(is.factor), droplevels))
+}
 ```
 
 
@@ -23,7 +49,8 @@ raw_df <- readRDS(paste0(here::here(),"/data/merged_analysis_datasets.RDS"))
 
 ```{r, echo=FALSE}
 
-table1(~ sex + mage + meducyrs + mhtcm + parity + nperson + nrooms + imp_water_src + impfloor + cookplac + dvseason + dlvloc + hhwealth + hhfoodsecure | arm, data=raw_df %>% filter(studyid=="MISAME-3", visit==1), transpose=FALSE)
+table1(~ sex + mage + meducyrs + mbmi + mmuaccm + parity + nperson + nrooms + imp_water_src + impfloor + cookplac + dvseason + dlvloc + hhwealth + hhfoodsecure | arm, data=raw_df %>% filter(studyid=="MISAME-3", visit==1) %>%
+    drop_empty_levels(), transpose=FALSE)
 
 ```
 
@@ -32,7 +59,8 @@ table1(~ sex + mage + meducyrs + mhtcm + parity + nperson + nrooms + imp_water_s
 
 ```{r, echo=FALSE}
 
-table1(~ sex + mage + meducyrs + mhtcm + parity + nperson + nrooms + imp_water_src + impfloor + cookplac + dvseason + dlvloc + hhwealth + hhfoodsecure | arm, data=raw_df %>% filter(studyid=="VITAL-Lactation", visit==40), transpose=FALSE)
+table1(~ sex + mage + meducyrs + mbmi + mmuaccm + mhtcm + parity + nperson + nrooms + imp_water_src + impfloor + cookplac + dvseason + dlvloc + hhwealth + hhfoodsecure | arm, data=raw_df %>% filter(studyid=="VITAL-Lactation", visit==40) %>%
+    drop_empty_levels(), transpose=FALSE)
 
 ```
 
@@ -40,6 +68,7 @@ table1(~ sex + mage + meducyrs + mhtcm + parity + nperson + nrooms + imp_water_s
 
 ```{r, echo=FALSE}
 
-table1(~ sex + mage + meducyrs + mhtcm + parity + nperson + nrooms + imp_water_src + impfloor + cookplac + dvseason + dlvloc + hhwealth + hhfoodsecure | arm, data=raw_df %>% filter(studyid=="ELICIT", visit==1), transpose=FALSE)
+table1(~ sex + mage + meducyrs  + mbmi + mmuaccm + mhtcm + parity + nperson + nrooms + imp_water_src + impfloor + cookplac + dvseason + dlvloc + hhwealth + hhfoodsecure | arm, data=raw_df %>% filter(studyid=="ELICIT", visit==1) %>%
+    drop_empty_levels(), transpose=FALSE)
 
 ```

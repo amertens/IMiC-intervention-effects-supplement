@@ -1,8 +1,13 @@
 
-# Unadjusted estimate forest plots
+# Unadjusted Intervention Effects on Individual Milk Components
+
+This chapter presents unadjusted estimates of the effects of maternal nutritional interventions on individual human milk components. Results are shown as forest plots stratified by study and milk collection visit and are intended to provide descriptive comparisons with the covariate-adjusted analyses presented in the preceding chapter.
+
+Average treatment effects (ATEs) are estimated using targeted maximum likelihood estimation (TMLE) without adjustment for baseline prognostic factors. As in the adjusted analyses, results are first presented for pooled postnatal nutritional intervention arms to improve precision, followed by estimates for each randomized intervention arm contrasted with the corresponding control arm. False-discovery rate (FDR) correction is applied within outcome groups, and effects remaining significant after correction are indicated by solid symbols in the forest plots.
+
+These unadjusted results should be interpreted as descriptive. Differences between unadjusted and adjusted estimates may reflect confounding by baseline maternal, infant, or household characteristics, differences in sampling structure across studies and visits, or chance variation. Formal inference and primary interpretation of intervention effects are based on the covariate-adjusted analyses presented elsewhere in the supplement.
 
 
-For each milk modality, the intervention effects are shown in forest plots, faceted by study and visit. Significant effects after FDR correction are shown with solid circles. Intervention average treatment effects are first shown for combined intervention arms (pooling post-natal nutritional intervention arms), and then the effects are shown contrasting each randomized arm against the control arms. Effects are estimated using TMLE, unadjusted for baseline prognistic factors.
 
 ```{r, include=FALSE}
 tableau10 <- c("#1F77B4","#FF7F0E","#2CA02C","#D62728",

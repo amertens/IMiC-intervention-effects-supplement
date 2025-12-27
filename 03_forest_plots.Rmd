@@ -1,7 +1,16 @@
 
-# Intervention effects forest plots and results tables
+
+# Adjusted Intervention Effects on Individual Milk Components
+
+This chapter presents covariate-adjusted estimates of the effects of maternal nutritional interventions on individual human milk components. Results are shown as forest plots and accompanying tables, stratified by study and milk collection visit. Average treatment effects (ATEs) are estimated using targeted maximum likelihood estimation (TMLE) with adjustment for prespecified baseline prognostic factors. False-discovery rate (FDR) correction is applied within outcome groups.
 
 For each milk modality, the intervention effects are shown in forest plots, faceted by study and visit. Significant effects after FDR correction are shown with solid circles. Intervention average treatment effects are first shown for combined intervention arms (pooling post-natal nutritional intervention arms), and then the effects are shown contrasting each randomized arm against the control arms. Effects are estimated using TMLE, adjusting for baseline prognistic factors. Tables of results are shown below each forest plot, which also include unscaled estimates (in original units of measurement).
+
+## Primary Outcomes: Macronutrients and Micronutrients
+
+Forest plots display point estimates and 95% confidence intervals for standardized effect sizes. Solid symbols indicate effects that remain statistically significant after FDR correction within the corresponding outcome group. Dashed vertical lines denote the null effect.
+
+
 
 ```{r, include=FALSE}
 tableau10 <- c("#1F77B4","#FF7F0E","#2CA02C","#D62728",
