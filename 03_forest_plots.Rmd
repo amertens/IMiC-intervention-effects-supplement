@@ -1,0 +1,234 @@
+
+
+# Adjusted Intervention Effects on Individual Milk Components
+
+This chapter presents covariate-adjusted estimates of the effects of maternal nutritional interventions on individual human milk components. Results are shown as forest plots and accompanying tables, stratified by study and milk collection visit. Average treatment effects (ATEs) are estimated using targeted maximum likelihood estimation (TMLE) with adjustment for prespecified baseline prognostic factors. False-discovery rate (FDR) correction is applied within outcome groups.
+
+For each milk modality, the intervention effects are shown in forest plots, faceted by study and visit. Significant effects after FDR correction are shown with solid circles. Intervention average treatment effects are first shown for combined intervention arms (pooling post-natal nutritional intervention arms), and then the effects are shown contrasting each randomized arm against the control arms. Effects are estimated using TMLE, adjusting for baseline prognistic factors. Tables of results are shown below each forest plot, which also include unscaled estimates (in original units of measurement).
+
+## Primary Outcomes: Macronutrients and Micronutrients
+
+Forest plots display point estimates and 95% confidence intervals for standardized effect sizes. Solid symbols indicate effects that remain statistically significant after FDR correction within the corresponding outcome group. Dashed vertical lines denote the null effect.
+
+
+
+```{r, include=FALSE}
+tableau10 <- c("#1F77B4","#FF7F0E","#2CA02C","#D62728",
+               "#9467BD","#8C564B","#E377C2","#7F7F7F","#BCBD22","#17BECF")
+
+library(tidyverse)
+library(DT)
+library(here)
+
+forest_plot <- function(tab, arm_strat=F){
+  
+  tab$study <- as.character(tab$study)
+  tab$study[tab$study == "Vital"] <- "Mumta-LW"
+  
+  tab$label_f[tab$label_f == "Total Carbohydrate"] <- "Total Carbohydrates"
+  tab$sigFDR <- factor(tab$sigFDR, levels=c(0,1))
+  tab$sig <- factor(tab$sig, levels=c(0,1))
+  tab$study <- factor(tab$study, levels=c("Misame", "Mumta-LW","Elicit"))
+  tab$visit <- factor(tab$visit, levels=c( "14-21 days", "1-2 mo.","3-4 mo.", "1.5 mo.","2 mo.","1 mo.","5 mo."))
+  tab=tab %>% mutate(sigcat=case_when(
+    sigFDR == 1 & sig == 1 ~ "Sig",
+    sigFDR == 0 & sig == 1 ~ "Sig before FDR",
+    sigFDR == 0 & sig == 0 ~ "Not Significant"
+  ), sigcat=factor(sigcat, levels=c("Not Significant", "Sig before FDR", "Sig")))
+  unique(tab$visit)
+  unique(tab$study)
+
+  if(arm_strat){
+    ggplot(tab, aes(x = reorder(label_f, -est), y = est, color=contrast, shape=sigcat, group=contrast)) +
+      geom_point(position = position_dodge(width = 0.5), size = 2) +
+      geom_errorbar(aes(ymin = cil, ymax = ciu), width = 0.2, position = position_dodge(width = 0.5)) +
+      geom_hline(yintercept = 0, linetype = "dashed", color = "grey") +
+      coord_flip() +
+      scale_shape_manual(values = c(1, 19, 17), 
+                         labels = c("Not Significant","Sig before FDR", "Sig")) +
+      scale_color_manual(values = c(tableau10)) +
+      facet_wrap(study~visit) +
+      labs(title = "Forest Plot of Estimates",
+           x = "Variable",
+           y = "Estimate") +
+      theme_minimal() + theme(legend.position = "right")
+  }else{
+    ggplot(tab, aes(x = reorder(label_f, -est), y = est, color=sigFDR, shape=sig, group=contrast)) +
+      geom_point(position = position_dodge(width = 0.5), size = 2) +
+      geom_errorbar(aes(ymin = cil, ymax = ciu), width = 0.2, position = position_dodge(width = 0.5)) +
+      geom_hline(yintercept = 0, linetype = "dashed", color = "grey") +
+      coord_flip() +
+      scale_shape_manual(values = c(1, 19), 
+                         labels = c("Not Significant", "Significant")) +
+      scale_color_manual(values = c("grey60", tableau10[2]), 
+                         labels = c("Not Significant", "Significant")) +
+      facet_wrap(study~visit) +
+      labs(title = "Forest Plot of Estimates",
+           x = "Variable",
+           y = "Estimate") +
+      theme_minimal() + theme(legend.position = "none")
+  }
+
+
+}
+
+clean_tab <- function(tab){
+  rownames(tab)=NULL
+  
+    tab$study <- as.character(tab$study)
+  tab$study[tab$study == "Vital"] <- "Mumta-LW"
+  
+  if(!any(colnames(tab)=="perc_imp")){
+    tab$perc_imp=NA
+  }
+
+  tab <- tab %>% 
+    mutate(ATE = paste0(round(est, 2), " (", round(cil, 2), ", ", round(ciu, 2), ")"),
+           ATE_unscaled = paste0(round(est_unscaled, 2), " (", round(cil_unscaled, 2), ", ", round(ciu_unscaled, 2), ")"),
+           pval_cat=case_when(
+             pval < 0.001 ~ "***",
+             pval < 0.01 ~ "**",
+             pval < 0.05 ~ "*",
+             TRUE ~ ""
+           ),
+           pval_adj_cat=case_when(
+             pval_adj < 0.001 ~ "***",
+             pval_adj < 0.01 ~ "**",
+             pval_adj < 0.05 ~ "*",
+             TRUE ~ ""
+           ),
+          pval_adj_cat_unscaled=case_when(
+             pval_adj_unscaled < 0.001 ~ "***",
+             pval_adj_unscaled < 0.01 ~ "**",
+             pval_adj_unscaled < 0.05 ~ "*",
+             TRUE ~ ""
+           ),
+           pval=paste0(round(pval, 3),pval_cat), 
+          perc_imp = round(perc_imp, 2),
+          pval_adj = paste0(round(pval_adj, 3),pval_adj_cat),
+          pval_adj_unscaled = paste0(round(pval_adj_unscaled, 3),pval_adj_cat_unscaled)
+           ) %>%
+    subset(., select = -c(X, cil, ciu)) %>%
+    select(study, visit, contrast, label_f, perc_imp, ATE, ATE_unscaled, pval, pval_adj,pval_adj_unscaled)
+
+  tab = datatable(tab) %>%
+  formatStyle(columns = colnames(tab), fontSize = '11px')
+
+  return(tab)
+  
+}
+
+
+```
+
+
+
+#### Macronutrients - combined arms
+
+```{r, echo=FALSE}
+
+df <- read.csv(here("results/subsetted results/primary_macro.csv"))
+forest_plot(df)
+
+clean_tab(df)
+
+```
+
+#### Macronutrients - stratified arms
+
+```{r, echo=FALSE}
+
+df <- read.csv(here("results/subsetted results/primary_macro_arm_strat.csv"))
+forest_plot(df, arm_strat=T)
+
+clean_tab(df)
+
+```
+
+
+#### Micronutrients - combined arms
+
+Includes fat-soluble vitamins
+
+```{r, echo=FALSE, fig.height=12}
+
+df <- read.csv(here("results/subsetted results/primary_micro.csv"))
+forest_plot(df)
+clean_tab(df)
+
+```
+
+#### Micronutrients - stratified arms
+
+```{r, echo=FALSE, fig.height=12}
+
+df <- read.csv(here("results/subsetted results/primary_micro_arm_strat.csv"))
+forest_plot(df, arm_strat=T)
+clean_tab(df)
+
+```
+
+#### B-vitamins - combined arms
+
+```{r, echo=FALSE, fig.height=12}
+
+df <- read.csv(here("results/subsetted results/primary_bvit.csv"))
+forest_plot(df)
+clean_tab(df)
+
+```
+
+#### B-vitamins - stratified arms
+
+```{r, echo=FALSE, fig.height=12}
+
+df <- read.csv(here("results/subsetted results/primary_bvit_arm_strat.csv"))
+forest_plot(df, arm_strat=T)
+clean_tab(df)
+
+```
+
+
+#### HMOs - combined arms
+
+```{r, echo=FALSE, fig.height=12}
+
+df <- read.csv(here("results/subsetted results/secondary_hmo.csv"))
+forest_plot(df)
+clean_tab(df)
+
+```
+
+
+#### HMOs - stratified arms
+
+```{r, echo=FALSE, fig.height=12}
+
+df <- read.csv(here("results/subsetted results/secondary_hmo_arm_strat.csv"))
+forest_plot(df, arm_strat=T)
+clean_tab(df)
+
+```
+
+#### Bioactives - combined arms
+
+```{r, echo=FALSE, fig.height=12}
+
+df <- read.csv(here("results/subsetted results/secondary_bioactives.csv"))
+forest_plot(df)
+clean_tab(df)
+
+```
+
+
+
+#### Bioactives - stratified arms
+
+```{r, echo=FALSE, fig.height=12}
+
+df <- read.csv(here("results/subsetted results/secondary_bioactives_arm_strat.csv"))
+forest_plot(df, arm_strat=T)
+clean_tab(df)
+
+```
+

@@ -1,4 +1,14 @@
-# Subgroup estimates
+# Subgroup analyses stratified by maternal BMI
+
+This chapter presents subgroup analyses evaluating whether the effects of maternal nutritional interventions on human milk components differed by maternal nutritional status at baseline, operationalized using maternal body mass index (BMI). Maternal BMI was dichotomized a priori into underweight (BMI ≤ 18.5 kg/m²) and normal or overweight (BMI > 18.5 kg/m²) categories, consistent with international definitions and the distribution of BMI across studies.
+
+Analyses were conducted separately within each BMI stratum using the same targeted maximum likelihood estimation (TMLE) framework as in the primary adjusted analyses, including adjustment for prespecified baseline prognostic covariates and standardization of outcomes. Average treatment effects were estimated within strata for primary outcomes (macronutrients, micronutrients, and B-vitamins), secondary outcomes (HMOs and bioactive proteins), and tertiary outcomes (targeted metabolites).
+
+To formally assess effect heterogeneity, interaction p-values were computed for each milk component by comparing stratum-specific treatment effect estimates. Specifically, differences in estimated average treatment effects between BMI strata were evaluated using a Wald-type test based on the difference in estimates scaled by the pooled standard error. These interaction p-values are reported alongside stratum-specific estimates to facilitate assessment of potential effect modification.
+
+Forest plots summarize BMI-stratified treatment effects for selected outcome groups, and accompanying tables report point estimates, confidence intervals, and interaction p-values for all analyzed components. Across studies, visits, and outcome domains, there was no consistent evidence of effect modification by maternal BMI. Where stratum-specific estimates differed in magnitude or direction, confidence intervals were typically wide and interaction tests were not statistically significant after accounting for multiplicity and limited subgroup sample sizes.
+
+These subgroup analyses were conducted as secondary, exploratory assessments of heterogeneity and were not powered to detect modest interaction effects. Consequently, they should be interpreted cautiously. Primary inference regarding intervention effects is based on pooled analyses presented in earlier chapters, with BMI-stratified results serving to assess robustness of findings across maternal nutritional status categories and to inform future hypothesis generation rather than definitive conclusions about effect modification.
 
 
 ```{r, echo=FALSE, out.width="80%", fig.cap="", message=FALSE}

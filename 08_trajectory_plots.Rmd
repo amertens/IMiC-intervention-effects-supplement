@@ -1,0 +1,48 @@
+# Trajectory analyses of human milk component change across lactation
+
+This chapter presents longitudinal trajectory analyses assessing whether maternal nutritional interventions influenced within-individual changes in human milk composition across successive postpartum visits. Unlike the cross-sectional analyses presented elsewhere in the supplement, these analyses focus on changes over time in milk components within the same mother–infant dyads.
+
+For each milk component, trajectories were constructed by transforming the raw concentration measurements into visit-to-visit differences, defined as the difference between a given visit and the immediately preceding visit within each mother. This approach isolates temporal changes in milk composition and evaluates whether the magnitude or direction of those changes differed by intervention arm. Baseline visits without a prior observation were excluded from the trajectory analyses.
+
+Trajectory-specific intervention effects were estimated using targeted maximum likelihood estimation (TMLE), with adjustment for the same prespecified baseline prognostic covariates used in the primary adjusted analyses. Outcomes were standardized prior to estimation to facilitate comparability across components with different measurement scales. Analyses were conducted separately by study and visit interval, and intervention arms were pooled where appropriate to improve statistical efficiency.
+
+Results are summarized using volcano plots for primary outcomes (macronutrients, micronutrients, and B-vitamins), secondary outcomes (HMOs and bioactive proteins), and tertiary outcomes (targeted metabolites). These plots display estimated intervention effects on visit-to-visit changes alongside corresponding statistical significance after false-discovery rate (FDR) correction, highlighting milk components for which supplementation was associated with altered temporal trajectories rather than static differences at a single visit.
+
+Accompanying tables provide full numerical results for trajectory effects, including adjusted estimates, confidence intervals, and multiplicity-adjusted p-values for both pooled intervention contrasts and combined-arm analyses. In addition, trajectory line plots visualize mean milk component concentrations over time by intervention arm for selected outcomes, linking the modeled trajectory effects to observed longitudinal patterns.
+
+These trajectory analyses are exploratory and should be interpreted cautiously. Power to detect trajectory-specific intervention effects is limited by the number of repeated measurements per participant and by sample size within individual studies and visit intervals. Accordingly, primary inference regarding intervention effects is based on cross-sectional adjusted analyses at prespecified visits, with trajectory analyses serving to contextualize those findings and to explore whether supplementation is associated with consistent, delayed, or cumulative changes in milk composition across early lactation.
+
+
+```{r, echo=FALSE, out.width="80%", fig.cap=""}
+library(here)
+
+knitr::include_graphics(here("figures/volcano_plot_traj_primary.png"))
+knitr::include_graphics(here("figures/volcano_plot_traj_secondary.png"))
+knitr::include_graphics(here("figures/volcano_plot_traj_tertiary.png"))
+
+```
+
+
+## Tables
+
+```{r, echo=FALSE, out.width="80%", fig.cap=""}
+
+DT::datatable(readRDS(here("results/adjusted_intervention_effects_traj_results_clean.RDS")) %>% mutate(across(where(is.numeric), ~ round(.x, 2))))
+DT::datatable(readRDS(here("results/adjusted_combined_arms_intervention_effects_traj_results_clean.RDS")) %>% mutate(across(where(is.numeric), ~ round(.x, 2))))
+
+
+```
+
+
+## Trajectory lineplots
+
+The final figures in this chapter visualize longitudinal trajectories of human milk components by intervention arm within each study. Line plots display mean milk component levels across successive visits, aggregated within biologically defined component categories (for example, macronutrients, B-vitamins, HMOs, amino acids, and other metabolite classes), and stratified by randomized intervention arm.
+
+For each study separately, milk component measurements were first aligned to study-specific visit schedules and harmonized across visits. Individual milk components were then grouped into predefined analytical categories. Within each study, visit, and intervention arm, component values were averaged across all available biomarkers within a category to produce category-level summaries. Plots are shown both on a standardized scale (z-scored within study and visit) to facilitate comparison of temporal patterns across categories with different units and variances, and on the original measurement scale to preserve interpretability of absolute concentrations.
+
+```{r, echo=FALSE, out.width="80%", fig.cap=""}
+
+p_s5 <- readRDS(here("figure-data/figure_s4_trajectory_plots.RDS"))
+
+p_s5
+```
