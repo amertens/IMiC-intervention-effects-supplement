@@ -55,23 +55,3 @@ The online supplement is organized into the following chapters:
    Longitudinal analyses of visit-to-visit changes in milk composition.
 
 ---
-
-## Rendering the supplement
-
-### Requirements
-
-- R (≥ 4.1 recommended)
-- R packages:
-  - `bookdown`
-  - `rmarkdown`
-  - `tidyverse`
-  - `DT`
-  - `ggplot2`
-  - `plotly`
-  - `BiocParallel`
-  - Additional packages loaded in `src/0-config.R`
-
-
-
-```r
-bookdown::render_book("index.Rmd", "bookdown::gitbook")
