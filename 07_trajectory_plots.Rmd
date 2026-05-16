@@ -1,0 +1,83 @@
+# Trajectory analyses of human milk component change across lactation
+
+This chapter presents longitudinal trajectory analyses assessing whether maternal nutritional interventions influenced **within-individual changes** in human milk composition across successive postpartum visits. Unlike the cross-sectional analyses presented elsewhere in the supplement, these analyses focus on visit-to-visit change within the same mother–infant dyad.
+
+For each milk component, trajectories were constructed by transforming the raw concentration measurements into **visit-to-visit differences** (current visit minus immediately preceding visit within each mother). Baseline visits without a prior observation were excluded. Trajectory-specific intervention effects were estimated using TMLE with adjustment for the same prespecified baseline prognostic covariates as in the primary adjusted analyses. Outcomes were standardized prior to estimation. Analyses were run separately by study and visit interval; arms were pooled where appropriate to improve precision.
+
+Results are summarized as **volcano plots** for primary, secondary, and tertiary outcomes and as **trajectory line plots** that visualize mean milk component concentrations across visits by intervention arm. The volcano plots in this chapter are rendered as interactive plotly figures in the HTML build; hover any point to read the component name, study, visit interval, ATE, and FDR-adjusted q-value.
+
+> **Interpretation note.** Trajectory analyses are exploratory. Power to detect trajectory-specific effects is limited by the number of repeated measurements per participant and by the per-stratum sample size. Primary inference about intervention effects is based on the cross-sectional adjusted analyses; trajectory analyses contextualize those findings and let readers ask whether supplementation produces consistent, delayed, or cumulative changes across early lactation.
+
+```{r traj-setup, include=FALSE}
+library(tidyverse)
+library(here)
+library(DT)
+library(plotly)
+source(here::here("functions.R"))
+## Reviewer flagged static plot labels as too small. Apply a larger base font
+## for newly built plots and bump default fig dimensions for the trajectory
+## line plots (saved upstream as smaller-font ggplots).
+ggplot2::theme_set(ggplot2::theme_minimal(base_size = 14))
+knitr::opts_chunk$set(fig.width = 12, fig.height = 9, dpi = 110)
+```
+
+## Volcano plots of trajectory effects
+
+```{r traj-volcanoes, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7, results='asis'}
+traj_primary   <- safe_readRDS(here::here("results/adjusted_intervention_effects_traj_results_clean.RDS"),
+                               label = "adjusted_intervention_effects_traj_results_clean.RDS")
+traj_combined  <- safe_readRDS(here::here("results/adjusted_combined_arms_intervention_effects_traj_results_clean.RDS"),
+                               label = "adjusted_combined_arms_intervention_effects_traj_results_clean.RDS")
+
+make_traj_volcano <- function(df, cat_filter, title) {
+  if (is.null(df) || !is.data.frame(df)) return(invisible(NULL))
+  cond <- rep(FALSE, nrow(df))
+  if ("category" %in% names(df))      cond <- cond | df$category %in% cat_filter
+  if ("outcome_group" %in% names(df)) cond <- cond | df$outcome_group %in% cat_filter
+  if ("outcome_class" %in% names(df)) cond <- cond | df$outcome_class %in% cat_filter
+  sub <- df[cond, , drop = FALSE]
+  if (!nrow(sub)) return(invisible(NULL))
+  ## Cap interactive points for tertiary metabolites (thousands of features).
+  volcano_capped(sub, n_show = 1500, title = title)
+}
+
+make_traj_volcano(traj_combined,
+                  cat_filter = c("primary","Primary"),
+                  title = "Trajectory effects — primary outcomes")
+make_traj_volcano(traj_combined,
+                  cat_filter = c("secondary","Secondary"),
+                  title = "Trajectory effects — secondary outcomes")
+make_traj_volcano(traj_combined,
+                  cat_filter = c("tertiary","Tertiary"),
+                  title = "Trajectory effects — tertiary outcomes (targeted metabolites)")
+```
+
+## Searchable tables of trajectory effects
+
+### Per-arm contrasts
+
+```{r traj-table-armstrat, echo=FALSE, message=FALSE, warning=FALSE}
+if (!is.null(traj_primary) && is.data.frame(traj_primary)) {
+  nice_dt(traj_primary %>% dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 3))),
+          caption = "Adjusted trajectory ATEs, per randomized arm vs. control.")
+}
+```
+
+### Combined intervention arms
+
+```{r traj-table-combined, echo=FALSE, message=FALSE, warning=FALSE}
+if (!is.null(traj_combined) && is.data.frame(traj_combined)) {
+  nice_dt(traj_combined %>% dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 3))),
+          caption = "Adjusted trajectory ATEs, pooled intervention arms vs. control.")
+}
+```
+
+## Trajectory line plots by intervention arm
+
+The figures below visualize longitudinal trajectories of human milk components by intervention arm within each study. Line plots display mean milk component levels across successive visits, aggregated within biologically defined component categories (e.g. macronutrients, B-vitamins, HMOs, amino acids, other metabolite classes), stratified by randomized intervention arm. Within each study, component values were averaged across all available biomarkers within a category to produce category-level summaries. Plots are shown both on a standardized scale (z-scored within study × visit) for cross-category comparison, and on the original measurement scale to preserve interpretability of absolute concentrations.
+
+```{r traj-lineplots, echo=FALSE, message=FALSE, warning=FALSE, fig.height=8}
+p_s5 <- safe_readRDS(here::here("figure-data/figure_s4_trajectory_plots.RDS"),
+                     label = "figure_s4_trajectory_plots.RDS")
+show_any(p_s5)
+```

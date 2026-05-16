@@ -1,0 +1,137 @@
+# Adjusted intervention effects on individual milk components
+
+This chapter presents the **primary, covariate-adjusted estimates** of the effects of maternal nutritional interventions on individual human milk components. Results are shown as interactive forest plots and accompanying searchable tables, stratified by study and milk collection visit. Average treatment effects (ATEs) are estimated using targeted maximum likelihood estimation (TMLE) with adjustment for prespecified baseline prognostic factors, and the Benjamini–Hochberg false-discovery rate (FDR) correction is applied within each outcome group × study × visit.
+
+For each modality, results are presented twice: (i) with intervention arms **pooled** (all maternal nutritional intervention arms combined vs. the corresponding control), to maximize precision, and (ii) **stratified by randomized arm**, where each post-randomization nutritional arm is contrasted against the trial's control. In the forest plots, solid filled symbols mark effects that remain significant after FDR correction; open symbols are not significant; intermediate ("Sig before FDR") symbols indicate nominal *p* < 0.05 that did not survive multiplicity correction. Hover over any point in the HTML version to see the exact estimate, 95% CI, and q-value; use the column filters in each table to drill into specific components, studies, or visits.
+
+This chapter corresponds to **Figure 2 and Figure S4** in the manuscript.
+
+> **Looking for absolute concentrations?** The estimates below are on the **standardised (SD) scale** for cross-component comparison. For the same intervention effects expressed in the **native assay units** (g/100 mL for macronutrients; µg/L or mg/L for micronutrients; relative abundance for HMOs), see **§8.2 "Unscaled (natural-unit) intervention effects"** in the *Sensitivity analyses and additional outputs* chapter. The result tables below also include an `ATE_unscaled` column reporting the per-component natural-unit estimate alongside the standardised one. Unadjusted estimates are in **§8.1** for sensitivity.
+
+```{r effects-setup, include=FALSE}
+library(tidyverse)
+library(here)
+library(DT)
+library(plotly)
+source(here::here("functions.R"))
+
+## Render the forest plot and the searchable estimates table for one CSV.
+## Returns an htmltools tagList so that htmlwidgets (plotly and DT) are picked
+## up by knit_print at the chunk top level — print() of widgets from inside
+## a function does not trigger the htmlwidget rendering path.
+show_forest_and_table <- function(csv_path, arm_strat = FALSE, title = NULL) {
+  df <- safe_read_csv(here::here(csv_path))
+  if (is.null(df) || !nrow(df)) return(htmltools::tagList())
+  htmltools::tagList(
+    forest_plot(df, arm_strat = arm_strat,
+                title = title %||% "Forest plot of adjusted ATEs"),
+    clean_tab(df)
+  )
+}
+```
+
+## Macronutrients
+
+> Total protein, fat, and digestible carbohydrate (primarily lactose), measured in g/100 mL.
+
+### Combined intervention arms
+
+```{r effects-macro-combined, echo=FALSE, message=FALSE, warning=FALSE, fig.height=8}
+show_forest_and_table("results/subsetted results/primary_macro.csv",
+                      title = "Macronutrients — pooled intervention vs. control")
+```
+
+### Stratified by randomized arm
+
+```{r effects-macro-strat, echo=FALSE, message=FALSE, warning=FALSE, fig.height=8}
+show_forest_and_table("results/subsetted results/primary_macro_arm_strat.csv",
+                      arm_strat = TRUE,
+                      title = "Macronutrients — per-arm contrasts vs. control")
+```
+
+## Micronutrients (including fat-soluble vitamins)
+
+### Combined intervention arms
+
+```{r effects-micro-combined, echo=FALSE, message=FALSE, warning=FALSE, fig.height=12}
+show_forest_and_table("results/subsetted results/primary_micro.csv",
+                      title = "Micronutrients — pooled intervention vs. control")
+```
+
+### Stratified by randomized arm
+
+```{r effects-micro-strat, echo=FALSE, message=FALSE, warning=FALSE, fig.height=12}
+show_forest_and_table("results/subsetted results/primary_micro_arm_strat.csv",
+                      arm_strat = TRUE,
+                      title = "Micronutrients — per-arm contrasts vs. control")
+```
+
+## B-vitamins
+
+### Combined intervention arms
+
+```{r effects-bvit-combined, echo=FALSE, message=FALSE, warning=FALSE, fig.height=12}
+show_forest_and_table("results/subsetted results/primary_bvit.csv",
+                      title = "B-vitamins — pooled intervention vs. control")
+```
+
+### Stratified by randomized arm
+
+```{r effects-bvit-strat, echo=FALSE, message=FALSE, warning=FALSE, fig.height=12}
+show_forest_and_table("results/subsetted results/primary_bvit_arm_strat.csv",
+                      arm_strat = TRUE,
+                      title = "B-vitamins — per-arm contrasts vs. control")
+```
+
+## Human milk oligosaccharides (HMOs)
+
+### Combined intervention arms
+
+```{r effects-hmo-combined, echo=FALSE, message=FALSE, warning=FALSE, fig.height=12}
+show_forest_and_table("results/subsetted results/secondary_hmo.csv",
+                      title = "HMOs — pooled intervention vs. control")
+```
+
+### Stratified by randomized arm
+
+```{r effects-hmo-strat, echo=FALSE, message=FALSE, warning=FALSE, fig.height=12}
+show_forest_and_table("results/subsetted results/secondary_hmo_arm_strat.csv",
+                      arm_strat = TRUE,
+                      title = "HMOs — per-arm contrasts vs. control")
+```
+
+## Bioactive proteins
+
+### Combined intervention arms
+
+```{r effects-bio-combined, echo=FALSE, message=FALSE, warning=FALSE, fig.height=12}
+show_forest_and_table("results/subsetted results/secondary_bioactives.csv",
+                      title = "Bioactive proteins — pooled intervention vs. control")
+```
+
+### Stratified by randomized arm
+
+```{r effects-bio-strat, echo=FALSE, message=FALSE, warning=FALSE, fig.height=12}
+show_forest_and_table("results/subsetted results/secondary_bioactives_arm_strat.csv",
+                      arm_strat = TRUE,
+                      title = "Bioactive proteins — per-arm contrasts vs. control")
+```
+
+## Targeted metabolites (tertiary outcomes)
+
+The targeted-metabolomics panel (Biocrates MxP Quant 500) is large; pathway-level views in the *Pathway enrichment* chapter and the trajectory volcano plots in the *Trajectory analyses* chapter provide higher-level summaries. The forest plots below show the same metabolites as a long, hover-searchable forest, primarily useful for filtering to a specific compound class via the table search.
+
+### Combined intervention arms
+
+```{r effects-tertiary-combined, echo=FALSE, message=FALSE, warning=FALSE, fig.height=14}
+show_forest_and_table("results/subsetted results/tertiary_targeted_metabolomics.csv",
+                      title = "Targeted metabolites — pooled intervention vs. control")
+```
+
+### Stratified by randomized arm
+
+```{r effects-tertiary-strat, echo=FALSE, message=FALSE, warning=FALSE, fig.height=14}
+show_forest_and_table("results/subsetted results/tertiary_targeted_metabolomics_arm_strat.csv",
+                      arm_strat = TRUE,
+                      title = "Targeted metabolites — per-arm contrasts vs. control")
+```

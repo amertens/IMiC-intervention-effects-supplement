@@ -1,0 +1,417 @@
+# Sensitivity analyses and additional outputs
+
+This chapter collects the robustness analyses and supplementary outputs referenced from the manuscript. It is organised by analysis class, with each subsection answering a distinct "would the headline conclusions still hold?" question against the primary, adjusted, standardised TMLE analyses presented earlier:
+
+- **8.1 Unadjusted intervention effects** — same TMLE framework, no covariate adjustment. Detects whether confounder adjustment is doing meaningful work in the primary analyses.
+- **8.2 Unscaled (natural-unit) intervention effects** — adjusted TMLE ATEs in the native assay units (e.g. g/100 mL, µg/L) so readers can interpret effect magnitudes clinically.
+- **8.3 Fat-adjusted triglyceride effects (Figure S5)** — disentangles changes in triglyceride composition from transient changes in total milk fat.
+- **8.4 SuperLearner CV-AUC treatment-arm prediction** — multivariate test of whether the *joint* distribution of HM components carries intervention signal beyond per-component testing.
+- **8.5 PCA-based composite outcome scores** — ATEs on the first principal component of each modality, testing whether each modality moved as a whole.
+- **8.6 Pathway enrichment analyses** — biological interpretation of the high-dimensional metabolomic and proteomic signals (Tables S2, S3, S5, S6 of the printed Word supplement).
+- **8.7 Infant growth analyses (Figure S1)** — intervention effects on infant anthropometry within the IMiC subsamples, as a within-trial sanity check.
+
+Primary inference about the presence and consistency of intervention effects rests on the adjusted analyses in §5. The analyses in this chapter contextualise those findings rather than replace them.
+
+```{r sens-setup, include=FALSE}
+library(tidyverse)
+library(here)
+library(DT)
+library(plotly)
+source(here::here("functions.R"))
+
+## Apply a slightly larger base font to all static ggplots in this chapter
+## (reviewer flagged static plot labels as too small to read).
+ggplot2::theme_set(ggplot2::theme_minimal(base_size = 14))
+
+metadata_loaded <- safe_load(here::here("metadata/milk_component.Rdata"))
+```
+
+## Unadjusted intervention effects
+
+Unadjusted estimates use the same TMLE framework but omit covariate adjustment. Differences between adjusted and unadjusted estimates may reflect confounding by baseline maternal, infant, or household characteristics, differences in sampling structure across studies and visits, or chance. For randomised comparisons within a single trial, large divergences would be unexpected and would warrant scrutiny of the adjustment set; readers should compare these forest plots side-by-side with those in §5.
+
+```{r sens-unadjusted, echo=FALSE, message=FALSE, warning=FALSE, fig.height=10}
+res_unadj <- safe_readRDS(here::here("results/unadjusted_intervention_effects_results_clean.RDS"),
+                          label = "unadjusted_intervention_effects_results_clean.RDS")
+if (!is.null(res_unadj) && isTRUE(metadata_loaded)) {
+  res_unadj <- res_unadj %>% dplyr::filter(measure == "ATE") %>%
+    dplyr::mutate(biomarker = stringr::str_to_lower(biomarker))
+  groups <- list(
+    "Macronutrients"      = c(all_milk_components$macro, "total carbohydrate"),
+    "Micronutrients"      = all_milk_components$micro,
+    "B-vitamins"          = all_milk_components$bvit,
+    "HMOs"                = all_milk_components$hmo,
+    "Bioactive proteins"  = all_milk_components$protein
+  )
+  out <- htmltools::tagList()
+  for (g in names(groups)) {
+    sub <- res_unadj %>% dplyr::filter(biomarker %in% groups[[g]])
+    if (!nrow(sub)) next
+    out <- htmltools::tagList(
+      out,
+      htmltools::h3(g),
+      forest_plot(sub, title = paste0("Unadjusted ATEs — ", g)),
+      clean_tab(sub)
+    )
+  }
+  out
+}
+```
+
+## Unscaled (natural-unit) intervention effects
+
+Unscaled estimates are adjusted TMLE ATEs reported on the **native assay scale** of each milk component (for example, g/100 mL for macronutrients; µg/L or mg/L for micronutrients; relative abundance for HMOs). The standardised, SD-unit estimates in §5 are designed for cross-component comparison; the natural-unit estimates here translate them into biologically meaningful units, so readers can ask, for example, "how much did B3 actually go up, in mg/L?" rather than only "by how many SD units did B3 go up?". This section is the **absolute-concentration view** of the §5 results.
+
+```{r sens-unscaled, echo=FALSE, message=FALSE, warning=FALSE, fig.height=10}
+res_unscaled <- safe_readRDS(here::here("results/adjusted_combined_arms_intervention_effects_unscaled_results_clean.RDS"),
+                             label = "adjusted_combined_arms_intervention_effects_unscaled_results_clean.RDS")
+if (!is.null(res_unscaled) && isTRUE(metadata_loaded)) {
+  res_unscaled <- res_unscaled %>% dplyr::filter(measure == "ATE") %>%
+    dplyr::mutate(biomarker = stringr::str_to_lower(biomarker))
+  groups <- list(
+    "Macronutrients (native units)"     = c(all_milk_components$macro, "total carbohydrate"),
+    "Micronutrients (native units)"     = all_milk_components$micro,
+    "B-vitamins (native units)"         = all_milk_components$bvit,
+    "HMOs (native units)"               = all_milk_components$hmo,
+    "Bioactive proteins (native units)" = all_milk_components$protein
+  )
+  out <- htmltools::tagList()
+  for (g in names(groups)) {
+    sub <- res_unscaled %>% dplyr::filter(biomarker %in% groups[[g]])
+    if (!nrow(sub)) next
+    out <- htmltools::tagList(
+      out,
+      htmltools::h3(g),
+      forest_plot(sub, title = g),
+      clean_tab(sub)
+    )
+  }
+  out
+}
+```
+
+## Fat-adjusted triglyceride effects (Figure S5)
+
+The largest tertiary-outcome signal in the manuscript is on **triglycerides (TGs)**: the same TGs were *increased* at 14–21 days and 3–4 months in MISAME-III but *decreased* at the 1–2 month visit. This temporal inversion disappears when concentrations are expressed as a fraction of total fat content — implying that the apparent 1–2 month decrease reflects the transient reduction in total fat at that visit rather than a compositional change in the TG pool. The plot below reproduces Figure S5 (treatment-specific TG means with and without fat adjustment), and the forest plot beneath shows the fat-adjusted ATEs that drive that interpretation.
+
+> **Milk-volume caveat.** Total milk *output* was not measured in any of the three IMiC trials. The transient reduction in milk fat concentration observed at 1–2 months in MISAME-III may therefore reflect a dilution effect from increased milk volume in the supplemented arm rather than a true reduction in fat synthesis or secretion. Concentration-based effects on macronutrients (and any fat-dependent metabolite) should be interpreted with this in mind: without a denominator on total daily output, concentration changes cannot be unambiguously translated into changes in infant nutrient delivery. The fat-adjusted analysis below removes one form of this confounding (proportional re-allocation across TGs) but cannot address the absent volume term.
+
+```{r sens-fat-tg-figure, echo=FALSE, message=FALSE, warning=FALSE, fig.height=8}
+p_s5 <- safe_readRDS(here::here("figure-data/figure_s7_tri_pattern.RDS"),
+                     label = "figure_s7_tri_pattern.RDS")
+show_any(p_s5)
+```
+
+```{r sens-fat-tg-forest, echo=FALSE, message=FALSE, warning=FALSE, fig.height=10}
+p_s6 <- safe_readRDS(here::here("figure-data/figure_sX_forest_plot_fat_adjusted.RDS"),
+                     label = "figure_sX_forest_plot_fat_adjusted.RDS")
+show_any(p_s6)
+```
+
+## SuperLearner multi-class treatment-arm prediction
+
+The Methods describe a **SuperLearner ensemble** trained to predict multi-class randomised treatment-arm membership from the full set of measured primary, secondary, and tertiary HM outcomes within each study × visit. Cross-validated AUC (CV-AUC) above chance indicates that the joint distribution of HM components contains intervention signal beyond what any single component carries. Variable-importance (VIMP) measures identify the components carrying the most predictive signal.
+
+This is a multivariate counterpart to the univariate forest plots in §5: it asks whether the per-component signals, taken together, predict arm assignment, and which components drive prediction.
+
+```{r sens-sl-vimp, echo=FALSE, message=FALSE, warning=FALSE, fig.height=8}
+sl <- safe_readRDS(here::here("figure-data/SL_vim_plot_data.RDS"),
+                   label = "SL_vim_plot_data.RDS")
+if (!is.null(sl) && is.data.frame(sl)) {
+  sl <- sl %>% dplyr::mutate(
+    tooltip = paste0("Study: ", studyid,
+                     "<br>Visit: ", visit,
+                     "<br>Arm: ", arm,
+                     "<br>Group: ", group,
+                     "<br>N: ", N_obs,
+                     "<br>CV-AUC: ", round(cvAUC, 3),
+                     " (", round(ci.lb, 3), ", ", round(ci.ub, 3), ")")
+  )
+  p_sl <- ggplot2::ggplot(sl,
+                          ggplot2::aes(x = cvAUC,
+                                       y = stats::reorder(paste(studyid, visit_f, arm_f, sep=" | "), cvAUC),
+                                       color = group, text = tooltip)) +
+    ggplot2::geom_point(size = 2) +
+    ggplot2::geom_errorbar(ggplot2::aes(xmin = ci.lb, xmax = ci.ub),
+                           width = 0.2, orientation = "y") +
+    ggplot2::geom_vline(xintercept = 0.5, linetype = "dashed", color = "grey50") +
+    ggplot2::scale_color_manual(values = tableau10) +
+    ggplot2::labs(x = "Cross-validated AUC",
+                  y = NULL,
+                  color = "Outcome group",
+                  title = "SuperLearner multi-class treatment-arm prediction (CV-AUC)")
+  out_sl <- if (knitr::is_html_output() && requireNamespace("plotly", quietly = TRUE)) {
+    conv <- try(plotly::ggplotly(p_sl, tooltip = "text"), silent = TRUE)
+    if (!inherits(conv, "try-error")) conv else p_sl
+  } else p_sl
+  htmltools::tagList(out_sl,
+    nice_dt(sl %>% dplyr::select(studyid, visit, arm, group, N_obs, cvAUC, ci.lb, ci.ub) %>%
+              dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 3))),
+            caption = "SuperLearner CV-AUC for multi-class treatment-arm prediction."))
+}
+```
+
+### Per-study variable importance
+
+The pre-built per-study variable-importance plots (one per IMiC trial) are reproduced below for completeness.
+
+```{r sens-sl-vimp-perstudy, echo=FALSE, message=FALSE, warning=FALSE, fig.height=8}
+sl_plots <- safe_readRDS(here::here("results/SLvim_lab_plots.RDS"),
+                         label = "SLvim_lab_plots.RDS")
+show_any(sl_plots)
+```
+
+## PCA-based composite outcome scores
+
+ATEs were also estimated for the **first principal component** of each modality (macronutrients, B-vitamins, HMOs, bioactives, targeted metabolites). PCA-based composites collapse correlated within-modality components into a single scalar that captures the dominant axis of variation, and are sensitive to coordinated multivariate shifts that may not survive per-component FDR. They serve as a single-summary check on whether each modality moved as a whole.
+
+```{r sens-pca, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7}
+pca <- safe_readRDS(here::here("figure-data/pca_intervention_effects_results.RDS"),
+                    label = "pca_intervention_effects_results.RDS")
+if (!is.null(pca) && is.data.frame(pca)) {
+  pca <- pca %>% dplyr::filter(measure == "ATE" | is.na(measure)) %>%
+    dplyr::mutate(
+      sigFDR = factor(sigFDR, levels = c(0, 1)),
+      tooltip = paste0(label_f,
+                       "<br>", studytime, " | ", contrast,
+                       "<br>ATE: ", round(est, 3),
+                       " (", round(cil, 3), ", ", round(ciu, 3), ")",
+                       "<br>q: ", signif(chi_pval_adj, 3))
+    )
+  p_pca <- ggplot2::ggplot(pca,
+                           ggplot2::aes(y = stats::reorder(label_f, est), x = est,
+                                        color = contrast, shape = sigFDR, text = tooltip)) +
+    ggplot2::geom_point(position = ggplot2::position_dodge(width = 0.5), size = 2) +
+    ggplot2::geom_errorbar(ggplot2::aes(xmin = cil, xmax = ciu), width = 0.2,
+                           orientation = "y",
+                           position = ggplot2::position_dodge(width = 0.5)) +
+    ggplot2::geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
+    ggplot2::scale_shape_manual(values = c(1, 19),
+                                labels = c("Not significant","Significant (FDR)")) +
+    ggplot2::scale_color_manual(values = tableau10) +
+    ggplot2::facet_wrap(~ studytime) +
+    ggplot2::labs(y = "Outcome-group PC1", x = "ATE on standardized PC1",
+                  color = "Contrast", shape = NULL,
+                  title = "Adjusted ATEs on outcome-group PC1 composites") +
+    ggplot2::theme(legend.position = "bottom")
+  htmltools::tagList(
+    if (knitr::is_html_output() && requireNamespace("plotly", quietly = TRUE)) {
+      conv <- try(plotly::ggplotly(p_pca, tooltip = "text"), silent = TRUE)
+      if (!inherits(conv, "try-error")) conv else p_pca
+    } else p_pca,
+    nice_dt(pca %>% dplyr::select(studytime, contrast, outcome_group, label_f,
+                                  est, cil, ciu, chi_pval, chi_pval_adj, sig, sigFDR) %>%
+              dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 3))),
+            caption = "PCA-based composite outcome ATEs (pooled intervention vs. control).")
+  )
+}
+```
+
+### Arm-stratified PCA composites
+
+```{r sens-pca-strat, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7}
+pca_strat <- safe_readRDS(here::here("results/pca_intervention_effects_results_arm_strat.RDS"),
+                          label = "pca_intervention_effects_results_arm_strat.RDS")
+if (!is.null(pca_strat) && is.data.frame(pca_strat)) {
+  pca_strat <- pca_strat %>% dplyr::filter(measure == "ATE" | is.na(measure)) %>%
+    dplyr::mutate(
+      sigFDR  = factor(sigFDR, levels = c(0, 1)),
+      tooltip = paste0(label_f,
+                       "<br>", studytime, " | ", contrast,
+                       "<br>ATE: ", round(est, 3),
+                       " (", round(cil, 3), ", ", round(ciu, 3), ")",
+                       "<br>q: ", signif(chi_pval_adj, 3))
+    )
+  p_pca_strat <- ggplot2::ggplot(pca_strat,
+                                 ggplot2::aes(y = stats::reorder(label_f, est), x = est,
+                                              color = contrast, shape = sigFDR, text = tooltip)) +
+    ggplot2::geom_point(position = ggplot2::position_dodge(width = 0.5), size = 2) +
+    ggplot2::geom_errorbar(ggplot2::aes(xmin = cil, xmax = ciu), width = 0.2,
+                           orientation = "y",
+                           position = ggplot2::position_dodge(width = 0.5)) +
+    ggplot2::geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
+    ggplot2::scale_shape_manual(values = c(1, 19),
+                                labels = c("Not significant","Significant (FDR)")) +
+    ggplot2::scale_color_manual(values = tableau10) +
+    ggplot2::facet_wrap(~ studytime) +
+    ggplot2::labs(y = "Outcome-group PC1", x = "ATE on standardized PC1",
+                  color = "Contrast", shape = NULL,
+                  title = "Arm-stratified PCA composite ATEs (per arm vs. control)") +
+    ggplot2::theme(legend.position = "bottom")
+  htmltools::tagList(
+    if (knitr::is_html_output() && requireNamespace("plotly", quietly = TRUE)) {
+      conv <- try(plotly::ggplotly(p_pca_strat, tooltip = "text"), silent = TRUE)
+      if (!inherits(conv, "try-error")) conv else p_pca_strat
+    } else p_pca_strat,
+    nice_dt(pca_strat %>% dplyr::select(studytime, contrast, outcome_group, label_f,
+                                        est, cil, ciu, chi_pval, chi_pval_adj, sig, sigFDR) %>%
+              dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 3))),
+            caption = "Arm-stratified PCA-based composite outcome ATEs.")
+  )
+}
+```
+
+## Pathway enrichment analyses
+
+Four complementary enrichment analyses convert the high-dimensional metabolomic and proteomic feature-level signals (per-feature volcano plots in §4) into **biologically interpretable pathway summaries**. They back **Tables S2, S3, S5, and S6** of the printed Word supplement:
+
+1. **MetaboAnalyst over-representation analysis (ORA)** of untargeted-metabolomics feature lists (positive and negative ionization modes), stratified by study, timepoint, and direction of effect.
+2. **Mummichog functional enrichment** of the same untargeted-metabolomics feature lists, run with mass-accuracy tolerance of 10 ppm against the `human_mfn` reference, stratified by study, timepoint, ionisation mode, and direction.
+3. **Gene Ontology Biological Process (GO BP) enrichment** of intervention-associated untargeted proteomic features (UniProt IDs → Entrez IDs → `enrichGO` against the full proteomics universe as background).
+4. **Compositional fatty-acid enrichment** of intervention-responsive triglycerides — testing whether specific fatty acids are over- or under-represented among TGs that respond to supplementation, using parsed sn-1/sn-2/sn-3 annotations from the Biocrates MxP Quant 500 panel.
+
+"Signed enrichment" plots place upregulated pathways on the positive x-axis and downregulated pathways on the negative x-axis to preserve directionality.
+
+> **Proteomic-interpretation caveat (GO BP).** Milk proteomic features draw from a heterogeneous mixture of cellular debris (mammary epithelial cells, leukocytes, exosomes) and secreted proteins. Enrichment of GO terms such as "telomere organisation and maintenance" or "negative regulation of peptidase activity" therefore indicates a **signature consistent with** changes in cellular composition or proteolytic balance, not a demonstration that the named biological process is being executed in milk. These signatures should be read as hypothesis-generating; mechanistic claims require functional assays (e.g. antimicrobial / antioxidant activity, paired serum measurements) that were not part of the IMiC protocol.
+
+```{r path-setup, include=FALSE}
+signed_enrichment_plot <- function(df, title = "Pathway enrichment",
+                                   x_lab = "Signed enrichment ratio",
+                                   pathway_col = NULL) {
+  if (is.null(df) || !is.data.frame(df) || !nrow(df)) {
+    cat("*No enrichment results to display.*"); return(invisible(NULL))
+  }
+  if (is.null(pathway_col)) {
+    pathway_col <- intersect(c("Pathway","pathway","term","Description"), names(df))[1]
+  }
+  ratio_col <- intersect(c("signed_enrichment","signed_ratio","signed_fold","Impact"), names(df))[1]
+  p_col     <- intersect(c("p_value","P.Value","p","Pvalue","raw_p","pval"), names(df))[1]
+  if (any(vapply(list(pathway_col, ratio_col, p_col), is.null, logical(1)))) {
+    cat("*Enrichment table missing required columns; showing raw table.*"); print(nice_dt(df)); return(invisible(NULL))
+  }
+  df$.neglog10p <- -log10(pmax(df[[p_col]], .Machine$double.eps))
+  df$.label     <- df[[pathway_col]]
+  df$.tooltip   <- paste0(df$.label,
+                          if ("Study" %in% names(df)) paste0("<br>Study: ", df$Study) else "",
+                          if ("study" %in% names(df)) paste0("<br>Study: ", df$study) else "",
+                          if ("Time.Point" %in% names(df)) paste0("<br>Visit: ", df$Time.Point) else "",
+                          "<br>signed enrichment: ", signif(df[[ratio_col]], 3),
+                          "<br>p: ", signif(df[[p_col]], 3))
+  p <- ggplot2::ggplot(df,
+                       ggplot2::aes(x = .data[[ratio_col]], y = .neglog10p,
+                                    color = if ("Study" %in% names(df)) Study else if ("study" %in% names(df)) study else NULL,
+                                    text = .tooltip)) +
+    ggplot2::geom_point(alpha = 0.75, size = 1.6) +
+    ggplot2::geom_hline(yintercept = -log10(0.05), linetype = "dotted", color = "grey50") +
+    ggplot2::geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
+    ggplot2::scale_color_manual(values = tableau10) +
+    ggplot2::labs(title = title, x = x_lab, y = "-log10(p)", color = "Study")
+  if (knitr::is_html_output() && requireNamespace("plotly", quietly = TRUE)) {
+    conv <- try(plotly::ggplotly(p, tooltip = "text"), silent = TRUE)
+    if (!inherits(conv, "try-error")) return(conv)
+  }
+  p
+}
+```
+
+### Untargeted metabolomics — MetaboAnalyst ORA (Table S2)
+
+```{r path-msea, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7}
+msea <- safe_readRDS(here::here("results/pathway_enrichment_msea.RDS"),
+                     label = "pathway_enrichment_msea.RDS")
+print(signed_enrichment_plot(msea, title = "MetaboAnalyst ORA — signed enrichment"))
+if (is.data.frame(msea)) print(nice_dt(msea %>% dplyr::mutate(dplyr::across(where(is.numeric), ~ signif(.x, 3))),
+                                       caption = "Full MetaboAnalyst ORA results, all studies × visits × directions."))
+```
+
+### Untargeted metabolomics — Mummichog functional enrichment (Table S5)
+
+```{r path-mummichog, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7}
+mum <- safe_readRDS(here::here("results/pathway_enrichment_mummichog.RDS"),
+                    label = "pathway_enrichment_mummichog.RDS")
+print(signed_enrichment_plot(mum, title = "Mummichog — signed pathway coverage"))
+if (is.data.frame(mum)) print(nice_dt(mum %>% dplyr::mutate(dplyr::across(where(is.numeric), ~ signif(.x, 3))),
+                                      caption = "Mummichog functional enrichment results, all study × timepoint × ionization × direction strata."))
+```
+
+### Untargeted proteomics — GO Biological Process enrichment (Table S6)
+
+```{r path-go, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7}
+go <- safe_readRDS(here::here("results/pathway_enrichment_go_bp.RDS"),
+                   label = "pathway_enrichment_go_bp.RDS")
+print(signed_enrichment_plot(go, title = "GO Biological Process — signed fold enrichment"))
+if (is.data.frame(go)) print(nice_dt(go %>% dplyr::mutate(dplyr::across(where(is.numeric), ~ signif(.x, 3))),
+                                     caption = "GO Biological Process enrichment for intervention-associated proteomic features (Word supplement Table S6)."))
+```
+
+### Compositional fatty-acid enrichment of intervention-responsive triglycerides (Table S3)
+
+For each study × timepoint × contrast stratum, fatty acids represented across sn-1/sn-2/sn-3 positions of significantly regulated TGs are compared with those of non-significant TGs using a Wilcoxon rank-sum test on within-TG proportional representation; p-values are FDR-corrected. **This is not an absolute fatty-acid concentration analysis** — it identifies fatty acids *compositionally enriched or depleted* within TG species responsive to supplementation. Positive mean differences in upregulated TGs indicate fatty acids preferentially represented in TGs increased by intervention; negative differences in downregulated TGs indicate fatty acids preferentially lost from TGs reduced by intervention.
+
+```{r path-fa, echo=FALSE, message=FALSE, warning=FALSE}
+fa <- safe_readRDS(here::here("results/fatty_acid_composition_enrichment.RDS"),
+                   label = "fatty_acid_composition_enrichment.RDS")
+if (is.data.frame(fa)) print(nice_dt(fa %>% dplyr::mutate(dplyr::across(where(is.numeric), ~ signif(.x, 3))),
+                                     caption = "Compositional enrichment of fatty acids within intervention-responsive triglycerides."))
+```
+
+### Network views of pathway and feature relationships
+
+```{r path-networks, echo=FALSE, message=FALSE, warning=FALSE, fig.height=8}
+net_primary <- safe_readRDS(here::here("figure-data/figures8_network_plots_primary.RDS"),
+                            label = "figures8_network_plots_primary.RDS")
+net_metab   <- safe_readRDS(here::here("figure-data/figures8_network_plots_metabolomics.RDS"),
+                            label = "figures8_network_plots_metabolomics.RDS")
+show_any(net_primary)
+show_any(net_metab)
+```
+
+## Infant growth analyses (Figure S1)
+
+This section presents the effects of maternal nutritional supplementation on infant anthropometric outcomes within the IMiC subsamples of each trial: length-for-age z-score (LAZ), weight-for-length z-score (WLZ), weight-for-age z-score (WAZ), head-circumference-for-age z-score (HCAZ), and mid-upper-arm-circumference-for-age z-score (MUACZ). Estimates use the same covariate-adjusted TMLE framework as the primary milk-component analyses. These IMiC-subsample growth analyses are within-trial sanity checks: they document the plausibility of the IMiC subsample as a representative window onto the parent trial, and situate the manuscript's HM-composition findings against the corresponding infant phenotype.
+
+> **Negative-control note (ELICIT).** Infant azithromycin and infant nicotinamide were administered after 6 months of age. Their effects on the 1-month and 5-month HM-collection visits are null by design and serve as a within-trial negative control on the analytic pipeline. Non-null estimates in those contrasts should be read as noise.
+
+```{r growth-forest, echo=FALSE, message=FALSE, warning=FALSE, fig.height=8}
+g <- safe_readRDS(here::here("figure-data/primary_growth_plot.RDS"),
+                  label = "primary_growth_plot.RDS")
+if (!is.null(g) && is.data.frame(g)) {
+  g <- g %>% dplyr::mutate(
+    Measure = factor(Measure),
+    contrast = factor(contrast),
+    study   = factor(study, levels = c("Misame","MISAME-3","Mumta-LW","Vital","Elicit","ELICIT")) %>%
+               droplevels(),
+    sigFDR  = factor(sigFDR, levels = c(0, 1)),
+    sig     = factor(sig, levels = c(0, 1)),
+    tooltip = paste0(Measure, " @ ", age, " mo.",
+                     "<br>Study: ", study,
+                     "<br>Contrast: ", contrast,
+                     "<br>ATE: ", round(est, 3),
+                     " (", round(cil, 3), ", ", round(ciu, 3), ")",
+                     "<br>q: ", signif(chi_pval_adj, 3))
+  )
+  p <- ggplot2::ggplot(g,
+                       ggplot2::aes(x = factor(age), y = est, color = contrast,
+                                    shape = sigFDR, text = tooltip)) +
+    ggplot2::geom_point(position = ggplot2::position_dodge(width = 0.6), size = 2) +
+    ggplot2::geom_errorbar(ggplot2::aes(ymin = cil, ymax = ciu),
+                           width = 0.2,
+                           position = ggplot2::position_dodge(width = 0.6)) +
+    ggplot2::geom_hline(yintercept = 0, linetype = "dashed", color = "grey50") +
+    ggplot2::scale_shape_manual(values = c(1, 19),
+                                labels = c("Not significant","Significant (FDR)")) +
+    ggplot2::scale_color_manual(values = tableau10) +
+    ggplot2::facet_grid(Measure ~ study, scales = "free") +
+    ggplot2::labs(x = "Infant age at measurement (months)",
+                  y = "Adjusted ATE on z-score",
+                  color = "Contrast", shape = NULL,
+                  title = "Intervention effects on infant anthropometry (IMiC subsamples)") +
+    ggplot2::theme(legend.position = "bottom")
+  out <- if (knitr::is_html_output() && requireNamespace("plotly", quietly = TRUE)) {
+    conv <- try(plotly::ggplotly(p, tooltip = "text"), silent = TRUE)
+    if (!inherits(conv, "try-error")) conv else p
+  } else p
+  out
+}
+```
+
+```{r growth-table, echo=FALSE, message=FALSE, warning=FALSE}
+if (!is.null(g) && is.data.frame(g)) {
+  out <- g %>%
+    dplyr::select(study, age, Measure, contrast, est, cil, ciu,
+                  chi_pval, chi_pval_adj, sig, sigFDR) %>%
+    dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 3)))
+  nice_dt(out,
+          caption = "Adjusted ATEs on infant anthropometric z-scores within the IMiC subsamples (Figure S1).")
+}
+```

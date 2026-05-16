@@ -1,0 +1,113 @@
+# Outcomes and human milk component distributions
+
+This section serves two purposes. The first half is the **outcomes list** referenced from the manuscript Methods (*"A list of all outcomes and descriptions is available in the Online Appendix (Section 2)"*): a searchable inventory of every milk component analysed in the IMiC harmonised dataset, grouped by prespecified outcome class and annotated with per-study availability. The second half (from *MILQ-overlay density plots* onward) is the descriptive **distribution** of each component, stratified by study, visit, and randomised intervention arm, and corresponds to **Figure S2** of the printed Word supplement.
+
+Together these two views give the reader the full per-component context — *what was measured, where, and what the raw distribution looks like* — before encountering the modelled intervention-effect estimates in the subsequent sections.
+
+```{r distributions-setup, include=FALSE}
+library(tidyverse)
+library(here)
+library(DT)
+library(plotly)
+source(here::here("functions.R"))
+safe_load(here::here("metadata/milk_component.Rdata"))
+## Reviewer flagged static plot labels as too small. Apply a larger base font
+## to all new ggplots in this chapter and bump default fig dimensions.
+ggplot2::theme_set(ggplot2::theme_minimal(base_size = 14))
+knitr::opts_chunk$set(fig.width = 14, fig.height = 11, dpi = 110)
+```
+
+## Outcomes list
+
+The table below enumerates every milk component analysed in this supplement, grouped by the prespecified outcome class used throughout the manuscript (primary: macronutrients, micronutrients, B-vitamins; secondary: HMOs, bioactive proteins; tertiary: targeted metabolites from the Biocrates MxP Quant 500 panel). Per-study availability indicators show in which of the three IMiC trials each component was measured.
+
+Use the column filters at the top of the table to look up a specific component, or search by name in the upper-right.
+
+```{r outcomes-dictionary, echo=FALSE}
+build_dict <- function() {
+  if (!exists("all_milk_components")) {
+    cat("*`all_milk_components` was not available — metadata file missing or out of sync.*")
+    return(invisible(NULL))
+  }
+  groups <- list(
+    "Macronutrients (primary)"                = all_milk_components$macro,
+    "Micronutrients (primary)"                = all_milk_components$micro,
+    "B-vitamins (primary)"                    = all_milk_components$bvit,
+    "Human milk oligosaccharides (secondary)" = all_milk_components$hmo,
+    "Bioactive proteins (secondary)"          = all_milk_components$protein,
+    "Targeted metabolites (tertiary)"         = all_milk_components$metabolomics
+  )
+  per_study <- list(
+    "MISAME-III" = if (exists("misame_milk_components")) misame_milk_components else NULL,
+    "Mumta-LW"   = if (exists("vital_milk_components"))  vital_milk_components  else NULL,
+    "ELICIT"     = if (exists("elicit_milk_components")) elicit_milk_components else NULL
+  )
+  pooled <- dplyr::bind_rows(lapply(names(groups), function(g) {
+    tibble::tibble(
+      outcome_group = g,
+      component     = unlist(groups[[g]], use.names = FALSE)
+    )
+  }))
+  for (s in names(per_study)) {
+    if (is.null(per_study[[s]])) next
+    in_s <- unlist(per_study[[s]], use.names = FALSE)
+    pooled[[paste0("measured_in_", s)]] <- pooled$component %in% in_s
+  }
+  pooled
+}
+dict <- build_dict()
+if (!is.null(dict) && nrow(dict)) {
+  nice_dt(dict, caption = "All milk components analysed in this supplement, grouped by prespecified outcome class.")
+}
+```
+
+The full **targeted-metabolite metadata** (Biocrates panel categories, with per-study availability) is reproduced as a focused subsection in [§6 Reductions in HM nutrient deficiency](#reductions-in-hm-nutrient-deficiency-relative-to-milq-reference-standards) so that the metadata called out in the manuscript Fig. 5A legend (*"metadata in Online Supplement 6"*) lives at that section's anchor.
+
+## Distributions
+
+The remainder of this section shows the unadjusted distribution of each measured human milk component, stratified by study, visit, and randomized intervention arm. Two views are provided: (i) density plots overlaid by intervention arm, and (ii) per-component boxplots faceted by study and visit. Density plots include grey and red reference lines at the 50th and 10th percentiles of the MILQ age-specific reference distribution where applicable. Asterisks indicate FDR-corrected statistical significance of the pooled intervention vs. control contrast for that component–visit (\\* q\\<0.05, \\*\\* q\\<0.01, \\*\\*\\* q\\<0.001). Y-axes are log-transformed where the underlying distribution is markedly right-skewed (most micronutrients and metabolites).
+
+### MILQ-overlay density plots (Figure S2)
+
+```{r distributions-figure-s2, echo=FALSE, message=FALSE, warning=FALSE, fig.width=14, fig.height=11}
+p_s2 <- safe_readRDS(here::here("figure-data/figure_s2_plots.RDS"),
+                     label = "figure_s2_plots.RDS")
+show_any(p_s2)
+```
+
+### Per-component boxplots by study, visit, and arm
+
+These boxplots summarize the raw concentration of each component on its native assay scale. Hover (in HTML output) to see the median, IQR, and sample size for each box.
+
+```{r distributions-boxplots, echo=FALSE, message=FALSE, warning=FALSE, fig.width=14, fig.height=11}
+raw_path <- here::here("data/merged_analysis_datasets.RDS")
+metadata_loaded <- safe_load(here::here("metadata/milk_component.Rdata"))
+
+if (file.exists(raw_path) && isTRUE(metadata_loaded)) {
+  df <- readRDS(raw_path)
+  comps <- unique(unlist(all_milk_components, use.names = FALSE))
+  comps <- intersect(comps, names(df))
+  if (length(comps) == 0) {
+    cat("*No matching milk-component columns were found in the merged analysis dataset.*")
+  } else {
+    long <- df %>%
+      dplyr::select(studyid, visit, arm, dplyr::all_of(comps)) %>%
+      tidyr::pivot_longer(dplyr::all_of(comps),
+                          names_to = "component", values_to = "value") %>%
+      dplyr::filter(!is.na(value))
+    p <- ggplot2::ggplot(long,
+                         ggplot2::aes(x = factor(visit), y = value, fill = arm)) +
+      ggplot2::geom_boxplot(outlier.size = 0.5, alpha = 0.7) +
+      ggplot2::scale_y_log10() +
+      ggplot2::facet_wrap(~ component, scales = "free_y") +
+      ggplot2::labs(x = "Visit", y = "Concentration (native units, log scale)",
+                    fill = "Arm") +
+      ggplot2::theme_minimal() +
+      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
+                     legend.position = "bottom")
+    show_any(p)
+  }
+} else {
+  cat("*Raw IMiC dyad-level dataset and/or component metadata not available in this build; boxplots will be rendered when `data/merged_analysis_datasets.RDS` and `metadata/milk_component.Rdata` are present.*")
+}
+```
