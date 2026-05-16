@@ -1,0 +1,95 @@
+# Subgroup analyses stratified by maternal BMI
+
+This chapter presents subgroup analyses evaluating whether the effects of maternal nutritional interventions on human milk components differed by maternal nutritional status at baseline, operationalized using **maternal body mass index (BMI)**. BMI was dichotomized a priori into *underweight* (BMI ≤ 18.5 kg/m²) and *normal or overweight* (BMI > 18.5 kg/m²) strata. Stratum-specific ATEs were estimated using the same TMLE framework as in the primary adjusted analyses, and **interaction p-values** were computed by comparing stratum-specific estimates with a Wald-type test on the difference in estimates scaled by the pooled standard error.
+
+This section is cited as **"Online Appendix 3"** in the main manuscript (Results paragraphs on macronutrient and micronutrient effects). The manuscript reports **no consistent evidence of effect modification by maternal BMI** for primary, secondary, or tertiary outcomes. The plots and tables below allow that conclusion to be verified at the per-component level.
+
+> **Interpretation note.** These subgroup analyses are exploratory and not powered to detect modest interactions, particularly within studies where the underweight stratum is small. Per-component point estimates that differ in magnitude or direction across BMI strata should be interpreted cautiously, especially where the corresponding 95% CIs are wide.
+
+```{r bmi-setup, include=FALSE}
+library(tidyverse)
+library(here)
+library(DT)
+library(plotly)
+source(here::here("functions.R"))
+
+stratified_forest <- function(tab, title = "BMI-stratified intervention effects") {
+  tab <- .harmonize_factors(tab)
+  if (!nrow(tab)) { cat("*No rows in this outcome group.*"); return(invisible(NULL)) }
+  tab$tooltip <- paste0(tab$label_f,
+                        "<br>BMI stratum: ", tab$subgroup,
+                        "<br>Study: ", tab$study, " | Visit: ", tab$visit,
+                        if ("contrast" %in% names(tab)) paste0("<br>Contrast: ", tab$contrast) else "",
+                        "<br>ATE: ", round(tab$est, 3),
+                        " (", round(tab$cil, 3), ", ", round(tab$ciu, 3), ")",
+                        if ("chi_pval_adj" %in% names(tab)) paste0("<br>q: ", signif(tab$chi_pval_adj, 3)) else "",
+                        if ("interaction_pvalue" %in% names(tab)) paste0("<br>p_interaction: ", signif(tab$interaction_pvalue, 3)) else "")
+  tab$panel <- factor(paste0(tab$study, " — ", tab$visit))
+  p <- ggplot2::ggplot(tab,
+                       ggplot2::aes(y = stats::reorder(label_f, est), x = est,
+                                    color = subgroup, text = tooltip)) +
+    ggplot2::geom_point(position = ggplot2::position_dodge(width = 0.6), size = 2) +
+    ggplot2::geom_errorbar(ggplot2::aes(xmin = cil, xmax = ciu),
+                          width = 0.2, orientation = "y",
+                          position = ggplot2::position_dodge(width = 0.6)) +
+    ggplot2::geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
+    ggplot2::scale_color_manual(values = tableau10[c(1, 2, 3, 4)]) +
+    ggplot2::facet_wrap(~ panel) +
+    ggplot2::labs(title = title, y = "Outcome", x = "Estimate (SD units)",
+                  color = "Maternal BMI stratum") +
+    ggplot2::theme_minimal() + ggplot2::theme(legend.position = "bottom")
+  if (knitr::is_html_output() && requireNamespace("plotly", quietly = TRUE)) {
+    conv <- try(plotly::ggplotly(p, tooltip = "text"), silent = TRUE)
+    if (!inherits(conv, "try-error")) return(conv)
+  }
+  p
+}
+
+bmi_df <- safe_readRDS(here::here("figure-data/subgroup_results.RDS"),
+                       label = "subgroup_results.RDS")
+```
+
+## Per-component stratified forest plots
+
+```{r bmi-primary, echo=FALSE, message=FALSE, warning=FALSE, fig.height=14}
+if (!is.null(bmi_df) && is.data.frame(bmi_df)) {
+  primary <- bmi_df %>%
+    dplyr::filter(outcome_group %in% c("primary","Primary","Macronutrients","Micronutrients","B-vitamins"))
+  stratified_forest(primary,
+                    title = "Primary outcomes (macro / micro / B-vitamins) — BMI-stratified ATEs")
+}
+```
+
+```{r bmi-secondary, echo=FALSE, message=FALSE, warning=FALSE, fig.height=12}
+if (!is.null(bmi_df) && is.data.frame(bmi_df)) {
+  sec <- bmi_df %>%
+    dplyr::filter(outcome_group %in% c("secondary","Secondary","HMOs","Bioactive proteins"))
+  stratified_forest(sec,
+                    title = "Secondary outcomes (HMOs and bioactive proteins) — BMI-stratified ATEs")
+}
+```
+
+```{r bmi-tertiary, echo=FALSE, message=FALSE, warning=FALSE, fig.height=14}
+if (!is.null(bmi_df) && is.data.frame(bmi_df)) {
+  tert <- bmi_df %>%
+    dplyr::filter(outcome_group %in% c("tertiary","Tertiary","Targeted metabolites"))
+  stratified_forest(tert,
+                    title = "Tertiary outcomes (targeted metabolites) — BMI-stratified ATEs")
+}
+```
+
+## Searchable table of all BMI-stratified estimates
+
+```{r bmi-table, echo=FALSE, message=FALSE, warning=FALSE}
+if (!is.null(bmi_df) && is.data.frame(bmi_df)) {
+  tbl <- bmi_df %>%
+    dplyr::select(dplyr::any_of(c(
+      "study","visit","subgroup","contrast","outcome_group","category",
+      "label_f","est","cil","ciu","chi_pval","chi_pval_adj",
+      "interaction_pvalue","interaction_pvalue_adj","sig","sigFDR"
+    ))) %>%
+    dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 3)))
+  nice_dt(tbl,
+          caption = "BMI-stratified ATEs and Wald-type interaction p-values for every analyzed milk component.")
+}
+```

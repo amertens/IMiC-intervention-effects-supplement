@@ -1,0 +1,140 @@
+# Targeted-metabolite metadata and reductions in HM nutrient deficiency
+
+This section contains two distinct types of content. The first subsection, *Targeted-metabolite metadata*, is the inventory of the Biocrates MxP Quant 500 panel called out in the **manuscript Fig. 5A legend** (*"metadata in Online Supplement 6"*) — every targeted metabolite analysed as a tertiary outcome, grouped by Biocrates category and annotated with per-study availability.
+
+The remainder of this section presents effects of maternal nutritional supplementation on the **prevalence of human milk (HM) nutrient deficiency**, defined as concentrations below the 10th percentile of age-specific reference distributions from the Mothers, Infants, and Lactation Quality (MILQ) study. For each milk sample, infant age at collection was mapped to a MILQ age band (0–3, 4–17, 18–31 days; 1–2, 2–3, 3–4, 4–5, 5–6 months), concentrations were harmonized to MILQ units, and deficiency was operationalized as a binary indicator at the 10th percentile threshold. Components with fewer than five inadequate samples within a study × visit stratum were excluded to avoid sparse-data bias. Relative risks (RRs) were estimated using TMLE with adjustment for the same prespecified baseline prognostic factors as in the primary analyses, contrasting pooled maternal nutritional intervention arms against the corresponding control. FDR correction was applied within visit × outcome group. The MILQ-deficiency analyses correspond to **Figure S3** in the printed Word supplement.
+
+## Targeted-metabolite metadata (Online Supplement 6)
+
+The Biocrates MxP Quant 500 panel was used to measure tertiary outcomes — a broad targeted metabolomics panel covering acylcarnitines, amino acids and biogenic amines, bile acids, ceramides, cholesteryl esters, di- and triglycerides, free fatty acids, lysophosphatidyl- and phosphatidylcholines, sphingomyelins, hexosyl- and trihexosylceramides, and other classes. The table below enumerates every metabolite analysed in this supplement, grouped by Biocrates category, with indicators for whether the metabolite was measured in each of the three IMiC trials.
+
+This metadata is the resource cited from **Fig. 5A** of the manuscript. The intervention-effect estimates for these metabolites are in [§5 *Adjusted intervention effects on individual milk components*](#adjusted-intervention-effects-on-individual-milk-components) (tertiary-outcome subsections, pooled and per-arm); their effects on within-mother trajectories are in [§7 *Trajectory analyses*](#trajectory-analyses-of-human-milk-component-change-across-lactation); and pathway-level enrichment summaries (MetaboAnalyst ORA, Mummichog, fatty-acid compositional enrichment) are in [§8.6 *Pathway enrichment analyses*](#pathway-enrichment-analyses).
+
+```{r milq-metabolite-metadata, echo=FALSE, message=FALSE, warning=FALSE}
+metadata_loaded <- safe_load(here::here("metadata/milk_component.Rdata"))
+if (isTRUE(metadata_loaded) && exists("all_milk_components") &&
+    !is.null(all_milk_components$metabolomics)) {
+  ## all_milk_components$metabolomics may be a single character vector or a
+  ## named list keyed by Biocrates category. Handle both.
+  metab_obj <- all_milk_components$metabolomics
+  if (is.list(metab_obj) && !is.null(names(metab_obj))) {
+    metab_tbl <- dplyr::bind_rows(lapply(names(metab_obj), function(cat) {
+      tibble::tibble(
+        biocrates_category = cat,
+        metabolite         = unlist(metab_obj[[cat]], use.names = FALSE)
+      )
+    }))
+  } else {
+    metab_tbl <- tibble::tibble(
+      biocrates_category = "Targeted metabolites",
+      metabolite         = unlist(metab_obj, use.names = FALSE)
+    )
+  }
+  metab_tbl <- dplyr::distinct(metab_tbl)
+  pick_metab <- function(x) if (is.list(x)) unlist(x$metabolomics %||% x, use.names = FALSE)
+                            else unlist(x, use.names = FALSE)
+  per_study <- list(
+    "MISAME-III" = if (exists("misame_milk_components")) pick_metab(misame_milk_components) else NULL,
+    "Mumta-LW"   = if (exists("vital_milk_components"))  pick_metab(vital_milk_components)  else NULL,
+    "ELICIT"     = if (exists("elicit_milk_components")) pick_metab(elicit_milk_components) else NULL
+  )
+  for (s in names(per_study)) {
+    if (is.null(per_study[[s]])) next
+    metab_tbl[[paste0("measured_in_", s)]] <- metab_tbl$metabolite %in% per_study[[s]]
+  }
+  nice_dt(metab_tbl,
+          caption = "Targeted-metabolite metadata: Biocrates MxP Quant 500 panel inventory, by category and per-study availability. Referenced from Fig. 5A of the manuscript.")
+} else {
+  cat("*Targeted-metabolite metadata is not available in this build (`metadata/milk_component.Rdata` did not load).*")
+}
+```
+
+## MILQ-deficiency reductions — headline findings
+
+- **ELICIT — high-dose nicotinamide** reduced HM vitamin B3 deficiency at both timepoints (1-month RR 0.10, 95% CI 0.01–0.76, q = 0.162; 5-month RR 0.22, 95% CI 0.13–0.39, q < 0.001), with the FDR-significant signal at the second timepoint.
+- **Mumta-LW — postnatal BEP** reduced pantothenic acid, B2, and B3 deficiencies, although only at the first visit.
+- **MISAME-III — postnatal BEP** reduced pantothenic acid, B2, and B3 deficiencies at 14–21 days; pantothenic acid and B3 at 1–2 months; B3 at 4–5 months. Selenium deficiency was significantly reduced at all three timepoints (RR range 0.43–0.86).
+
+```{r milq-setup, include=FALSE}
+library(tidyverse)
+library(here)
+library(plotly)
+library(DT)
+source(here::here("functions.R"))
+ggplot2::theme_set(ggplot2::theme_minimal(base_size = 14))
+knitr::opts_chunk$set(fig.width = 12, fig.height = 10, dpi = 110)
+```
+
+## Forest plot of relative risks (Figure S3)
+
+```{r milq-forest, echo=FALSE, message=FALSE, warning=FALSE, fig.height=10}
+milq_df <- safe_readRDS(here::here("figure-data/fig-milq-deficiency-reduction-data.RDS"),
+                        label = "fig-milq-deficiency-reduction-data.RDS")
+
+if (!is.null(milq_df) && is.data.frame(milq_df)) {
+  d <- milq_df %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(
+      study = factor(study, levels = c("Misame","MISAME-3","Mumta-LW","Vital","Elicit","ELICIT")) %>%
+                droplevels(),
+      sigFDR  = factor(sigFDR, levels = c(0, 1)),
+      tooltip = paste0(label_f,
+                       "<br>Study: ", study, " | Visit: ", visit,
+                       if ("contrast" %in% names(milq_df)) paste0("<br>Contrast: ", contrast) else "",
+                       "<br>RR: ", signif(RR, 3),
+                       " (", signif(ci.lb, 3), ", ", signif(ci.ub, 3), ")",
+                       "<br>p: ", signif(pvalue, 3),
+                       "<br>q: ", signif(pval_adj, 3))
+    )
+
+  d$panel <- factor(paste0(d$study, " — ", d$visit))
+  p <- ggplot2::ggplot(d,
+                       ggplot2::aes(y = stats::reorder(label_f, RR), x = RR,
+                                    color = sigFDR, shape = sigFDR, text = tooltip)) +
+    ggplot2::geom_point(size = 2) +
+    ggplot2::geom_errorbar(ggplot2::aes(xmin = ci.lb, xmax = ci.ub),
+                           width = 0.25, orientation = "y") +
+    ggplot2::geom_vline(xintercept = 1, linetype = "dashed", color = "grey50") +
+    ggplot2::scale_x_log10() +
+    ggplot2::scale_shape_manual(values = c(1, 19),
+                                labels = c("Not significant","Significant (FDR)")) +
+    ggplot2::scale_color_manual(values = c("grey60", tableau10[2]),
+                                labels = c("Not significant","Significant (FDR)")) +
+    ggplot2::facet_wrap(~ panel, scales = "free_y") +
+    ggplot2::labs(title = "Relative risk of HM nutrient deficiency (MILQ 10th-percentile threshold)",
+                  y = "Component", x = "Relative risk (log scale)",
+                  color = NULL, shape = NULL) +
+    ggplot2::theme_minimal() +
+    ggplot2::theme(legend.position = "bottom")
+
+  out <- if (knitr::is_html_output() && requireNamespace("plotly", quietly = TRUE)) {
+    conv <- try(plotly::ggplotly(p, tooltip = "text"), silent = TRUE)
+    if (!inherits(conv, "try-error")) conv else p
+  } else p
+  out
+}
+```
+
+## Searchable table of MILQ-deficiency effects
+
+```{r milq-table, echo=FALSE, message=FALSE, warning=FALSE}
+if (!is.null(milq_df) && is.data.frame(milq_df)) {
+  out <- milq_df %>%
+    dplyr::ungroup() %>%
+    dplyr::select(dplyr::any_of(c(
+      "study","visit","contrast","category","label_f",
+      "N","nY","RR","ci.lb","ci.ub","pvalue","pval_adj","sig","sigFDR"
+    ))) %>%
+    dplyr::mutate(dplyr::across(where(is.numeric), ~ signif(.x, 3)))
+  nice_dt(out,
+          caption = "Relative risks of HM nutrient deficiency (defined at the MILQ 10th percentile), pooled intervention vs. control, by study and visit.")
+}
+```
+
+## Interpretation
+
+The MILQ-anchored analysis differs from the continuous-scale TMLE in two important ways. First, by binarizing at a clinically anchored threshold rather than estimating mean shifts in SD units, it asks whether supplementation moves the *tail* of the HM distribution that is most likely to be associated with inadequate infant supply. Second, the reference is exogenous (an external population studied under harmonized conditions) rather than within-trial, so effects measured here reflect movement *toward an external adequacy standard* rather than within-trial contrasts.
+
+This pairing is informative: the components for which the manuscript reports the largest mean-scale ATE (B-vitamins, particularly B3 in ELICIT; pantothenic acid and B3 in BEP trials; selenium in MISAME-III) are the same components for which deficiency prevalence is materially reduced here, supporting a consistent biological interpretation.
+
+Two caveats apply. Components excluded for sparse-data reasons (fewer than five deficient samples within stratum) are dropped from the plot and table — this is more likely for components on which the IMiC populations already exceed the MILQ 10th percentile (e.g. several macronutrients), so absence of a row should not be read as a null result. And RRs cannot resolve direction-of-effect questions at the upper tail of the distribution; readers interested in supra-physiological enrichment (most clearly seen for B3 in ELICIT) should consult the continuous-scale forest plots in the *Adjusted intervention effects* chapter.

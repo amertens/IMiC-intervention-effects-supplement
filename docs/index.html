@@ -5,19 +5,19 @@
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <title>IMiC supplementary material</title>
-  <meta name="description" content="Supplementary material for “The impact of nutritional interventions on human milk in low resource settings: findings from the International Milk Composition (IMiC) Consortium”" />
+  <meta name="description" content="Online supplementary appendix for “Nutritional interventions’ impacts on human milk: three trial analyses from low-resource settings” (Dailey-Chwalibóg, Mertens et al., 2025), reporting the full analytical outputs of the International Milk Composition (IMiC) Consortium intervention-effects analysis." />
   <meta name="generator" content="bookdown 0.42 and GitBook 2.6.7" />
 
   <meta property="og:title" content="IMiC supplementary material" />
   <meta property="og:type" content="book" />
   
-  <meta property="og:description" content="Supplementary material for “The impact of nutritional interventions on human milk in low resource settings: findings from the International Milk Composition (IMiC) Consortium”" />
-  <meta name="github-repo" content="rstudio/bookdown-demo" />
+  <meta property="og:description" content="Online supplementary appendix for “Nutritional interventions’ impacts on human milk: three trial analyses from low-resource settings” (Dailey-Chwalibóg, Mertens et al., 2025), reporting the full analytical outputs of the International Milk Composition (IMiC) Consortium intervention-effects analysis." />
+  <meta name="github-repo" content="amertens/IMiC-intervention-effects-supplement" />
 
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="IMiC supplementary material" />
   
-  <meta name="twitter:description" content="Supplementary material for “The impact of nutritional interventions on human milk in low resource settings: findings from the International Milk Composition (IMiC) Consortium”" />
+  <meta name="twitter:description" content="Online supplementary appendix for “Nutritional interventions’ impacts on human milk: three trial analyses from low-resource settings” (Dailey-Chwalibóg, Mertens et al., 2025), reporting the full analytical outputs of the International Milk Composition (IMiC) Consortium intervention-effects analysis." />
   
 
 
@@ -29,7 +29,7 @@
   
   
 
-<link rel="next" href="study-baseline-characteristics-1.html"/>
+<link rel="next" href="baseline-characteristics-by-study-and-intervention-arm.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -53,17 +53,29 @@
 <link href="libs/table1-1.0/table1_defaults.css" rel="stylesheet" />
 <link href="libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet" />
 <script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
-<script src="libs/plotly-binding-4.10.4/plotly.js"></script>
-<script src="libs/typedarray-0.1/typedarray.min.js"></script>
-<link href="libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet" />
-<script src="libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
-<link href="libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet" />
-<script src="libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
 <link href="libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet" />
 <script src="libs/datatables-binding-0.33/datatables.js"></script>
 <link href="libs/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
 <link href="libs/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet" />
 <script src="libs/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="libs/jszip-1.13.6/jszip.min.js"></script>
+<link href="libs/dt-ext-buttons-1.13.6/css/buttons.dataTables.min.css" rel="stylesheet" />
+<script src="libs/dt-ext-buttons-1.13.6/js/dataTables.buttons.min.js"></script>
+<script src="libs/dt-ext-buttons-1.13.6/js/buttons.html5.min.js"></script>
+<script src="libs/dt-ext-buttons-1.13.6/js/buttons.colVis.min.js"></script>
+<script src="libs/dt-ext-buttons-1.13.6/js/buttons.print.min.js"></script>
+<link href="libs/dt-ext-fixedheader-1.13.6/css/fixedHeader.dataTables.min.css" rel="stylesheet" />
+<script src="libs/dt-ext-fixedheader-1.13.6/js/dataTables.fixedHeader.min.js"></script>
+<link href="libs/nouislider-7.0.10/jquery.nouislider.min.css" rel="stylesheet" />
+<script src="libs/nouislider-7.0.10/jquery.nouislider.min.js"></script>
+<link href="libs/selectize-0.12.0/selectize.bootstrap3.css" rel="stylesheet" />
+<script src="libs/selectize-0.12.0/selectize.min.js"></script>
+<link href="libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet" />
+<script src="libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
+<script src="libs/plotly-binding-4.12.0/plotly.js"></script>
+<script src="libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="libs/plotly-htmlwidgets-css-2.25.2/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="libs/plotly-main-2.25.2/plotly-latest.min.js"></script>
 
 
 
@@ -88,53 +100,120 @@
 <li><a href="./">IMiC Intervention Supplement</a></li>
 
 <li class="divider"></li>
-<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Supplementary Material for IMiC Intervention Effects Manuscript</a>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Overview</a>
 <ul>
-<li class="chapter" data-level="1.1" data-path="index.html"><a href="index.html#organization-of-the-online-supplement"><i class="fa fa-check"></i><b>1.1</b> Organization of the Online Supplement</a>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html#outstanding-todos-revision-round-1"><i class="fa fa-check"></i>Outstanding TODOs (revision round 1)</a></li>
+<li class="chapter" data-level="0.1" data-path="index.html"><a href="index.html#how-this-appendix-maps-to-the-manuscript"><i class="fa fa-check"></i><b>0.1</b> How this appendix maps to the manuscript</a></li>
+<li class="chapter" data-level="0.2" data-path="index.html"><a href="index.html#methods-recap"><i class="fa fa-check"></i><b>0.2</b> Methods recap</a></li>
+<li class="chapter" data-level="0.3" data-path="index.html"><a href="index.html#how-to-read-interactive-figures"><i class="fa fa-check"></i><b>0.3</b> How to read interactive figures</a></li>
+<li class="chapter" data-level="0.4" data-path="index.html"><a href="index.html#citation-and-reproducibility"><i class="fa fa-check"></i><b>0.4</b> Citation and reproducibility</a></li>
+</ul></li>
+<li class="chapter" data-level="1" data-path="baseline-characteristics-by-study-and-intervention-arm.html"><a href="baseline-characteristics-by-study-and-intervention-arm.html"><i class="fa fa-check"></i><b>1</b> Baseline characteristics by study and intervention arm</a>
 <ul>
-<li class="chapter" data-level="1.1.1" data-path="index.html"><a href="index.html#study-baseline-characteristics"><i class="fa fa-check"></i><b>1.1.1</b> Study Baseline Characteristics</a></li>
-<li class="chapter" data-level="1.1.2" data-path="index.html"><a href="index.html#human-milk-component-distributions"><i class="fa fa-check"></i><b>1.1.2</b> Human Milk Component Distributions</a></li>
-<li class="chapter" data-level="1.1.3" data-path="index.html"><a href="index.html#adjusted-intervention-effects-on-individual-milk-components"><i class="fa fa-check"></i><b>1.1.3</b> Adjusted Intervention Effects on Individual Milk Components</a></li>
-<li class="chapter" data-level="1.1.4" data-path="index.html"><a href="index.html#unadjusted-intervention-effects-on-individual-milk-components"><i class="fa fa-check"></i><b>1.1.4</b> Unadjusted Intervention Effects on Individual Milk Components</a></li>
-<li class="chapter" data-level="1.1.5" data-path="index.html"><a href="index.html#unscaled-intervention-effects-on-individual-milk-components"><i class="fa fa-check"></i><b>1.1.5</b> Unscaled Intervention Effects on Individual Milk Components</a></li>
-<li class="chapter" data-level="1.1.6" data-path="index.html"><a href="index.html#targeted-and-exploratory-milk-components"><i class="fa fa-check"></i><b>1.1.6</b> Targeted and Exploratory Milk Components</a></li>
-<li class="chapter" data-level="1.1.7" data-path="index.html"><a href="index.html#subgroup-analyses-stratified-by-maternal-bmi"><i class="fa fa-check"></i><b>1.1.7</b> Subgroup analyses stratified by maternal BMI</a></li>
-<li class="chapter" data-level="1.1.8" data-path="index.html"><a href="index.html#trajectory-analyses-of-human-milk-component-change-across-lactation"><i class="fa fa-check"></i><b>1.1.8</b> Trajectory analyses of human milk component change across lactation</a></li>
+<li class="chapter" data-level="1.1" data-path="baseline-characteristics-by-study-and-intervention-arm.html"><a href="baseline-characteristics-by-study-and-intervention-arm.html#misame-iii-burkina-faso"><i class="fa fa-check"></i><b>1.1</b> MISAME-III (Burkina Faso)</a></li>
+<li class="chapter" data-level="1.2" data-path="baseline-characteristics-by-study-and-intervention-arm.html"><a href="baseline-characteristics-by-study-and-intervention-arm.html#mumta-lw-pakistan"><i class="fa fa-check"></i><b>1.2</b> Mumta-LW (Pakistan)</a></li>
+<li class="chapter" data-level="1.3" data-path="baseline-characteristics-by-study-and-intervention-arm.html"><a href="baseline-characteristics-by-study-and-intervention-arm.html#elicit-tanzania"><i class="fa fa-check"></i><b>1.3</b> ELICIT (Tanzania)</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="outcomes-and-human-milk-component-distributions.html"><a href="outcomes-and-human-milk-component-distributions.html"><i class="fa fa-check"></i><b>2</b> Outcomes and human milk component distributions</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="outcomes-and-human-milk-component-distributions.html"><a href="outcomes-and-human-milk-component-distributions.html#outcomes-list"><i class="fa fa-check"></i><b>2.1</b> Outcomes list</a></li>
+<li class="chapter" data-level="2.2" data-path="outcomes-and-human-milk-component-distributions.html"><a href="outcomes-and-human-milk-component-distributions.html#distributions"><i class="fa fa-check"></i><b>2.2</b> Distributions</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="outcomes-and-human-milk-component-distributions.html"><a href="outcomes-and-human-milk-component-distributions.html#milq-overlay-density-plots-figure-s2"><i class="fa fa-check"></i><b>2.2.1</b> MILQ-overlay density plots (Figure S2)</a></li>
+<li class="chapter" data-level="2.2.2" data-path="outcomes-and-human-milk-component-distributions.html"><a href="outcomes-and-human-milk-component-distributions.html#per-component-boxplots-by-study-visit-and-arm"><i class="fa fa-check"></i><b>2.2.2</b> Per-component boxplots by study, visit, and arm</a></li>
 </ul></li>
 </ul></li>
-<li class="chapter" data-level="2" data-path="study-baseline-characteristics-1.html"><a href="study-baseline-characteristics-1.html"><i class="fa fa-check"></i><b>2</b> Study Baseline Characteristics</a>
+<li class="chapter" data-level="3" data-path="subgroup-analyses-stratified-by-maternal-bmi.html"><a href="subgroup-analyses-stratified-by-maternal-bmi.html"><i class="fa fa-check"></i><b>3</b> Subgroup analyses stratified by maternal BMI</a>
 <ul>
-<li class="chapter" data-level="2.1" data-path="study-baseline-characteristics-1.html"><a href="study-baseline-characteristics-1.html#misame"><i class="fa fa-check"></i><b>2.1</b> Misame</a></li>
-<li class="chapter" data-level="2.2" data-path="study-baseline-characteristics-1.html"><a href="study-baseline-characteristics-1.html#mumta"><i class="fa fa-check"></i><b>2.2</b> Mumta</a></li>
-<li class="chapter" data-level="2.3" data-path="study-baseline-characteristics-1.html"><a href="study-baseline-characteristics-1.html#elicit"><i class="fa fa-check"></i><b>2.3</b> Elicit</a></li>
+<li class="chapter" data-level="3.1" data-path="subgroup-analyses-stratified-by-maternal-bmi.html"><a href="subgroup-analyses-stratified-by-maternal-bmi.html#per-component-stratified-forest-plots"><i class="fa fa-check"></i><b>3.1</b> Per-component stratified forest plots</a></li>
+<li class="chapter" data-level="3.2" data-path="subgroup-analyses-stratified-by-maternal-bmi.html"><a href="subgroup-analyses-stratified-by-maternal-bmi.html#searchable-table-of-all-bmi-stratified-estimates"><i class="fa fa-check"></i><b>3.2</b> Searchable table of all BMI-stratified estimates</a></li>
 </ul></li>
-<li class="chapter" data-level="3" data-path="desc_stats.html"><a href="desc_stats.html"><i class="fa fa-check"></i><b>3</b> Human Milk Component Distributions</a>
+<li class="chapter" data-level="4" data-path="exploratory-high-dimensional-outcomes-microbiome-untargeted-proteomics-untargeted-metabolomics.html"><a href="exploratory-high-dimensional-outcomes-microbiome-untargeted-proteomics-untargeted-metabolomics.html"><i class="fa fa-check"></i><b>4</b> Exploratory high-dimensional outcomes: microbiome, untargeted proteomics, untargeted metabolomics</a>
 <ul>
-<li class="chapter" data-level="3.1" data-path="desc_stats.html"><a href="desc_stats.html#histograms-of-milk-components"><i class="fa fa-check"></i><b>3.1</b> Histograms of milk components</a></li>
-<li class="chapter" data-level="3.2" data-path="desc_stats.html"><a href="desc_stats.html#interactive-boxplots"><i class="fa fa-check"></i><b>3.2</b> Interactive boxplots</a></li>
-</ul></li>
-<li class="chapter" data-level="4" data-path="adjusted-intervention-effects-on-individual-milk-components-1.html"><a href="adjusted-intervention-effects-on-individual-milk-components-1.html"><i class="fa fa-check"></i><b>4</b> Adjusted Intervention Effects on Individual Milk Components</a>
+<li class="chapter" data-level="4.1" data-path="exploratory-high-dimensional-outcomes-microbiome-untargeted-proteomics-untargeted-metabolomics.html"><a href="exploratory-high-dimensional-outcomes-microbiome-untargeted-proteomics-untargeted-metabolomics.html#microbiome"><i class="fa fa-check"></i><b>4.1</b> Microbiome</a>
 <ul>
-<li class="chapter" data-level="4.1" data-path="adjusted-intervention-effects-on-individual-milk-components-1.html"><a href="adjusted-intervention-effects-on-individual-milk-components-1.html#primary-outcomes-macronutrients-and-micronutrients"><i class="fa fa-check"></i><b>4.1</b> Primary Outcomes: Macronutrients and Micronutrients</a></li>
+<li class="chapter" data-level="4.1.1" data-path="index.html"><a href="#intervention-effects-on-microbiome-%CE%B1-diversity-figure-s6"><i class="fa fa-check"></i><b>4.1.1</b> Intervention effects on microbiome α-diversity (Figure S6)</a></li>
+<li class="chapter" data-level="4.1.2" data-path="exploratory-high-dimensional-outcomes-microbiome-untargeted-proteomics-untargeted-metabolomics.html"><a href="exploratory-high-dimensional-outcomes-microbiome-untargeted-proteomics-untargeted-metabolomics.html#intervention-effects-on-individual-microbial-features"><i class="fa fa-check"></i><b>4.1.2</b> Intervention effects on individual microbial features</a></li>
 </ul></li>
-<li class="chapter" data-level="5" data-path="unadjusted-intervention-effects-on-individual-milk-components-1.html"><a href="unadjusted-intervention-effects-on-individual-milk-components-1.html"><i class="fa fa-check"></i><b>5</b> Unadjusted Intervention Effects on Individual Milk Components</a></li>
-<li class="chapter" data-level="6" data-path="unscaled-intervention-effects-on-individual-milk-components-1.html"><a href="unscaled-intervention-effects-on-individual-milk-components-1.html"><i class="fa fa-check"></i><b>6</b> Unscaled Intervention Effects on Individual Milk Components</a></li>
-<li class="chapter" data-level="7" data-path="exploratory-outcomes-microbiome-proteomics-and-untargeted-metabolomics.html"><a href="exploratory-outcomes-microbiome-proteomics-and-untargeted-metabolomics.html"><i class="fa fa-check"></i><b>7</b> Exploratory Outcomes: Microbiome, Proteomics, and Untargeted Metabolomics</a>
+<li class="chapter" data-level="4.2" data-path="exploratory-high-dimensional-outcomes-microbiome-untargeted-proteomics-untargeted-metabolomics.html"><a href="exploratory-high-dimensional-outcomes-microbiome-untargeted-proteomics-untargeted-metabolomics.html#untargeted-proteomics"><i class="fa fa-check"></i><b>4.2</b> Untargeted proteomics</a></li>
+<li class="chapter" data-level="4.3" data-path="exploratory-high-dimensional-outcomes-microbiome-untargeted-proteomics-untargeted-metabolomics.html"><a href="exploratory-high-dimensional-outcomes-microbiome-untargeted-proteomics-untargeted-metabolomics.html#untargeted-metabolomics"><i class="fa fa-check"></i><b>4.3</b> Untargeted metabolomics</a></li>
+<li class="chapter" data-level="4.4" data-path="exploratory-high-dimensional-outcomes-microbiome-untargeted-proteomics-untargeted-metabolomics.html"><a href="exploratory-high-dimensional-outcomes-microbiome-untargeted-proteomics-untargeted-metabolomics.html#pre-rendered-volcano-plot-objects-manuscript-figure-panels"><i class="fa fa-check"></i><b>4.4</b> Pre-rendered volcano plot objects (manuscript figure panels)</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="adjusted-intervention-effects-on-individual-milk-components.html"><a href="adjusted-intervention-effects-on-individual-milk-components.html"><i class="fa fa-check"></i><b>5</b> Adjusted intervention effects on individual milk components</a>
 <ul>
-<li class="chapter" data-level="7.1" data-path="exploratory-outcomes-microbiome-proteomics-and-untargeted-metabolomics.html"><a href="exploratory-outcomes-microbiome-proteomics-and-untargeted-metabolomics.html#microbiome"><i class="fa fa-check"></i><b>7.1</b> Microbiome</a>
+<li class="chapter" data-level="5.1" data-path="adjusted-intervention-effects-on-individual-milk-components.html"><a href="adjusted-intervention-effects-on-individual-milk-components.html#macronutrients"><i class="fa fa-check"></i><b>5.1</b> Macronutrients</a>
 <ul>
-<li class="chapter" data-level="7.1.1" data-path="exploratory-outcomes-microbiome-proteomics-and-untargeted-metabolomics.html"><a href="exploratory-outcomes-microbiome-proteomics-and-untargeted-metabolomics.html#intervention-effects-on-microbiome-diversity"><i class="fa fa-check"></i><b>7.1.1</b> Intervention effects on microbiome diversity</a></li>
-<li class="chapter" data-level="7.1.2" data-path="exploratory-outcomes-microbiome-proteomics-and-untargeted-metabolomics.html"><a href="exploratory-outcomes-microbiome-proteomics-and-untargeted-metabolomics.html#intervention-effects-on-individual-microbial-features"><i class="fa fa-check"></i><b>7.1.2</b> Intervention effects on individual microbial features</a></li>
+<li class="chapter" data-level="5.1.1" data-path="adjusted-intervention-effects-on-individual-milk-components.html"><a href="adjusted-intervention-effects-on-individual-milk-components.html#combined-intervention-arms-2"><i class="fa fa-check"></i><b>5.1.1</b> Combined intervention arms</a></li>
+<li class="chapter" data-level="5.1.2" data-path="adjusted-intervention-effects-on-individual-milk-components.html"><a href="adjusted-intervention-effects-on-individual-milk-components.html#stratified-by-randomized-arm-2"><i class="fa fa-check"></i><b>5.1.2</b> Stratified by randomized arm</a></li>
 </ul></li>
-<li class="chapter" data-level="7.2" data-path="exploratory-outcomes-microbiome-proteomics-and-untargeted-metabolomics.html"><a href="exploratory-outcomes-microbiome-proteomics-and-untargeted-metabolomics.html#proteomics"><i class="fa fa-check"></i><b>7.2</b> Proteomics</a></li>
-<li class="chapter" data-level="7.3" data-path="exploratory-outcomes-microbiome-proteomics-and-untargeted-metabolomics.html"><a href="exploratory-outcomes-microbiome-proteomics-and-untargeted-metabolomics.html#untargeted-metabolomics"><i class="fa fa-check"></i><b>7.3</b> Untargeted Metabolomics</a></li>
-</ul></li>
-<li class="chapter" data-level="8" data-path="subgroup-analyses-stratified-by-maternal-bmi-1.html"><a href="subgroup-analyses-stratified-by-maternal-bmi-1.html"><i class="fa fa-check"></i><b>8</b> Subgroup analyses stratified by maternal BMI</a></li>
-<li class="chapter" data-level="9" data-path="trajectory-analyses-of-human-milk-component-change-across-lactation-1.html"><a href="trajectory-analyses-of-human-milk-component-change-across-lactation-1.html"><i class="fa fa-check"></i><b>9</b> Trajectory analyses of human milk component change across lactation</a>
+<li class="chapter" data-level="5.2" data-path="adjusted-intervention-effects-on-individual-milk-components.html"><a href="adjusted-intervention-effects-on-individual-milk-components.html#micronutrients-including-fat-soluble-vitamins"><i class="fa fa-check"></i><b>5.2</b> Micronutrients (including fat-soluble vitamins)</a>
 <ul>
-<li class="chapter" data-level="9.1" data-path="trajectory-analyses-of-human-milk-component-change-across-lactation-1.html"><a href="trajectory-analyses-of-human-milk-component-change-across-lactation-1.html#tables"><i class="fa fa-check"></i><b>9.1</b> Tables</a></li>
-<li class="chapter" data-level="9.2" data-path="trajectory-analyses-of-human-milk-component-change-across-lactation-1.html"><a href="trajectory-analyses-of-human-milk-component-change-across-lactation-1.html#trajectory-lineplots"><i class="fa fa-check"></i><b>9.2</b> Trajectory lineplots</a></li>
+<li class="chapter" data-level="5.2.1" data-path="adjusted-intervention-effects-on-individual-milk-components.html"><a href="adjusted-intervention-effects-on-individual-milk-components.html#combined-intervention-arms-3"><i class="fa fa-check"></i><b>5.2.1</b> Combined intervention arms</a></li>
+<li class="chapter" data-level="5.2.2" data-path="adjusted-intervention-effects-on-individual-milk-components.html"><a href="adjusted-intervention-effects-on-individual-milk-components.html#stratified-by-randomized-arm-3"><i class="fa fa-check"></i><b>5.2.2</b> Stratified by randomized arm</a></li>
 </ul></li>
+<li class="chapter" data-level="5.3" data-path="adjusted-intervention-effects-on-individual-milk-components.html"><a href="adjusted-intervention-effects-on-individual-milk-components.html#b-vitamins"><i class="fa fa-check"></i><b>5.3</b> B-vitamins</a>
+<ul>
+<li class="chapter" data-level="5.3.1" data-path="adjusted-intervention-effects-on-individual-milk-components.html"><a href="adjusted-intervention-effects-on-individual-milk-components.html#combined-intervention-arms-4"><i class="fa fa-check"></i><b>5.3.1</b> Combined intervention arms</a></li>
+<li class="chapter" data-level="5.3.2" data-path="adjusted-intervention-effects-on-individual-milk-components.html"><a href="adjusted-intervention-effects-on-individual-milk-components.html#stratified-by-randomized-arm-4"><i class="fa fa-check"></i><b>5.3.2</b> Stratified by randomized arm</a></li>
+</ul></li>
+<li class="chapter" data-level="5.4" data-path="adjusted-intervention-effects-on-individual-milk-components.html"><a href="adjusted-intervention-effects-on-individual-milk-components.html#human-milk-oligosaccharides-hmos"><i class="fa fa-check"></i><b>5.4</b> Human milk oligosaccharides (HMOs)</a>
+<ul>
+<li class="chapter" data-level="5.4.1" data-path="adjusted-intervention-effects-on-individual-milk-components.html"><a href="adjusted-intervention-effects-on-individual-milk-components.html#combined-intervention-arms-5"><i class="fa fa-check"></i><b>5.4.1</b> Combined intervention arms</a></li>
+<li class="chapter" data-level="5.4.2" data-path="adjusted-intervention-effects-on-individual-milk-components.html"><a href="adjusted-intervention-effects-on-individual-milk-components.html#stratified-by-randomized-arm-5"><i class="fa fa-check"></i><b>5.4.2</b> Stratified by randomized arm</a></li>
+</ul></li>
+<li class="chapter" data-level="5.5" data-path="adjusted-intervention-effects-on-individual-milk-components.html"><a href="adjusted-intervention-effects-on-individual-milk-components.html#bioactive-proteins"><i class="fa fa-check"></i><b>5.5</b> Bioactive proteins</a>
+<ul>
+<li class="chapter" data-level="5.5.1" data-path="adjusted-intervention-effects-on-individual-milk-components.html"><a href="adjusted-intervention-effects-on-individual-milk-components.html#combined-intervention-arms-6"><i class="fa fa-check"></i><b>5.5.1</b> Combined intervention arms</a></li>
+<li class="chapter" data-level="5.5.2" data-path="adjusted-intervention-effects-on-individual-milk-components.html"><a href="adjusted-intervention-effects-on-individual-milk-components.html#stratified-by-randomized-arm-6"><i class="fa fa-check"></i><b>5.5.2</b> Stratified by randomized arm</a></li>
+</ul></li>
+<li class="chapter" data-level="5.6" data-path="adjusted-intervention-effects-on-individual-milk-components.html"><a href="adjusted-intervention-effects-on-individual-milk-components.html#targeted-metabolites-tertiary-outcomes"><i class="fa fa-check"></i><b>5.6</b> Targeted metabolites (tertiary outcomes)</a>
+<ul>
+<li class="chapter" data-level="5.6.1" data-path="adjusted-intervention-effects-on-individual-milk-components.html"><a href="adjusted-intervention-effects-on-individual-milk-components.html#combined-intervention-arms-7"><i class="fa fa-check"></i><b>5.6.1</b> Combined intervention arms</a></li>
+<li class="chapter" data-level="5.6.2" data-path="adjusted-intervention-effects-on-individual-milk-components.html"><a href="adjusted-intervention-effects-on-individual-milk-components.html#stratified-by-randomized-arm-7"><i class="fa fa-check"></i><b>5.6.2</b> Stratified by randomized arm</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="targeted-metabolite-metadata-and-reductions-in-hm-nutrient-deficiency.html"><a href="targeted-metabolite-metadata-and-reductions-in-hm-nutrient-deficiency.html"><i class="fa fa-check"></i><b>6</b> Targeted-metabolite metadata and reductions in HM nutrient deficiency</a>
+<ul>
+<li class="chapter" data-level="6.1" data-path="targeted-metabolite-metadata-and-reductions-in-hm-nutrient-deficiency.html"><a href="targeted-metabolite-metadata-and-reductions-in-hm-nutrient-deficiency.html#targeted-metabolite-metadata-online-supplement-6"><i class="fa fa-check"></i><b>6.1</b> Targeted-metabolite metadata (Online Supplement 6)</a></li>
+<li class="chapter" data-level="6.2" data-path="targeted-metabolite-metadata-and-reductions-in-hm-nutrient-deficiency.html"><a href="targeted-metabolite-metadata-and-reductions-in-hm-nutrient-deficiency.html#milq-deficiency-reductions-headline-findings"><i class="fa fa-check"></i><b>6.2</b> MILQ-deficiency reductions — headline findings</a></li>
+<li class="chapter" data-level="6.3" data-path="targeted-metabolite-metadata-and-reductions-in-hm-nutrient-deficiency.html"><a href="targeted-metabolite-metadata-and-reductions-in-hm-nutrient-deficiency.html#forest-plot-of-relative-risks-figure-s3"><i class="fa fa-check"></i><b>6.3</b> Forest plot of relative risks (Figure S3)</a></li>
+<li class="chapter" data-level="6.4" data-path="targeted-metabolite-metadata-and-reductions-in-hm-nutrient-deficiency.html"><a href="targeted-metabolite-metadata-and-reductions-in-hm-nutrient-deficiency.html#searchable-table-of-milq-deficiency-effects"><i class="fa fa-check"></i><b>6.4</b> Searchable table of MILQ-deficiency effects</a></li>
+<li class="chapter" data-level="6.5" data-path="targeted-metabolite-metadata-and-reductions-in-hm-nutrient-deficiency.html"><a href="targeted-metabolite-metadata-and-reductions-in-hm-nutrient-deficiency.html#interpretation"><i class="fa fa-check"></i><b>6.5</b> Interpretation</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="trajectory-analyses-of-human-milk-component-change-across-lactation.html"><a href="trajectory-analyses-of-human-milk-component-change-across-lactation.html"><i class="fa fa-check"></i><b>7</b> Trajectory analyses of human milk component change across lactation</a>
+<ul>
+<li class="chapter" data-level="7.1" data-path="trajectory-analyses-of-human-milk-component-change-across-lactation.html"><a href="trajectory-analyses-of-human-milk-component-change-across-lactation.html#volcano-plots-of-trajectory-effects"><i class="fa fa-check"></i><b>7.1</b> Volcano plots of trajectory effects</a></li>
+<li class="chapter" data-level="7.2" data-path="trajectory-analyses-of-human-milk-component-change-across-lactation.html"><a href="trajectory-analyses-of-human-milk-component-change-across-lactation.html#searchable-tables-of-trajectory-effects"><i class="fa fa-check"></i><b>7.2</b> Searchable tables of trajectory effects</a>
+<ul>
+<li class="chapter" data-level="7.2.1" data-path="trajectory-analyses-of-human-milk-component-change-across-lactation.html"><a href="trajectory-analyses-of-human-milk-component-change-across-lactation.html#per-arm-contrasts"><i class="fa fa-check"></i><b>7.2.1</b> Per-arm contrasts</a></li>
+<li class="chapter" data-level="7.2.2" data-path="trajectory-analyses-of-human-milk-component-change-across-lactation.html"><a href="trajectory-analyses-of-human-milk-component-change-across-lactation.html#combined-intervention-arms-8"><i class="fa fa-check"></i><b>7.2.2</b> Combined intervention arms</a></li>
+</ul></li>
+<li class="chapter" data-level="7.3" data-path="trajectory-analyses-of-human-milk-component-change-across-lactation.html"><a href="trajectory-analyses-of-human-milk-component-change-across-lactation.html#trajectory-line-plots-by-intervention-arm"><i class="fa fa-check"></i><b>7.3</b> Trajectory line plots by intervention arm</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="sensitivity-analyses-and-additional-outputs.html"><a href="sensitivity-analyses-and-additional-outputs.html"><i class="fa fa-check"></i><b>8</b> Sensitivity analyses and additional outputs</a>
+<ul>
+<li class="chapter" data-level="8.1" data-path="sensitivity-analyses-and-additional-outputs.html"><a href="sensitivity-analyses-and-additional-outputs.html#unadjusted-intervention-effects"><i class="fa fa-check"></i><b>8.1</b> Unadjusted intervention effects</a></li>
+<li class="chapter" data-level="8.2" data-path="sensitivity-analyses-and-additional-outputs.html"><a href="sensitivity-analyses-and-additional-outputs.html#unscaled-natural-unit-intervention-effects"><i class="fa fa-check"></i><b>8.2</b> Unscaled (natural-unit) intervention effects</a></li>
+<li class="chapter" data-level="8.3" data-path="sensitivity-analyses-and-additional-outputs.html"><a href="sensitivity-analyses-and-additional-outputs.html#fat-adjusted-triglyceride-effects-figure-s5"><i class="fa fa-check"></i><b>8.3</b> Fat-adjusted triglyceride effects (Figure S5)</a></li>
+<li class="chapter" data-level="8.4" data-path="sensitivity-analyses-and-additional-outputs.html"><a href="sensitivity-analyses-and-additional-outputs.html#superlearner-multi-class-treatment-arm-prediction"><i class="fa fa-check"></i><b>8.4</b> SuperLearner multi-class treatment-arm prediction</a>
+<ul>
+<li class="chapter" data-level="8.4.1" data-path="sensitivity-analyses-and-additional-outputs.html"><a href="sensitivity-analyses-and-additional-outputs.html#per-study-variable-importance"><i class="fa fa-check"></i><b>8.4.1</b> Per-study variable importance</a></li>
+</ul></li>
+<li class="chapter" data-level="8.5" data-path="sensitivity-analyses-and-additional-outputs.html"><a href="sensitivity-analyses-and-additional-outputs.html#pca-based-composite-outcome-scores"><i class="fa fa-check"></i><b>8.5</b> PCA-based composite outcome scores</a>
+<ul>
+<li class="chapter" data-level="8.5.1" data-path="sensitivity-analyses-and-additional-outputs.html"><a href="sensitivity-analyses-and-additional-outputs.html#arm-stratified-pca-composites"><i class="fa fa-check"></i><b>8.5.1</b> Arm-stratified PCA composites</a></li>
+</ul></li>
+<li class="chapter" data-level="8.6" data-path="sensitivity-analyses-and-additional-outputs.html"><a href="sensitivity-analyses-and-additional-outputs.html#pathway-enrichment-analyses"><i class="fa fa-check"></i><b>8.6</b> Pathway enrichment analyses</a>
+<ul>
+<li class="chapter" data-level="8.6.1" data-path="sensitivity-analyses-and-additional-outputs.html"><a href="sensitivity-analyses-and-additional-outputs.html#untargeted-metabolomics-metaboanalyst-ora-table-s2"><i class="fa fa-check"></i><b>8.6.1</b> Untargeted metabolomics — MetaboAnalyst ORA (Table S2)</a></li>
+<li class="chapter" data-level="8.6.2" data-path="sensitivity-analyses-and-additional-outputs.html"><a href="sensitivity-analyses-and-additional-outputs.html#untargeted-metabolomics-mummichog-functional-enrichment-table-s5"><i class="fa fa-check"></i><b>8.6.2</b> Untargeted metabolomics — Mummichog functional enrichment (Table S5)</a></li>
+<li class="chapter" data-level="8.6.3" data-path="sensitivity-analyses-and-additional-outputs.html"><a href="sensitivity-analyses-and-additional-outputs.html#untargeted-proteomics-go-biological-process-enrichment-table-s6"><i class="fa fa-check"></i><b>8.6.3</b> Untargeted proteomics — GO Biological Process enrichment (Table S6)</a></li>
+<li class="chapter" data-level="8.6.4" data-path="sensitivity-analyses-and-additional-outputs.html"><a href="sensitivity-analyses-and-additional-outputs.html#compositional-fatty-acid-enrichment-of-intervention-responsive-triglycerides-table-s3"><i class="fa fa-check"></i><b>8.6.4</b> Compositional fatty-acid enrichment of intervention-responsive triglycerides (Table S3)</a></li>
+<li class="chapter" data-level="8.6.5" data-path="sensitivity-analyses-and-additional-outputs.html"><a href="sensitivity-analyses-and-additional-outputs.html#network-views-of-pathway-and-feature-relationships"><i class="fa fa-check"></i><b>8.6.5</b> Network views of pathway and feature relationships</a></li>
+</ul></li>
+<li class="chapter" data-level="8.7" data-path="sensitivity-analyses-and-additional-outputs.html"><a href="sensitivity-analyses-and-additional-outputs.html#infant-growth-analyses-figure-s1"><i class="fa fa-check"></i><b>8.7</b> Infant growth analyses (Figure S1)</a></li>
+</ul></li>
+<li class="chapter" data-level="" data-path="reproducibility.html"><a href="reproducibility.html"><i class="fa fa-check"></i>Reproducibility</a></li>
 <li class="divider"></li>
 <li><a href="https://bookdown.org" target="_blank">Published with bookdown</a></li>
 
@@ -158,45 +237,92 @@
 <div id="header">
 <h1 class="title">IMiC supplementary material</h1>
 </div>
-<div id="supplementary-material-for-imic-intervention-effects-manuscript" class="section level1 hasAnchor" number="1">
-<h1><span class="header-section-number">Chapter 1</span> Supplementary Material for IMiC Intervention Effects Manuscript<a href="index.html#supplementary-material-for-imic-intervention-effects-manuscript" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>This online supplementary appendix provides the complete analytical outputs supporting the manuscript<br />
-<strong>“The impact of nutritional interventions on human milk in low resource settings: findings from the International Milk Composition (IMiC) Consortium.”</strong></p>
-<div id="organization-of-the-online-supplement" class="section level2 hasAnchor" number="1.1">
-<h2><span class="header-section-number">1.1</span> Organization of the Online Supplement<a href="index.html#organization-of-the-online-supplement" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<div id="study-baseline-characteristics" class="section level3 hasAnchor" number="1.1.1">
-<h3><span class="header-section-number">1.1.1</span> Study Baseline Characteristics<a href="index.html#study-baseline-characteristics" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Detailed maternal, infant, and household characteristics for the IMiC subsamples across trials, including comparisons with parent trial populations and baseline balance across intervention arms.</p>
+<div id="overview" class="section level1 unnumbered hasAnchor">
+<h1>Overview<a href="index.html#overview" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>This online appendix is the <strong>complete, searchable companion</strong> to the manuscript:</p>
+<blockquote>
+<p><strong>Nutritional interventions’ impacts on human milk: three trial analyses from low-resource settings</strong> (Dailey-Chwalibóg, Mertens et al., 2025). International Milk Composition (IMiC) Consortium.</p>
+</blockquote>
+<p>It provides every analytical output that supports the main manuscript — interactive forest and volcano plots, searchable estimate tables (filter and CSV-download enabled), longitudinal trajectory visualisations, MILQ-anchored deficiency analyses, BMI-stratified subgroup analyses, and pathway-level enrichment results — at a level of detail that does not fit in the printed article PDF.</p>
+<p>The appendix is organised into <strong>eight numbered sections</strong> matching the references in the printed paper (Sections 1–8), preceded by this unnumbered overview and followed by a reproducibility appendix.</p>
+<div id="outstanding-todos-revision-round-1" class="section level2 unnumbered hasAnchor">
+<h2>Outstanding TODOs (revision round 1)<a href="index.html#outstanding-todos-revision-round-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The following items remain open while the manuscript revision is in progress; the supplement will be updated as soon as the upstream actions complete:</p>
+<ul>
+<li><strong>TODO (revision item 3): Zenodo / Code-Ocean DOI archive.</strong> Science’s revision checklist requires that code in a GitHub repository be permanently archived in Zenodo or Code Ocean and cited with a DOI in the reference list. The supplement repository needs a tagged release linked to Zenodo, and the resulting DOI needs to be embedded in this overview, the <a href="https://github.com/amertens/IMiC-intervention-effects-supplement">README</a>, and the reference list of the main paper. Until that hook-up is in place, citing this supplement should use the repository URL (above) as a placeholder.</li>
+<li><strong>TODO (revision item 8): Re-target figure cross-references after Fig. S2 promotion.</strong> Reviewer 2 recommended promoting Fig. S2 (the B-vitamin biomarker panel) from the printed Word supplement to a main-text figure. If that change is accepted by the editor, every “Figure S#” cross-reference in this online appendix — currently <em>Figure S1</em> (growth), <em>Figure S2</em> (HM distributions), <em>Figure S3</em> (MILQ deficiency RR), <em>Figure S4</em> (HMOs/bioactives), <em>Figure S5</em> (TG fat-adjustment), and <em>Figure S6</em> (microbiome α-diversity) — must be renumbered to match the post-revision figure list.</li>
+</ul>
 </div>
-<div id="human-milk-component-distributions" class="section level3 hasAnchor" number="1.1.2">
-<h3><span class="header-section-number">1.1.2</span> Human Milk Component Distributions<a href="index.html#human-milk-component-distributions" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Unadjusted distributions of all measured human milk components, including macronutrients, micronutrients, B-vitamins, HMOs, targeted metabolites, proteins, and microbiome features, stratified by study and visit where applicable.</p>
+<div id="how-this-appendix-maps-to-the-manuscript" class="section level2 hasAnchor" number="0.1">
+<h2><span class="header-section-number">0.1</span> How this appendix maps to the manuscript<a href="index.html#how-this-appendix-maps-to-the-manuscript" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<table>
+<colgroup>
+<col width="50%" />
+<col width="50%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Manuscript reference</th>
+<th>Section here</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Methods: “baseline participant characteristics … (Section 1)”</td>
+<td><a href="baseline-characteristics-by-study-and-intervention-arm.html#baseline-characteristics-by-study-and-intervention-arm">§1 Baseline characteristics by study and intervention arm</a></td>
+</tr>
+<tr class="even">
+<td>Methods: “outcomes list … (Section 2)” + manuscript Fig. S2</td>
+<td><a href="outcomes-and-human-milk-component-distributions.html#outcomes-and-human-milk-component-distributions">§2 Outcomes and human milk component distributions</a></td>
+</tr>
+<tr class="odd">
+<td>Results: “Online Appendix 3” (effect modification by maternal BMI)</td>
+<td><a href="subgroup-analyses-stratified-by-maternal-bmi.html#subgroup-analyses-stratified-by-maternal-bmi">§3 Subgroup analyses stratified by maternal BMI</a></td>
+</tr>
+<tr class="even">
+<td>Results: “Online Appendix 4” (individual microbial taxa); Fig. S6</td>
+<td><a href="exploratory-high-dimensional-outcomes-microbiome-untargeted-proteomics-untargeted-metabolomics.html#exploratory-high-dimensional-outcomes-microbiome-untargeted-proteomics-untargeted-metabolomics">§4 Microbiome and exploratory high-dimensional outcomes</a></td>
+</tr>
+<tr class="odd">
+<td>Fig. 4A: “metadata in Online Supplement 5” (primary milk components)</td>
+<td><a href="adjusted-intervention-effects-on-individual-milk-components.html#adjusted-intervention-effects-on-individual-milk-components">§5 Adjusted intervention effects on individual milk components</a></td>
+</tr>
+<tr class="even">
+<td>Fig. 5A: “metadata in Online Supplement 6” (targeted metabolites); manuscript Fig. S3 (MILQ deficiency)</td>
+<td><a href="targeted-metabolite-metadata-and-reductions-in-hm-nutrient-deficiency.html#targeted-metabolite-metadata-and-reductions-in-hm-nutrient-deficiency">§6 Targeted-metabolite metadata and reductions in HM nutrient deficiency</a></td>
+</tr>
+<tr class="odd">
+<td>Longitudinal change in HM composition</td>
+<td><a href="trajectory-analyses-of-human-milk-component-change-across-lactation.html#trajectory-analyses-of-human-milk-component-change-across-lactation">§7 Trajectory analyses of HM component change across lactation</a></td>
+</tr>
+<tr class="even">
+<td>Fig. S1 (growth); Fig. S5 (TG fat adjustment); Tables S2/S3/S5/S6 (pathway enrichment); sensitivity analyses</td>
+<td><a href="sensitivity-analyses-and-additional-outputs.html#sensitivity-analyses-and-additional-outputs">§8 Sensitivity analyses and additional outputs</a></td>
+</tr>
+</tbody>
+</table>
+<p>The manuscript’s section-numbered citations — <em>“Section 1”</em>, <em>“Section 2”</em>, <em>“Online Appendix 3”</em>, <em>“Online Appendix 4”</em>, <em>“Online Supplement 5”</em>, <em>“Online Supplement 6”</em> — resolve directly to <strong>§1–§6</strong> of this build.</p>
 </div>
-<div id="adjusted-intervention-effects-on-individual-milk-components" class="section level3 hasAnchor" number="1.1.3">
-<h3><span class="header-section-number">1.1.3</span> Adjusted Intervention Effects on Individual Milk Components<a href="index.html#adjusted-intervention-effects-on-individual-milk-components" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Covariate-adjusted average treatment effect estimates for primary outcomes (macronutrients and micronutrients), with false-discovery rate correction applied by outcome group.</p>
+<div id="methods-recap" class="section level2 hasAnchor" number="0.2">
+<h2><span class="header-section-number">0.2</span> Methods recap<a href="index.html#methods-recap" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We conducted a harmonised individual-participant data meta-analysis of human milk from 640 mother–infant dyads drawn from three randomised controlled trials in one low- and two lower-middle-income country settings: <strong>MISAME-III</strong> (Burkina Faso; prenatal and/or postnatal balanced energy–protein supplementation), <strong>Mumta-LW</strong> (Pakistan; postnatal BEP and BEP+infant azithromycin), and <strong>ELICIT</strong> (Tanzania; maternal nicotinamide during lactation with independent infant antimicrobial arms). Each trial contributed its own intent-to-treat population, restricted to dyads with at least one HM measurement contributing to IMiC.</p>
+<p>Primary outcomes are macronutrients and micronutrients; secondary are HMOs and bioactive proteins; tertiary are targeted metabolites (Biocrates MxP Quant 500); exploratory are untargeted metabolomics, untargeted proteomics, and microbiome composition. All components were expressed in native assay units, then standardised to study × visit z-scores before TMLE. Effect estimates from the primary chapter therefore represent <strong>mean differences in SD units</strong>, with FDR correction applied within each outcome group × study × visit. The complete methods are in the manuscript and its Methods supplement.</p>
+<p>The full outcomes list — every milk component analysed in this supplement, grouped by prespecified outcome class with per-study availability — is now in <a href="outcomes-and-human-milk-component-distributions.html#outcomes-and-human-milk-component-distributions">§2 <em>Outcomes and human milk component distributions</em></a>, so that the manuscript Methods reference <em>“A list of all outcomes and descriptions is available in the Online Appendix (Section 2)”</em> resolves to a numbered section rather than an unnumbered overview.</p>
 </div>
-<div id="unadjusted-intervention-effects-on-individual-milk-components" class="section level3 hasAnchor" number="1.1.4">
-<h3><span class="header-section-number">1.1.4</span> Unadjusted Intervention Effects on Individual Milk Components<a href="index.html#unadjusted-intervention-effects-on-individual-milk-components" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Corresponding unadjusted estimates for all milk components.</p>
+<div id="how-to-read-interactive-figures" class="section level2 hasAnchor" number="0.3">
+<h2><span class="header-section-number">0.3</span> How to read interactive figures<a href="index.html#how-to-read-interactive-figures" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In the HTML build, forest and volcano plots are rendered as <code>plotly</code> widgets. Hover any point to reveal the component name, study, visit, ATE, 95% CI, and FDR-adjusted q-value. Plotly’s mode bar (top-right of each plot) allows zoom, pan, lasso-select, and PNG export. Every plot is paired with a <code>DT::datatable</code> containing the same underlying data with column filters, free-text search, sortable columns, and CSV/Excel download buttons.</p>
+<p>Where a section relies on an upstream data artefact that is not present in the current build, the section prints an inline notice naming the missing file rather than failing. Re-run the upstream analysis pipeline (see <em>Reproducing the supplement</em> in the repository README) to regenerate those artefacts.</p>
 </div>
-<div id="unscaled-intervention-effects-on-individual-milk-components" class="section level3 hasAnchor" number="1.1.5">
-<h3><span class="header-section-number">1.1.5</span> Unscaled Intervention Effects on Individual Milk Components<a href="index.html#unscaled-intervention-effects-on-individual-milk-components" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Corresponding adjusted, but unscaled estimates for all milk components, using the raw concentration values without Z-scoring for comparison across milk components.</p>
-</div>
-<div id="targeted-and-exploratory-milk-components" class="section level3 hasAnchor" number="1.1.6">
-<h3><span class="header-section-number">1.1.6</span> Targeted and Exploratory Milk Components<a href="index.html#targeted-and-exploratory-milk-components" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Results for tertiary and exploratory outcomes, including targeted metabolomics, untargeted metabolomics, untargeted proteomics, and milk microbiome analyses, with pathway- and set-level summaries.</p>
-</div>
-<div id="subgroup-analyses-stratified-by-maternal-bmi" class="section level3 hasAnchor" number="1.1.7">
-<h3><span class="header-section-number">1.1.7</span> Subgroup analyses stratified by maternal BMI<a href="index.html#subgroup-analyses-stratified-by-maternal-bmi" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Effect modification analyses stratified by maternal BMI category (underweight vs not)</p>
-</div>
-<div id="trajectory-analyses-of-human-milk-component-change-across-lactation" class="section level3 hasAnchor" number="1.1.8">
-<h3><span class="header-section-number">1.1.8</span> Trajectory analyses of human milk component change across lactation<a href="index.html#trajectory-analyses-of-human-milk-component-change-across-lactation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
-<p>Visualization of longitudinal trajectories of selected milk components across lactation by study and intervention arm.</p>
+<div id="citation-and-reproducibility" class="section level2 hasAnchor" number="0.4">
+<h2><span class="header-section-number">0.4</span> Citation and reproducibility<a href="index.html#citation-and-reproducibility" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<ul>
+<li>Source for this appendix: <a href="https://github.com/amertens/IMiC-intervention-effects-supplement" class="uri">https://github.com/amertens/IMiC-intervention-effects-supplement</a></li>
+<li>Upstream analysis code (TMLE pipelines, SuperLearner, enrichment workflows): <a href="https://github.com/amertens/imic_intervention_effects" class="uri">https://github.com/amertens/imic_intervention_effects</a></li>
+<li>Trial registration: ClinicalTrials.gov <strong>NCT05119166</strong></li>
+<li>DOI (Zenodo archive): <em>pending — see TODO above</em></li>
+</ul>
 
-</div>
 </div>
 </div>
             </section>
@@ -205,7 +331,7 @@
         </div>
       </div>
 
-<a href="study-baseline-characteristics-1.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+<a href="baseline-characteristics-by-study-and-intervention-arm.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>

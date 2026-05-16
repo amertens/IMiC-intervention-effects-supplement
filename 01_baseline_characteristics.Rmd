@@ -1,30 +1,30 @@
-# Study Baseline Characteristics
+# Baseline characteristics by study and intervention arm
 
+This chapter summarizes baseline maternal, infant, and household characteristics for the IMiC subsamples drawn from the three randomized controlled trials included in the intervention-effects analysis: **MISAME-III** (Burkina Faso), **Mumta-LW** (Pakistan), and **ELICIT** (Tanzania). Baseline characteristics are presented separately by study and stratified by randomized intervention arm, using the earliest available postnatal visit corresponding to milk sample collection in each trial.
 
-This chapter summarizes baseline maternal, infant, and household characteristics for the IMiC subsamples drawn from the three randomized trials included in the intervention effects analysis: MISAME-III (Burkina Faso), Mumta-LW (Pakistan), and ELICIT (Tanzania). Baseline characteristics are presented separately by study and stratified by randomized intervention arm, using the earliest available postnatal visit corresponding to milk sample collection in each trial.
+Tables report key demographic, anthropometric, socioeconomic, and household variables that are plausibly associated with maternal nutritional status, breastfeeding context, or infant outcomes: infant sex, maternal age, education, height, BMI, MUAC, parity, household composition, housing characteristics, water source, season and place of delivery, asset-based household wealth, and food security. These variables were harmonized across studies as part of the IMiC data curation process and are documented in the manuscript's Supplementary Methods.
 
-Tables report key demographic, anthropometric, socioeconomic, and household variables that are plausibly associated with maternal nutritional status, breastfeeding context, or infant outcomes, including infant sex, maternal age, education, height, parity, household composition, housing characteristics, water source, season and location of delivery, household wealth index, and food security. These variables were harmonized across studies as part of the IMiC data curation process and are described in detail in the Supplementary Methods.
+The purpose of this chapter is descriptive: to characterize the analytic populations contributing milk samples in each trial and to assess baseline balance across intervention arms following randomization. No statistical tests of between-arm differences are performed, consistent with best practices for randomized trials. These tables provide contextual information for interpreting intervention-effect estimates presented in subsequent chapters.
 
-The purpose of this chapter is descriptive: to characterize the analytic populations contributing milk samples in each trial and to assess baseline balance across intervention arms following randomization. No statistical tests of between-arm differences are performed here, consistent with best practices for randomized trials. These tables provide contextual information for interpreting intervention effect estimates presented in subsequent chapters.
-
-
-
-```{r, echo=FALSE, message=FALSE, out.width="100%", fig.cap="", warning=FALSE}
-
+```{r baseline-setup, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 library(tidyverse)
 library(here)
 library(table1)
 
+raw_path <- here::here("data/merged_analysis_datasets.RDS")
+have_baseline <- file.exists(raw_path)
+if (!have_baseline) {
+  cat("*Baseline table data (`data/merged_analysis_datasets.RDS`) is not present in this build. Re-run the upstream analysis pipeline (see README) to populate it.*\n\n")
+  raw_df <- NULL
+} else {
+  raw_df <- readRDS(raw_path)
 
-raw_df <- readRDS(paste0(here::here(),"/data/merged_analysis_datasets.RDS"))
-
-
-# Apply human-readable labels used by table1
 label(raw_df$sex)           <- "Infant sex"
 label(raw_df$mage)          <- "Maternal age (years)"
 label(raw_df$meducyrs)      <- "Maternal education (years)"
-label(raw_df$mbmi)          <- "Maternal BMI (kg/m²)"
+label(raw_df$mbmi)          <- "Maternal BMI (kg/m^2)"
 label(raw_df$mmuaccm)       <- "Maternal MUAC (cm)"
+if ("mhtcm" %in% names(raw_df)) label(raw_df$mhtcm) <- "Maternal height (cm)"
 label(raw_df$parity)        <- "Parity"
 label(raw_df$nperson)       <- "Household size (persons)"
 label(raw_df$nrooms)        <- "Number of rooms in household"
@@ -36,39 +36,40 @@ label(raw_df$dlvloc)        <- "Place of delivery"
 label(raw_df$hhwealth)      <- "Household wealth index"
 label(raw_df$hhfoodsecure)  <- "Household food security"
 label(raw_df$arm)           <- "Intervention arm"
-
-
-drop_empty_levels <- function(df) {
-  df %>%
-    mutate(across(where(is.factor), droplevels))
 }
+
+drop_empty_levels <- function(df) df %>% dplyr::mutate(dplyr::across(where(is.factor), droplevels))
 ```
 
+## MISAME-III (Burkina Faso)
 
-## Misame
-
-```{r, echo=FALSE}
-
-table1(~ sex + mage + meducyrs + mbmi + mmuaccm + parity + nperson + nrooms + imp_water_src + impfloor + cookplac + dvseason + dlvloc + hhwealth + hhfoodsecure | arm, data=raw_df %>% filter(studyid=="MISAME-3", visit==1) %>%
-    drop_empty_levels(), transpose=FALSE)
-
+```{r baseline-misame, echo=FALSE}
+if (have_baseline) table1(~ sex + mage + meducyrs + mbmi + mmuaccm + parity + nperson + nrooms +
+         imp_water_src + impfloor + cookplac + dvseason + dlvloc +
+         hhwealth + hhfoodsecure | arm,
+       data = raw_df %>% dplyr::filter(studyid == "MISAME-3", visit == 1) %>%
+         drop_empty_levels(),
+       transpose = FALSE)
 ```
 
+## Mumta-LW (Pakistan)
 
-## Mumta
-
-```{r, echo=FALSE}
-
-table1(~ sex + mage + meducyrs + mbmi + mmuaccm + mhtcm + parity + nperson + nrooms + imp_water_src + impfloor + cookplac + dvseason + dlvloc + hhwealth + hhfoodsecure | arm, data=raw_df %>% filter(studyid=="VITAL-Lactation", visit==40) %>%
-    drop_empty_levels(), transpose=FALSE)
-
+```{r baseline-mumta, echo=FALSE}
+if (have_baseline) table1(~ sex + mage + meducyrs + mbmi + mmuaccm + mhtcm + parity + nperson + nrooms +
+         imp_water_src + impfloor + cookplac + dvseason + dlvloc +
+         hhwealth + hhfoodsecure | arm,
+       data = raw_df %>% dplyr::filter(studyid == "VITAL-Lactation", visit == 40) %>%
+         drop_empty_levels(),
+       transpose = FALSE)
 ```
 
-## Elicit
+## ELICIT (Tanzania)
 
-```{r, echo=FALSE}
-
-table1(~ sex + mage + meducyrs  + mbmi + mmuaccm + mhtcm + parity + nperson + nrooms + imp_water_src + impfloor + cookplac + dvseason + dlvloc + hhwealth + hhfoodsecure | arm, data=raw_df %>% filter(studyid=="ELICIT", visit==1) %>%
-    drop_empty_levels(), transpose=FALSE)
-
+```{r baseline-elicit, echo=FALSE}
+if (have_baseline) table1(~ sex + mage + meducyrs + mbmi + mmuaccm + mhtcm + parity + nperson + nrooms +
+         imp_water_src + impfloor + cookplac + dvseason + dlvloc +
+         hhwealth + hhfoodsecure | arm,
+       data = raw_df %>% dplyr::filter(studyid == "ELICIT", visit == 1) %>%
+         drop_empty_levels(),
+       transpose = FALSE)
 ```

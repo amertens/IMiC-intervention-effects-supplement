@@ -1,105 +1,70 @@
---- 
+---
 title: "IMiC supplementary material"
 site: bookdown::bookdown_site
 documentclass: book
 bibliography: [book.bib, packages.bib]
-# url: your book url like https://bookdown.org/yihui/bookdown
-# cover-image: path to the social sharing image like images/cover.jpg
 description: |
-  Supplementary material for "The impact of nutritional interventions on human milk in low resource settings: findings from the International Milk Composition (IMiC) Consortium"
+  Online supplementary appendix for "Nutritional interventions' impacts on human milk: three trial analyses from low-resource settings" (Dailey-Chwalibóg, Mertens et al., 2025), reporting the full analytical outputs of the International Milk Composition (IMiC) Consortium intervention-effects analysis.
 link-citations: yes
-github-repo: rstudio/bookdown-demo
+github-repo: amertens/IMiC-intervention-effects-supplement
+url: https://amertens.github.io/IMiC-intervention-effects-supplement/
 ---
 
+# Overview {-}
 
-# Supplementary Material for IMiC Intervention Effects Manuscript
+This online appendix is the **complete, searchable companion** to the manuscript:
 
-This online supplementary appendix provides the complete analytical outputs supporting the manuscript  
-**“The impact of nutritional interventions on human milk in low resource settings: findings from the International Milk Composition (IMiC) Consortium.”**  
+> **Nutritional interventions' impacts on human milk: three trial analyses from low-resource settings** (Dailey-Chwalibóg, Mertens et al., 2025). International Milk Composition (IMiC) Consortium.
 
+It provides every analytical output that supports the main manuscript — interactive forest and volcano plots, searchable estimate tables (filter and CSV-download enabled), longitudinal trajectory visualisations, MILQ-anchored deficiency analyses, BMI-stratified subgroup analyses, and pathway-level enrichment results — at a level of detail that does not fit in the printed article PDF.
 
-## Organization of the Online Supplement
+The appendix is organised into **eight numbered sections** matching the references in the printed paper (Sections 1–8), preceded by this unnumbered overview and followed by a reproducibility appendix.
 
-### Study Baseline Characteristics
+## Outstanding TODOs (revision round 1) {-}
 
-  Detailed maternal, infant, and household characteristics for the IMiC subsamples across trials, including comparisons with parent trial populations and baseline balance across intervention arms.
+The following items remain open while the manuscript revision is in progress; the supplement will be updated as soon as the upstream actions complete:
 
-### Human Milk Component Distributions
+- **TODO (revision item 3): Zenodo / Code-Ocean DOI archive.** Science's revision checklist requires that code in a GitHub repository be permanently archived in Zenodo or Code Ocean and cited with a DOI in the reference list. The supplement repository needs a tagged release linked to Zenodo, and the resulting DOI needs to be embedded in this overview, the [README](https://github.com/amertens/IMiC-intervention-effects-supplement), and the reference list of the main paper. Until that hook-up is in place, citing this supplement should use the repository URL (above) as a placeholder.
+- **TODO (revision item 8): Re-target figure cross-references after Fig. S2 promotion.** Reviewer 2 recommended promoting Fig. S2 (the B-vitamin biomarker panel) from the printed Word supplement to a main-text figure. If that change is accepted by the editor, every "Figure S#" cross-reference in this online appendix — currently *Figure S1* (growth), *Figure S2* (HM distributions), *Figure S3* (MILQ deficiency RR), *Figure S4* (HMOs/bioactives), *Figure S5* (TG fat-adjustment), and *Figure S6* (microbiome α-diversity) — must be renumbered to match the post-revision figure list.
 
-  Unadjusted distributions of all measured human milk components, including macronutrients, micronutrients, B-vitamins, HMOs, targeted metabolites, proteins, and microbiome features, stratified by study and visit where applicable.
+## How this appendix maps to the manuscript
 
-### Adjusted Intervention Effects on Individual Milk Components
+| Manuscript reference | Section here |
+|---|---|
+| Methods: "baseline participant characteristics … (Section 1)" | [§1 Baseline characteristics by study and intervention arm](#baseline-characteristics-by-study-and-intervention-arm) |
+| Methods: "outcomes list … (Section 2)" + manuscript Fig. S2 | [§2 Outcomes and human milk component distributions](#outcomes-and-human-milk-component-distributions) |
+| Results: "Online Appendix 3" (effect modification by maternal BMI) | [§3 Subgroup analyses stratified by maternal BMI](#subgroup-analyses-stratified-by-maternal-bmi) |
+| Results: "Online Appendix 4" (individual microbial taxa); Fig. S6 | [§4 Microbiome and exploratory high-dimensional outcomes](#exploratory-high-dimensional-outcomes-microbiome-untargeted-proteomics-untargeted-metabolomics) |
+| Fig. 4A: "metadata in Online Supplement 5" (primary milk components) | [§5 Adjusted intervention effects on individual milk components](#adjusted-intervention-effects-on-individual-milk-components) |
+| Fig. 5A: "metadata in Online Supplement 6" (targeted metabolites); manuscript Fig. S3 (MILQ deficiency) | [§6 Targeted-metabolite metadata and reductions in HM nutrient deficiency](#targeted-metabolite-metadata-and-reductions-in-hm-nutrient-deficiency) |
+| Longitudinal change in HM composition | [§7 Trajectory analyses of HM component change across lactation](#trajectory-analyses-of-human-milk-component-change-across-lactation) |
+| Fig. S1 (growth); Fig. S5 (TG fat adjustment); Tables S2/S3/S5/S6 (pathway enrichment); sensitivity analyses | [§8 Sensitivity analyses and additional outputs](#sensitivity-analyses-and-additional-outputs) |
 
-  Covariate-adjusted average treatment effect estimates for primary outcomes (macronutrients and micronutrients), with false-discovery rate correction applied by outcome group.
+The manuscript's section-numbered citations — *"Section 1"*, *"Section 2"*, *"Online Appendix 3"*, *"Online Appendix 4"*, *"Online Supplement 5"*, *"Online Supplement 6"* — resolve directly to **§1–§6** of this build.
 
+## Methods recap
 
-### Unadjusted Intervention Effects on Individual Milk Components
-  Corresponding unadjusted estimates for all milk components.
+We conducted a harmonised individual-participant data meta-analysis of human milk from 640 mother–infant dyads drawn from three randomised controlled trials in one low- and two lower-middle-income country settings: **MISAME-III** (Burkina Faso; prenatal and/or postnatal balanced energy–protein supplementation), **Mumta-LW** (Pakistan; postnatal BEP and BEP+infant azithromycin), and **ELICIT** (Tanzania; maternal nicotinamide during lactation with independent infant antimicrobial arms). Each trial contributed its own intent-to-treat population, restricted to dyads with at least one HM measurement contributing to IMiC.
 
-### Unscaled Intervention Effects on Individual Milk Components
+Primary outcomes are macronutrients and micronutrients; secondary are HMOs and bioactive proteins; tertiary are targeted metabolites (Biocrates MxP Quant 500); exploratory are untargeted metabolomics, untargeted proteomics, and microbiome composition. All components were expressed in native assay units, then standardised to study × visit z-scores before TMLE. Effect estimates from the primary chapter therefore represent **mean differences in SD units**, with FDR correction applied within each outcome group × study × visit. The complete methods are in the manuscript and its Methods supplement.
 
-  Corresponding adjusted, but unscaled estimates for all milk components, using the raw concentration values without Z-scoring for comparison across milk components.
+The full outcomes list — every milk component analysed in this supplement, grouped by prespecified outcome class with per-study availability — is now in [§2 *Outcomes and human milk component distributions*](#outcomes-and-human-milk-component-distributions), so that the manuscript Methods reference *"A list of all outcomes and descriptions is available in the Online Appendix (Section 2)"* resolves to a numbered section rather than an unnumbered overview.
 
-### Targeted and Exploratory Milk Components
+## How to read interactive figures
 
-  Results for tertiary and exploratory outcomes, including targeted metabolomics, untargeted metabolomics, untargeted proteomics, and milk microbiome analyses, with pathway- and set-level summaries.
+In the HTML build, forest and volcano plots are rendered as `plotly` widgets. Hover any point to reveal the component name, study, visit, ATE, 95% CI, and FDR-adjusted q-value. Plotly's mode bar (top-right of each plot) allows zoom, pan, lasso-select, and PNG export. Every plot is paired with a `DT::datatable` containing the same underlying data with column filters, free-text search, sortable columns, and CSV/Excel download buttons.
 
-### Subgroup analyses stratified by maternal BMI
+Where a section relies on an upstream data artefact that is not present in the current build, the section prints an inline notice naming the missing file rather than failing. Re-run the upstream analysis pipeline (see *Reproducing the supplement* in the repository README) to regenerate those artefacts.
 
-  Effect modification analyses stratified by maternal BMI category (underweight vs not)
+## Citation and reproducibility
 
+- Source for this appendix: <https://github.com/amertens/IMiC-intervention-effects-supplement>
+- Upstream analysis code (TMLE pipelines, SuperLearner, enrichment workflows): <https://github.com/amertens/imic_intervention_effects>
+- Trial registration: ClinicalTrials.gov **NCT05119166**
+- DOI (Zenodo archive): *pending — see TODO above*
 
-### Trajectory analyses of human milk component change across lactation
-
-  Visualization of longitudinal trajectories of selected milk components across lactation by study and intervention arm.
-
-
-
-
-
-```{r include=FALSE}
-# automatically create a bib database for R packages
-knitr::write_bib(c(
-  .packages(), 'bookdown', 'knitr', 'rmarkdown', 'tidyverse', 'here'
-), 'packages.bib')
+```{r write-bib, include=FALSE}
+knitr::write_bib(c(.packages(), "bookdown","knitr","rmarkdown","tidyverse","here",
+                   "DT","plotly","table1"),
+                 "packages.bib")
 ```
-
-```{r, eval=F, include=F}
-
-#to create the book
-library(bookdown)
-library(rsconnect)
- 
-bookdown::render_book("index.Rmd")
-
-#bookdown::render_book()
-
-#  # view locally
-#  render_book("index.Rmd")
-#  
-#  # Remove the rsconnect folder to clear cached deployment info
-# #unlink("rsconnect", recursive = TRUE)
-#  
-#  
-# 
-# 
-# # #rebuild and publish
-# # bookdown::publish_book(
-# #   render  = "local",
-# #   account = "amertens",
-# #   server  = "bookdown.org"#,
-# #   #appName = "imic_intervention_supplement"
-# # )
-# 
-#  unlink("_book", recursive = TRUE)
-# bookdown::render_book(".", "bookdown::gitbook")
-# 
-# 
-# rsconnect::deployApp( appDir = "_book", account = "amertens", server = "bookdown.org", appName = "imic_intervention_effects_supplement" )
-
- 
-
-
-```
-
-
