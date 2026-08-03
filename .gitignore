@@ -5,11 +5,14 @@
 _book/
 data
 results
-figures
 boxplot_files/
 /data
 /results
 /figures
+
+# NOTE: `figures` (bare) is intentionally NOT ignored — it would also match
+# `docs/figures/`, the static images bookdown copies into the published site.
+# The root port target is still ignored via `/figures` above.
 /boxplot_files/
 02_descriptive_statistics.Rmd
 

@@ -265,7 +265,7 @@ cc_dt(read_cc("results/cross_compartment_pathways_adjusted.csv"), page_length = 
 
 ## Putative annotation of FDR-significant features {#cc-annotation}
 
-Because the metabolomic platforms are untargeted, the FDR-significant features carry only **putative** annotations, assigned by accurate mass against reference libraries (MSI level ≈ 3), with most features returning several candidates or none. The tables below list the mass-based candidate annotations for the blood and milk FDR-significant features; the curated milk list includes ~48 named metabolites (e.g. pantothenate/B5, ascorbate, fumarate). Treat every name as provisional.
+Because the metabolomic platforms are untargeted, the FDR-significant features carry only **putative** annotations, assigned by accurate mass against reference libraries (MSI level ≈ 3), with most features returning several candidates or none. The tables below list the mass-based candidate annotations for the blood and milk FDR-significant features; the curated milk list includes ~48 named metabolites (e.g. pantothenate/B5, ascorbate, fumarate). Treat every name as provisional. The fuller, finalized milk-side annotation — all 1,034 FDR-significant untargeted milk features, with named-vs-unresolved counts by direction and ionisation mode — is in the [feature-level putative annotation](#path-mummichog-annotation) subsection of §9.
 
 The interactive **feature map** below plots each FDR-significant milk feature by its *m/z* against its standardized effect, coloured by direction. Brush a mass region (Plotly *Box Select*) to filter the annotation table to those features, or use the dropdowns; this is the quickest way to see which masses carry the up- vs down-regulated signal and read their putative names.
 
