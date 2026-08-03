@@ -200,9 +200,8 @@ clean_tab <- function(tab, caption = NULL) {
 
   DT::datatable(
     tab,
-    extensions = c("Buttons","FixedHeader"),
-    options = list(pageLength = 15, dom = "Bfrtip",
-                   buttons = c("csv","excel","copy"),
+    extensions = "FixedHeader",
+    options = list(pageLength = 15, dom = "frtip",
                    fixedHeader = TRUE, scrollX = TRUE),
     caption = caption, filter = "top", rownames = FALSE
   ) %>% DT::formatStyle(columns = keep, fontSize = "11px")
@@ -216,9 +215,8 @@ nice_dt <- function(df, caption = NULL, page_length = 15, round_digits = 3) {
   num_cols <- names(df)[vapply(df, is.numeric, logical(1))]
   dt <- DT::datatable(
     df,
-    extensions = c("Buttons","FixedHeader"),
-    options = list(pageLength = page_length, dom = "Bfrtip",
-                   buttons = c("csv","excel","copy"),
+    extensions = "FixedHeader",
+    options = list(pageLength = page_length, dom = "frtip",
                    fixedHeader = TRUE, scrollX = TRUE),
     caption = caption, filter = "top", rownames = FALSE
   )
@@ -315,6 +313,72 @@ volcano_capped <- function(df, n_show = 2000, ...) {
     df_show <- df
   }
   volcano_plot(df_show, ...)
+}
+
+## Interactive LINKED volcano + table (crosstalk). Brushing/selecting points in
+## the volcano filters the rows shown in the table, and the table's own column
+## filters drive the plot — all client-side, so it works on static GitHub Pages
+## with no Shiny server. `df` needs est, pval, pval_adj, and a label column;
+## study/visit/contrast add dropdown filters and richer tooltips. Returns an
+## htmltools tagList (return it as the last value of a chunk).
+linked_volcano_table <- function(df, fdr_thresh = 0.05,
+                                 title = "Volcano — brush points to filter the table (and vice versa)",
+                                 x_lab = "Estimate (SD units)",
+                                 key_col = "label_f",
+                                 filter_cols = c("study", "visit", "contrast"),
+                                 show_cols = c("study","visit","contrast","label_f","est","cil","ciu",
+                                               "pval","pval_adj","pval_adj_global","sigFDR")) {
+  if (is.null(df) || !nrow(df)) return(htmltools::tags$em("No rows to display."))
+  df <- .harmonize_factors(df)
+  if (!"pval" %in% names(df) && "chi_pval" %in% names(df)) df$pval <- df$chi_pval
+  if (!"pval_adj" %in% names(df) && "chi_pval_adj" %in% names(df)) df$pval_adj <- df$chi_pval_adj
+  if (!all(c("est","pval","pval_adj") %in% names(df)) || !key_col %in% names(df)) {
+    return(htmltools::tags$em("Table lacks the est / pval / pval_adj / label columns needed for a volcano."))
+  }
+  df$neglog10p   <- -log10(pmax(df$pval, .Machine$double.eps))
+  df$Significance <- factor(
+    ifelse(df$pval_adj < fdr_thresh, paste0("q < ", fdr_thresh),
+    ifelse(df$pval < 0.05,           "p < 0.05", "ns")),
+    levels = c("ns", "p < 0.05", paste0("q < ", fdr_thresh)))
+  df$tooltip <- paste0(df[[key_col]],
+                       if ("study" %in% names(df)) paste0("<br>", df$study) else "",
+                       if ("visit" %in% names(df)) paste0(" | ", df$visit) else "",
+                       "<br>est ", signif(df$est, 3), " | p ", signif(df$pval, 3),
+                       " | q ", signif(df$pval_adj, 3))
+  keep <- union(intersect(show_cols, names(df)), c("neglog10p", "Significance", "tooltip", "est"))
+  df   <- df[, intersect(keep, names(df)), drop = FALSE]
+
+  if (!knitr::is_html_output() || !requireNamespace("crosstalk", quietly = TRUE)) {
+    return(nice_dt(df[, setdiff(names(df), c("neglog10p","Significance","tooltip")), drop = FALSE]))
+  }
+  sd <- crosstalk::SharedData$new(df)
+
+  p <- plotly::plot_ly(sd, x = ~est, y = ~neglog10p, type = "scatter", mode = "markers",
+                       color = ~Significance,
+                       colors = stats::setNames(c("grey70", tableau10[1], tableau10[2]),
+                                                levels(df$Significance)),
+                       text = ~tooltip, hoverinfo = "text",
+                       marker = list(size = 6, opacity = 0.6)) %>%
+    plotly::layout(title = list(text = title), xaxis = list(title = x_lab),
+                   yaxis = list(title = "-log10(p)"), legend = list(orientation = "h"),
+                   shapes = list(list(type = "line", x0 = 0, x1 = 0, yref = "paper",
+                                      y0 = 0, y1 = 1, line = list(dash = "dash", color = "grey50")))) %>%
+    plotly::highlight(on = "plotly_selected", off = "plotly_deselect", persistent = FALSE)
+
+  hide_idx <- which(names(df) %in% c("neglog10p", "Significance", "tooltip")) - 1
+  dt <- DT::datatable(sd, extensions = "FixedHeader",
+                      options = list(pageLength = 10, dom = "frtip",
+                                     fixedHeader = TRUE, scrollX = TRUE,
+                                     columnDefs = list(list(visible = FALSE, targets = hide_idx))),
+                      filter = "top", rownames = FALSE) %>%
+    DT::formatStyle(columns = names(df), fontSize = "11px")
+
+  fcols <- intersect(filter_cols, names(df))
+  filt  <- lapply(fcols, function(cc)
+    crosstalk::filter_select(cc, cc, sd, stats::as.formula(paste0("~", cc))))
+  htmltools::tagList(
+    if (length(filt)) do.call(crosstalk::bscols, filt) else NULL,
+    p, dt)
 }
 
 ## Unnest the upstream nested intervention-effects results (study, visit, res),

@@ -7,7 +7,7 @@ Source for the **interactive online supplementary appendix** to:
 The rendered appendix is a Bookdown gitbook published at:
 <https://amertens.github.io/IMiC-intervention-effects-supplement/>
 
-It provides full analytical outputs — interactive forest and volcano plots, searchable estimate tables with CSV download, longitudinal trajectories, MILQ-anchored deficiency analyses, BMI-stratified subgroup analyses, reproducible pathway-enrichment results, and the cross-compartment maternal/infant blood analyses — that complement the static main article.
+It provides full analytical outputs — interactive forest and volcano plots, searchable and filterable estimate tables, longitudinal trajectories, MILQ-anchored deficiency analyses, BMI-stratified subgroup analyses, reproducible pathway-enrichment results, and the cross-compartment maternal/infant blood analyses — that complement the static main article.
 
 ## Trial and terminology conventions
 
@@ -44,7 +44,7 @@ The scripted pathway-enrichment tables that were previously described under §8.
 ## Display conventions
 
 - **Forest plots** and **volcano plots** are rendered as `plotly` widgets in HTML — hover any point to read the component name, study, visit, ATE, 95% CI, and FDR-adjusted q-value. Plotly's mode bar (top-right) provides zoom, pan, and PNG export.
-- Each plot is paired with a **searchable `DT::datatable`** that exposes the same underlying data with column filters, free-text search, sortable columns, and CSV/Excel/copy download buttons.
+- Each plot is paired with a **searchable `DT::datatable`** that exposes the same underlying data with column filters, free-text search, and sortable columns.
 - Where a chapter's upstream input file is missing in the current build, the chapter prints an **inline notice** identifying the missing file rather than failing. This makes broken artefacts visible to readers and lets the book continue to render for everyone else.
 - Static-image figures (saved upstream as pre-built ggplots) are rendered at larger figure dimensions and a 14pt base font in the source chapters, in response to Reviewer 2's note that some labels were too small.
 

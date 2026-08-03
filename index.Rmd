@@ -16,7 +16,7 @@ This online appendix is the **complete, searchable companion** to the manuscript
 
 > **Nutritional interventions' impacts on human milk: three trial analyses from low-resource settings** (Dailey-Chwalibóg, Mertens et al., 2025). International Milk Composition (IMiC) Consortium.
 
-It provides every analytical output that supports the main manuscript, in more detail than the printed article PDF can hold: interactive forest and volcano plots, searchable estimate tables (filter and CSV-download enabled), longitudinal trajectory visualisations, MILQ-anchored deficiency analyses, BMI-stratified subgroup analyses, reproducible pathway-enrichment results, and the cross-compartment maternal/infant blood analyses.
+It provides every analytical output that supports the main manuscript, in more detail than the printed article PDF can hold: interactive forest and volcano plots, searchable and filterable estimate tables, longitudinal trajectory visualisations, MILQ-anchored deficiency analyses, BMI-stratified subgroup analyses, reproducible pathway-enrichment results, and the cross-compartment maternal/infant blood analyses.
 
 The appendix is organised into **ten numbered sections** matching the references in the printed paper (Sections 1–10), preceded by this unnumbered overview and followed by a reproducibility appendix. Sections 1–8 mirror the original submission; **§9 (reproducible pathway and enrichment analyses)** and **§10 (cross-compartment analyses in maternal and infant blood)** are added in this revision to report, respectively, the scripted MetaboAnalystR enrichment pipeline behind the manuscript's pathway figures and the maternal-plasma / dried-blood-VAMS / blood-proteomics analyses behind manuscript Fig. S7 and Table S8.
 
@@ -56,7 +56,7 @@ The full outcomes list (every milk component analysed in this supplement, groupe
 
 ## How to read interactive figures
 
-In the HTML build, forest and volcano plots are rendered as `plotly` widgets. Hover any point to reveal the component name, study, visit, ATE, 95% CI, and FDR-adjusted q-value. Plotly's mode bar (top-right of each plot) allows zoom, pan, lasso-select, and PNG export. Every plot is paired with a `DT::datatable` containing the same underlying data with column filters, free-text search, sortable columns, and CSV/Excel download buttons.
+In the HTML build, forest and volcano plots are rendered as `plotly` widgets. Hover any point to reveal the component name, study, visit, ATE, 95% CI, and FDR-adjusted q-value. Plotly's mode bar (top-right of each plot) allows zoom, pan, lasso-select, and PNG export. Every plot is paired with a `DT::datatable` containing the same underlying data with column filters, free-text search, and sortable columns.
 
 Where a section relies on an upstream data artefact that is not present in the current build, the section prints an inline notice naming the missing file rather than failing. Re-run the upstream analysis pipeline (see *Reproducing the supplement* in the repository README) to regenerate those artefacts.
 
