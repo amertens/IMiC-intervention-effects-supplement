@@ -32,9 +32,29 @@ copy_data("effect-explorer",
           c(paste0(prefixes, ".csv"), paste0(prefixes, "_arm_strat.csv")),
           from = "results/subsetted results")
 
-## ---- export (shared runtime under docs/apps/shinylive) --------------------
 shinylive::export(file.path(apps_root, "effect-explorer"), dest, subdir = "effect-explorer")
 cat("[export] effect-explorer -> docs/apps/effect-explorer\n")
+
+## ---- Pathway Explorer: 8 enrichment CSVs (from results/metaboanalyst) ------
+pe_data <- file.path(apps_root, "pathway-explorer", "data")
+dir.create(pe_data, recursive = TRUE, showWarnings = FALSE)
+pe_src <- c("primary_combined/primary_combined_supplementary_table.csv",
+            "primary_stratified/primary_stratified_supplementary_table.csv",
+            "tertiary_msea/tertiary_msea_combined.csv",
+            "tertiary_msea/tertiary_msea_stratified.csv",
+            "triglyceride_fa/triglyceride_fa_composition_stratified.csv",
+            "untargeted_msea/untargeted_msea_combined.csv",
+            "mummichog_s5/milk_mummichog_tableS5.csv",
+            "proteomics_go/proteomics_go_tableS6.csv")
+pe_ok <- 0
+for (rel in pe_src) {
+  src <- file.path("results/metaboanalyst", rel)
+  if (file.exists(src)) { file.copy(src, file.path(pe_data, basename(rel)), overwrite = TRUE); pe_ok <- pe_ok + 1 }
+  else cat(sprintf("[warn] missing enrichment file: %s\n", src))
+}
+cat(sprintf("[data] pathway-explorer: %d files staged\n", pe_ok))
+shinylive::export(file.path(apps_root, "pathway-explorer"), dest, subdir = "pathway-explorer")
+cat("[export] pathway-explorer -> docs/apps/pathway-explorer\n")
 
 dir_mb <- function(d) round(sum(file.info(list.files(d, recursive = TRUE, full.names = TRUE))$size, na.rm = TRUE)/1e6, 1)
 cat(sprintf("[size] docs/apps total: %.1f MB\n", dir_mb(dest)))

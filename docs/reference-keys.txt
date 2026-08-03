@@ -71,6 +71,7 @@ pathway-enrichment-analyses
 network-views-of-pathway-and-feature-relationships
 infant-growth-analyses-figure-s1
 reproducible-pathway-and-enrichment-analyses
+pathway-explorer-app
 path-primary
 arm-stratified
 path-ora-vs-pathway

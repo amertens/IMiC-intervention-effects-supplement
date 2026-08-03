@@ -45,6 +45,20 @@ enrich_dt <- function(df, caption = NULL, page_length = 15) {
 }
 ```
 
+## Interactive pathway explorer {#pathway-explorer-app}
+
+The app below spans all six enrichment analyses in this chapter (manuscript Tables S1–S6). Pick an analysis, restrict to FDR-significant pathways or show everything, and filter by study and timepoint; the dot plot ranks pathways by −log10(FDR) and the table gives the full numbers. Like the effect explorer in §5, it runs entirely in your browser (WebAssembly R), so the first load fetches the runtime and is then instant. [Open it full-screen in a new tab](apps/pathway-explorer/).
+
+```{r pathway-explorer-embed, echo=FALSE, results='asis'}
+if (knitr::is_html_output()) {
+  cat('<iframe src="apps/pathway-explorer/" title="IMiC Pathway-Enrichment Explorer" ',
+      'width="100%" height="820" loading="lazy" ',
+      'style="border:1px solid #ddd; border-radius:4px;"></iframe>\n', sep = "")
+} else {
+  cat("*The interactive pathway explorer is available in the HTML build of this appendix.*\n")
+}
+```
+
 ## Primary outcomes — MetaboAnalyst enrichment of micronutrient / B-vitamin features {#path-primary}
 
 These are the pathway summaries of the **primary-outcome** signals (macronutrients, micronutrients, B-vitamins). They correspond to manuscript **Table S1** and the enrichment panels of manuscript **Fig. 3B**. Over-representation analysis (ORA) is run per study × timepoint × contrast × direction against the targeted-panel background; the `significant` column flags pathways with `fdr_native` < 0.05.
