@@ -58,24 +58,20 @@
 <link href="libs/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet" />
 <link href="libs/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet" />
 <script src="libs/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="libs/jszip-1.13.6/jszip.min.js"></script>
-<link href="libs/dt-ext-buttons-1.13.6/css/buttons.dataTables.min.css" rel="stylesheet" />
-<script src="libs/dt-ext-buttons-1.13.6/js/dataTables.buttons.min.js"></script>
-<script src="libs/dt-ext-buttons-1.13.6/js/buttons.html5.min.js"></script>
-<script src="libs/dt-ext-buttons-1.13.6/js/buttons.colVis.min.js"></script>
-<script src="libs/dt-ext-buttons-1.13.6/js/buttons.print.min.js"></script>
 <link href="libs/dt-ext-fixedheader-1.13.6/css/fixedHeader.dataTables.min.css" rel="stylesheet" />
 <script src="libs/dt-ext-fixedheader-1.13.6/js/dataTables.fixedHeader.min.js"></script>
 <link href="libs/nouislider-7.0.10/jquery.nouislider.min.css" rel="stylesheet" />
 <script src="libs/nouislider-7.0.10/jquery.nouislider.min.js"></script>
-<link href="libs/selectize-0.12.0/selectize.bootstrap3.css" rel="stylesheet" />
-<script src="libs/selectize-0.12.0/selectize.min.js"></script>
+<link href="libs/selectize-0.12.4/css/selectize.bootstrap3.css" rel="stylesheet" />
+<script src="libs/selectize-0.12.4/js/selectize.min.js"></script>
 <link href="libs/crosstalk-1.2.2/css/crosstalk.min.css" rel="stylesheet" />
 <script src="libs/crosstalk-1.2.2/js/crosstalk.min.js"></script>
 <script src="libs/plotly-binding-4.12.1/plotly.js"></script>
 <script src="libs/typedarray-0.1/typedarray.min.js"></script>
 <link href="libs/plotly-htmlwidgets-css-2.25.2/plotly-htmlwidgets.css" rel="stylesheet" />
 <script src="libs/plotly-main-2.25.2/plotly-latest.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="libs/bootstrap-grid-3.4.1/bootstrap-grid.min.css" rel="stylesheet" />
 
 
 
@@ -168,8 +164,9 @@
 </ul></li>
 <li class="chapter" data-level="5.6" data-path="adjusted-intervention-effects-on-individual-milk-components.html"><a href="adjusted-intervention-effects-on-individual-milk-components.html#targeted-metabolites-tertiary-outcomes"><i class="fa fa-check"></i><b>5.6</b> Targeted metabolites (tertiary outcomes)</a>
 <ul>
-<li class="chapter" data-level="5.6.1" data-path="adjusted-intervention-effects-on-individual-milk-components.html"><a href="adjusted-intervention-effects-on-individual-milk-components.html#combined-intervention-arms-7"><i class="fa fa-check"></i><b>5.6.1</b> Combined intervention arms</a></li>
-<li class="chapter" data-level="5.6.2" data-path="adjusted-intervention-effects-on-individual-milk-components.html"><a href="adjusted-intervention-effects-on-individual-milk-components.html#stratified-by-randomized-arm-7"><i class="fa fa-check"></i><b>5.6.2</b> Stratified by randomized arm</a></li>
+<li class="chapter" data-level="5.6.1" data-path="adjusted-intervention-effects-on-individual-milk-components.html"><a href="adjusted-intervention-effects-on-individual-milk-components.html#interactive-explorer-linked-volcano-table"><i class="fa fa-check"></i><b>5.6.1</b> Interactive explorer (linked volcano + table)</a></li>
+<li class="chapter" data-level="5.6.2" data-path="adjusted-intervention-effects-on-individual-milk-components.html"><a href="adjusted-intervention-effects-on-individual-milk-components.html#combined-intervention-arms-7"><i class="fa fa-check"></i><b>5.6.2</b> Combined intervention arms</a></li>
+<li class="chapter" data-level="5.6.3" data-path="adjusted-intervention-effects-on-individual-milk-components.html"><a href="adjusted-intervention-effects-on-individual-milk-components.html#stratified-by-randomized-arm-7"><i class="fa fa-check"></i><b>5.6.3</b> Stratified by randomized arm</a></li>
 </ul></li>
 </ul></li>
 <li class="chapter" data-level="6" data-path="targeted-metabolite-metadata-and-reductions-in-hm-nutrient-deficiency.html"><a href="targeted-metabolite-metadata-and-reductions-in-hm-nutrient-deficiency.html"><i class="fa fa-check"></i><b>6</b> Targeted-metabolite metadata and reductions in HM nutrient deficiency</a>
@@ -272,7 +269,7 @@
 <blockquote>
 <p><strong>Nutritional interventions’ impacts on human milk: three trial analyses from low-resource settings</strong> (Dailey-Chwalibóg, Mertens et al., 2025). International Milk Composition (IMiC) Consortium.</p>
 </blockquote>
-<p>It provides every analytical output that supports the main manuscript, in more detail than the printed article PDF can hold: interactive forest and volcano plots, searchable estimate tables (filter and CSV-download enabled), longitudinal trajectory visualisations, MILQ-anchored deficiency analyses, BMI-stratified subgroup analyses, reproducible pathway-enrichment results, and the cross-compartment maternal/infant blood analyses.</p>
+<p>It provides every analytical output that supports the main manuscript, in more detail than the printed article PDF can hold: interactive forest and volcano plots, searchable and filterable estimate tables, longitudinal trajectory visualisations, MILQ-anchored deficiency analyses, BMI-stratified subgroup analyses, reproducible pathway-enrichment results, and the cross-compartment maternal/infant blood analyses.</p>
 <p>The appendix is organised into <strong>ten numbered sections</strong> matching the references in the printed paper (Sections 1–10), preceded by this unnumbered overview and followed by a reproducibility appendix. Sections 1–8 mirror the original submission; <strong>§9 (reproducible pathway and enrichment analyses)</strong> and <strong>§10 (cross-compartment analyses in maternal and infant blood)</strong> are added in this revision to report, respectively, the scripted MetaboAnalystR enrichment pipeline behind the manuscript’s pathway figures and the maternal-plasma / dried-blood-VAMS / blood-proteomics analyses behind manuscript Fig. S7 and Table S8.</p>
 <div id="outstanding-todos-revision-round-1" class="section level2 unnumbered hasAnchor">
 <h2>Outstanding TODOs (revision round 1)<a href="index.html#outstanding-todos-revision-round-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
@@ -349,7 +346,7 @@
 </div>
 <div id="how-to-read-interactive-figures" class="section level2 hasAnchor" number="0.3">
 <h2><span class="header-section-number">0.3</span> How to read interactive figures<a href="index.html#how-to-read-interactive-figures" class="anchor-section" aria-label="Anchor link to header"></a></h2>
-<p>In the HTML build, forest and volcano plots are rendered as <code>plotly</code> widgets. Hover any point to reveal the component name, study, visit, ATE, 95% CI, and FDR-adjusted q-value. Plotly’s mode bar (top-right of each plot) allows zoom, pan, lasso-select, and PNG export. Every plot is paired with a <code>DT::datatable</code> containing the same underlying data with column filters, free-text search, sortable columns, and CSV/Excel download buttons.</p>
+<p>In the HTML build, forest and volcano plots are rendered as <code>plotly</code> widgets. Hover any point to reveal the component name, study, visit, ATE, 95% CI, and FDR-adjusted q-value. Plotly’s mode bar (top-right of each plot) allows zoom, pan, lasso-select, and PNG export. Every plot is paired with a <code>DT::datatable</code> containing the same underlying data with column filters, free-text search, and sortable columns.</p>
 <p>Where a section relies on an upstream data artefact that is not present in the current build, the section prints an inline notice naming the missing file rather than failing. Re-run the upstream analysis pipeline (see <em>Reproducing the supplement</em> in the repository README) to regenerate those artefacts.</p>
 </div>
 <div id="citation-and-reproducibility" class="section level2 hasAnchor" number="0.4">

@@ -49,7 +49,7 @@ cc_dt <- function(df, caption = NULL, page_length = 15, sci = NULL) {
 
 ## Intervention effects on the blood compartments {#cc-volcanoes}
 
-Each blood compartment was run through the same covariate-adjusted TMLE framework used for milk. The pre-rendered volcanoes below (combined intervention arms vs. control) plot the standardized effect against significance for each compartment, with FDR-significant features highlighted. Arm-stratified versions of each panel, along with the unadjusted variants, are shipped in `figures/blood_volcano/` for download.
+Each blood compartment was run through the same covariate-adjusted TMLE framework used for milk. The pre-rendered volcanoes below (combined intervention arms vs. control) plot the standardized effect against significance for each compartment, with FDR-significant features highlighted. Arm-stratified versions of each panel, along with the unadjusted variants, are produced by the upstream blood pipeline (`figures/blood_volcano/`).
 
 The per-feature blood tables run to tens of thousands of rows, and the underlying clean objects are multi-GB and gitignored upstream, so the full per-feature interactive volcanoes are **not** rendered here. Each compartment is instead summarised by its count of FDR-significant features by visit, contrast, and direction; putative annotations of those features appear in §10.6.
 
@@ -160,7 +160,7 @@ if (!is.null(po) && nrow(po)) {
   po_sig <- po %>% dplyr::filter(both_sig %in% c(TRUE, 1, "TRUE") | concordant %in% c(TRUE, 1, "TRUE")) %>%
     dplyr::arrange(dplyr::desc(milk_est + blood_est))
   cc_dt(po_sig, page_length = 15,
-        caption = "Milk vs. maternal-blood proteome overlap (adjusted): proteins concordant or jointly significant across compartments. Full 302-protein table available via the download button on the complete table below.")
+        caption = "Milk vs. maternal-blood proteome overlap (adjusted): proteins concordant or jointly significant across compartments. The complete 302-row table appears below.")
 }
 ```
 
@@ -245,8 +245,8 @@ if (!is.null(bm) && nrow(bm)) {
   ordcol <- if (!is.na(pcol)) pcol else fdrcol
   n_sig  <- sum(bm[[fdrcol]] < 0.05, na.rm = TRUE)
   bm_top <- bm %>% dplyr::arrange(.data[[ordcol]]) %>% dplyr::slice_head(n = 40)
-  cat(sprintf("\n*No blood-compartment Mummichog pathway reached FDR significance in the adjusted models (%d of %s strata at Q<0.05); the direction-agnostic enrichment is weak in blood and the directional signal is instead carried by the signed sign-tests below. Showing the 40 lowest-p strata; the full %s-row grid is downloadable.*\n\n",
-              n_sig, format(nrow(bm), big.mark = ","), format(nrow(bm), big.mark = ",")))
+  cat(sprintf("\n*No blood-compartment Mummichog pathway reached FDR significance in the adjusted models (%d of %s strata at Q<0.05); the direction-agnostic enrichment is weak in blood, and the directional signal is instead carried by the signed sign-tests below. The 40 lowest-p strata are shown.*\n\n",
+              n_sig, format(nrow(bm), big.mark = ",")))
   print(cc_dt(bm_top, page_length = 15,
         caption = "Blood-compartment Mummichog pathway enrichment (adjusted), 40 lowest-p strata."))
 }

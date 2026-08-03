@@ -131,6 +131,16 @@ show_forest_and_table("results/subsetted results/secondary_bioactives_arm_strat.
 
 The targeted-metabolomics panel (Biocrates MxP Quant 500) is large, so higher-level summaries live elsewhere: pathway-level views in the *Pathway enrichment* chapter and volcano plots in the *Trajectory analyses* chapter. The forest plots below lay out the same metabolites as a long, hover-searchable forest, most useful when you filter the table to a specific compound class.
 
+### Interactive explorer (linked volcano + table)
+
+Because the targeted panel has thousands of metabolite estimates, the linked view below is often the quickest way in. Drag a box (Plotly's *Box Select* / *Lasso*) around points in the volcano to filter the table to just those metabolites; conversely, the dropdowns and the table's own column filters narrow the plotted points. Every point is one metabolite (pooled intervention vs. control), positioned by effect size and −log10(p); orange marks FDR-significant hits.
+
+```{r effects-tertiary-linked, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7}
+df_ter <- safe_read_csv(here::here("results/subsetted results/tertiary_targeted_metabolomics.csv"))
+linked_volcano_table(df_ter,
+                     title = "Targeted metabolites — pooled intervention vs. control (brush to filter the table)")
+```
+
 ### Combined intervention arms
 
 ```{r effects-tertiary-combined, echo=FALSE, message=FALSE, warning=FALSE, fig.height=14}

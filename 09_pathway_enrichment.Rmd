@@ -6,7 +6,7 @@ Each analysis is reported twice: for the **combined-arm** contrast (all maternal
 
 > **Interpretation note.** These enrichment results summarise and contextualise the prespecified per-component analyses; they are not themselves a separate confirmatory test. Over-representation depends on the choice of background metabolite set (see §9.2), and pathway membership in reference databases is incomplete, so absence of a pathway is not evidence of absence of biology. Read the results as a structured, hypothesis-generating map of where the intervention signal concentrates.
 
-> **Coverage — all six manuscript enrichment tables (S1–S6) are reproduced here** as searchable/downloadable tables, in manuscript order: primary ORA (**Table S1**, §9.1), the ORA-vs-impact comparison (§9.2), the empty secondary result (§9.3), tertiary MSEA (**Table S2**, §9.4), triglyceride fatty-acid composition (**Table S3**, §9.5), untargeted-metabolome MSEA (**Table S4**, §9.6), milk untargeted Mummichog (**Table S5**, §9.7), and milk-proteome GO (**Table S6**, §9.8).
+> **Coverage — all six manuscript enrichment tables (S1–S6) are reproduced here** as searchable tables, in manuscript order: primary ORA (**Table S1**, §9.1), the ORA-vs-impact comparison (§9.2), the empty secondary result (§9.3), tertiary MSEA (**Table S2**, §9.4), triglyceride fatty-acid composition (**Table S3**, §9.5), untargeted-metabolome MSEA (**Table S4**, §9.6), milk untargeted Mummichog (**Table S5**, §9.7), and milk-proteome GO (**Table S6**, §9.8).
 
 ```{r path-setup, include=FALSE}
 library(tidyverse)
@@ -156,13 +156,13 @@ Mummichog infers enriched pathways directly from mass-spectral features (without
 
 > **Two tolerances, one number apart.** The **10 ppm** here is a *compound-annotation* tolerance (matching a feature's *m/z* to a database compound). It is a different quantity from the **±25 ppm** *cross-platform feature-matching* tolerance used in §10.2 (matching a feature in one dataset to a feature in another). A reviewer comparing the two chapters should not read the difference as an inconsistency.
 
-The dominant signature is **down-regulation of polyunsaturated-fatty-acid and lipid pathways** — de novo fatty-acid biosynthesis, fatty-acid activation and metabolism, arachidonic-acid and linoleate metabolism, and leukotriene / prostaglandin formation — concentrated in the MISAME-III BEP contrasts. The full grid is large (≈9,500 pathway × stratum rows); the table below is filtered to FDR-significant rows, and the complete grid is available via the CSV/Excel download button.
+The dominant signature is **down-regulation of polyunsaturated-fatty-acid and lipid pathways** — de novo fatty-acid biosynthesis, fatty-acid activation and metabolism, arachidonic-acid and linoleate metabolism, and leukotriene / prostaglandin formation — concentrated in the MISAME-III BEP contrasts. The full grid is large (≈9,500 pathway × stratum rows), so the table below is filtered to the FDR-significant rows.
 
 ```{r path-mummichog-tab, echo=FALSE, message=FALSE, warning=FALSE}
 mum <- read_enrich("results/metaboanalyst/mummichog_s5/milk_mummichog_tableS5.csv")
 if (!is.null(mum) && nrow(mum)) {
   mum_sig <- mum %>% dplyr::filter(.data[["FDR"]] < 0.05) %>% dplyr::arrange(.data[["FDR"]])
-  cat(sprintf("\n*Showing %s FDR-significant (Q<0.05) pathway strata of %s total; download the full grid via the table buttons.*\n\n",
+  cat(sprintf("\n*Showing %s FDR-significant (Q<0.05) pathway strata of %s total.*\n\n",
               format(nrow(mum_sig), big.mark = ","), format(nrow(mum), big.mark = ",")))
   print(enrich_dt(mum_sig,
         caption = "Milk untargeted-metabolome Mummichog enrichment, FDR-significant strata (manuscript Table S5 / Fig. 6B)."))
