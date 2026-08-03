@@ -1,8 +1,8 @@
 # Outcomes and human milk component distributions
 
-This section serves two purposes. The first half is the **outcomes list** referenced from the manuscript Methods (*"A list of all outcomes and descriptions is available in the Online Appendix (Section 2)"*): a searchable inventory of every milk component analysed in the IMiC harmonised dataset, grouped by prespecified outcome class and annotated with per-study availability. The second half (from *MILQ-overlay density plots* onward) is the descriptive **distribution** of each component, stratified by study, visit, and randomised intervention arm, and corresponds to **Figure S2** of the printed Word supplement.
+The section has two halves. The first is the **outcomes list** referenced from the manuscript Methods (*"A list of all outcomes and descriptions is available in the Online Appendix (Section 2)"*): a searchable inventory of every milk component analysed in the IMiC harmonised dataset, grouped by prespecified outcome class and annotated with per-study availability. From *MILQ-overlay density plots* onward, the second half describes the **distribution** of each component, stratified by study, visit, and randomised intervention arm, and corresponds to **Figure S2** of the printed Word supplement.
 
-Together these two views give the reader the full per-component context — *what was measured, where, and what the raw distribution looks like* — before encountering the modelled intervention-effect estimates in the subsequent sections.
+Read together, these two views establish what was measured, where, and what the raw distribution looks like for each component, before the modelled intervention-effect estimates in the subsequent sections.
 
 ```{r distributions-setup, include=FALSE}
 library(tidyverse)
@@ -61,11 +61,11 @@ if (!is.null(dict) && nrow(dict)) {
 }
 ```
 
-The full **targeted-metabolite metadata** (Biocrates panel categories, with per-study availability) is reproduced as a focused subsection in [§6 Reductions in HM nutrient deficiency](#reductions-in-hm-nutrient-deficiency-relative-to-milq-reference-standards) so that the metadata called out in the manuscript Fig. 5A legend (*"metadata in Online Supplement 6"*) lives at that section's anchor.
+The full **targeted-metabolite metadata** (Biocrates panel categories, with per-study availability) is reproduced as a focused subsection in [§6 Targeted-metabolite metadata and reductions in HM nutrient deficiency](#targeted-metabolite-metadata-and-reductions-in-hm-nutrient-deficiency) so that the metadata called out in the manuscript Fig. 5A legend (*"metadata in Online Supplement 6"*) lives at that section's anchor.
 
 ## Distributions
 
-The remainder of this section shows the unadjusted distribution of each measured human milk component, stratified by study, visit, and randomized intervention arm. Two views are provided: (i) density plots overlaid by intervention arm, and (ii) per-component boxplots faceted by study and visit. Density plots include grey and red reference lines at the 50th and 10th percentiles of the MILQ age-specific reference distribution where applicable. Asterisks indicate FDR-corrected statistical significance of the pooled intervention vs. control contrast for that component–visit (\\* q\\<0.05, \\*\\* q\\<0.01, \\*\\*\\* q\\<0.001). Y-axes are log-transformed where the underlying distribution is markedly right-skewed (most micronutrients and metabolites).
+The remainder of this section shows the unadjusted distribution of each measured human milk component, stratified by study, visit, and randomized intervention arm. Two views follow: (i) density plots overlaid by intervention arm, and (ii) per-component boxplots faceted by study and visit. Density plots include grey and red reference lines at the 50th and 10th percentiles of the MILQ age-specific reference distribution where applicable. Asterisks indicate FDR-corrected statistical significance of the pooled intervention vs. control contrast for that component–visit (\\* q\\<0.05, \\*\\* q\\<0.01, \\*\\*\\* q\\<0.001). Y-axes are log-transformed where the underlying distribution is markedly right-skewed (most micronutrients and metabolites).
 
 ### MILQ-overlay density plots (Figure S2)
 
@@ -74,6 +74,8 @@ p_s2 <- safe_readRDS(here::here("figure-data/figure_s2_plots.RDS"),
                      label = "figure_s2_plots.RDS")
 show_any(p_s2)
 ```
+
+**Figure S2.** IMiC distributions of HM nutrients relative to MILQ reference standards. Violin plots of native-unit concentrations for each primary component with a significant intervention effect (energy density, fat, protein, B-vitamins B~1~/B~2~/B~3~/B~5~/B~6~/B~7~/B~12~, vitamin A, α- and γ-tocopherol, selenium, copper), stratified by study (E: ELICIT, Mi: MISAME-III, Mu: Mumta-LW), visit, and intervention arm (blue = control, orange = pooled intervention). Horizontal grey and red reference lines mark the 50th and 10th percentiles of the age-specific MILQ reference distribution; asterisks mark intervention-vs-control significance after FDR correction (\* *q* < 0.05, \*\* *q* < 0.01, \*\*\* *q* < 0.001). Y-axes are log-transformed.
 
 ### Per-component boxplots by study, visit, and arm
 
@@ -111,3 +113,5 @@ if (file.exists(raw_path) && isTRUE(metadata_loaded)) {
   cat("*Raw IMiC dyad-level dataset and/or component metadata not available in this build; boxplots will be rendered when `data/merged_analysis_datasets.RDS` and `metadata/milk_component.Rdata` are present.*")
 }
 ```
+
+**Supplementary figure.** Native-unit concentration of every measured human-milk component (log scale where right-skewed), shown as boxplots by milk-collection visit and randomized arm within each study. Boxes show the median and IQR; whiskers extend to 1.5×IQR.

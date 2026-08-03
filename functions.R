@@ -182,8 +182,20 @@ clean_tab <- function(tab, caption = NULL) {
       perc_imp = round(perc_imp, 2)
     )
 
+  ## pval_adj_global retains the more conservative correction pooled across
+  ## study and visit within each outcome group (the pre-revision scheme),
+  ## shown alongside the per-visit pval_adj for sensitivity.
+  if ("pval_adj_global" %in% names(tab)) {
+    tab <- tab %>% dplyr::mutate(
+      pval_adj_global_cat = dplyr::case_when(
+        pval_adj_global < 0.001 ~ "***", pval_adj_global < 0.01 ~ "**",
+        pval_adj_global < 0.05 ~ "*", TRUE ~ ""),
+      pval_adj_global = paste0(round(pval_adj_global, 3), pval_adj_global_cat)
+    )
+  }
+
   keep <- intersect(c("study","visit","contrast","label_f","perc_imp",
-                      "ATE","ATE_unscaled","pval","pval_adj"), names(tab))
+                      "ATE","ATE_unscaled","pval","pval_adj","pval_adj_global"), names(tab))
   tab <- tab[, keep, drop = FALSE]
 
   DT::datatable(
@@ -235,12 +247,28 @@ safe_load <- function(path) {
   invisible(TRUE)
 }
 
-safe_read_csv <- function(path) {
+safe_read_csv <- function(path, ...) {
   if (!file.exists(path)) {
     cat(sprintf("*Results file not found at `%s`. Build the upstream analysis repo to populate it.*", path))
     return(invisible(NULL))
   }
-  utils::read.csv(path)
+  utils::read.csv(path, ...)
+}
+
+## Embed a pre-rendered static image (PNG) shipped by the upstream analysis
+## pipeline, degrading gracefully to an inline notice when the file is absent
+## (mirrors safe_readRDS / safe_read_csv). Unlike the plot helpers, the
+## cross-compartment and blood-volcano figures in §§9–10 are rendered upstream
+## and copied in by port_results.R rather than rebuilt from R objects here.
+## Return the value of this directly as the last expression of a chunk (no
+## results='asis' needed — asis_output / include_graphics both handle it).
+safe_img <- function(path, label = basename(path)) {
+  if (!file.exists(path)) {
+    return(knitr::asis_output(sprintf(
+      "\n\n*Figure not found at `%s`. Run `port_results.R` to copy `%s` from the upstream analysis repo.*\n\n",
+      path, label)))
+  }
+  knitr::include_graphics(path)
 }
 
 ## Print an object whose type may vary across builds (single ggplot, list of

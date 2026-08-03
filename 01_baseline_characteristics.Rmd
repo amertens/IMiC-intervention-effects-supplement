@@ -1,10 +1,10 @@
 # Baseline characteristics by study and intervention arm
 
-This chapter summarizes baseline maternal, infant, and household characteristics for the IMiC subsamples drawn from the three randomized controlled trials included in the intervention-effects analysis: **MISAME-III** (Burkina Faso), **Mumta-LW** (Pakistan), and **ELICIT** (Tanzania). Baseline characteristics are presented separately by study and stratified by randomized intervention arm, using the earliest available postnatal visit corresponding to milk sample collection in each trial.
+The IMiC subsamples analyzed here are drawn from three randomized controlled trials included in the intervention-effects analysis: **MISAME-III** (Burkina Faso), **Mumta-LW** (Pakistan), and **ELICIT** (Tanzania). Baseline maternal, infant, and household characteristics are presented separately by study and stratified by randomized intervention arm, using the earliest available postnatal visit corresponding to milk sample collection in each trial.
 
-Tables report key demographic, anthropometric, socioeconomic, and household variables that are plausibly associated with maternal nutritional status, breastfeeding context, or infant outcomes: infant sex, maternal age, education, height, BMI, MUAC, parity, household composition, housing characteristics, water source, season and place of delivery, asset-based household wealth, and food security. These variables were harmonized across studies as part of the IMiC data curation process and are documented in the manuscript's Supplementary Methods.
+Tables report demographic, anthropometric, socioeconomic, and household variables that are plausibly associated with maternal nutritional status, breastfeeding context, or infant outcomes: infant sex, maternal age, education, height, BMI, MUAC, parity, household composition, housing characteristics, water source, season and place of delivery, asset-based household wealth, and food security. These variables were harmonized across studies during the IMiC data curation process and are documented in the manuscript's Supplementary Methods. The baseline summaries here are the **Section 1** content cited from the manuscript Methods. Because the printed-manuscript Supplementary Tables (S1–S6) cover pathway-enrichment results and Table S7 the native-unit intervention effects, no manuscript table number is assigned to the baseline characteristics.
 
-The purpose of this chapter is descriptive: to characterize the analytic populations contributing milk samples in each trial and to assess baseline balance across intervention arms following randomization. No statistical tests of between-arm differences are performed, consistent with best practices for randomized trials. These tables provide contextual information for interpreting intervention-effect estimates presented in subsequent chapters.
+These summaries serve a descriptive purpose: to characterize the analytic populations contributing milk samples in each trial and to assess baseline balance across intervention arms following randomization. Consistent with best practices for randomized trials, no statistical tests of between-arm differences are performed. The tables provide context for interpreting the intervention-effect estimates presented in subsequent chapters.
 
 ```{r baseline-setup, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 library(tidyverse)
@@ -43,6 +43,8 @@ drop_empty_levels <- function(df) df %>% dplyr::mutate(dplyr::across(where(is.fa
 
 ## MISAME-III (Burkina Faso)
 
+**Baseline characteristics — MISAME-III (Burkina Faso).** Maternal, infant, and household characteristics by randomized arm, at the earliest postnatal milk-collection visit. No between-arm significance tests are reported (randomized trial).
+
 ```{r baseline-misame, echo=FALSE}
 if (have_baseline) table1(~ sex + mage + meducyrs + mbmi + mmuaccm + parity + nperson + nrooms +
          imp_water_src + impfloor + cookplac + dvseason + dlvloc +
@@ -54,6 +56,8 @@ if (have_baseline) table1(~ sex + mage + meducyrs + mbmi + mmuaccm + parity + np
 
 ## Mumta-LW (Pakistan)
 
+**Baseline characteristics — Mumta-LW (Pakistan).** Maternal, infant, and household characteristics by randomized arm, at the earliest postnatal milk-collection visit. No between-arm significance tests are reported (randomized trial).
+
 ```{r baseline-mumta, echo=FALSE}
 if (have_baseline) table1(~ sex + mage + meducyrs + mbmi + mmuaccm + mhtcm + parity + nperson + nrooms +
          imp_water_src + impfloor + cookplac + dvseason + dlvloc +
@@ -64,6 +68,8 @@ if (have_baseline) table1(~ sex + mage + meducyrs + mbmi + mmuaccm + mhtcm + par
 ```
 
 ## ELICIT (Tanzania)
+
+**Baseline characteristics — ELICIT (Tanzania).** Maternal, infant, and household characteristics by randomized arm, at the earliest postnatal milk-collection visit. No between-arm significance tests are reported (randomized trial).
 
 ```{r baseline-elicit, echo=FALSE}
 if (have_baseline) table1(~ sex + mage + meducyrs + mbmi + mmuaccm + mhtcm + parity + nperson + nrooms +

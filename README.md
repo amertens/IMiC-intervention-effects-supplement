@@ -7,7 +7,13 @@ Source for the **interactive online supplementary appendix** to:
 The rendered appendix is a Bookdown gitbook published at:
 <https://amertens.github.io/IMiC-intervention-effects-supplement/>
 
-It provides full analytical outputs (interactive forest and volcano plots, searchable estimate tables with CSV download, longitudinal trajectories, MILQ-anchored deficiency analyses, BMI-stratified subgroup analyses, and pathway enrichment results) that complement the static main article.
+It provides full analytical outputs — interactive forest and volcano plots, searchable estimate tables with CSV download, longitudinal trajectories, MILQ-anchored deficiency analyses, BMI-stratified subgroup analyses, reproducible pathway-enrichment results, and the cross-compartment maternal/infant blood analyses — that complement the static main article.
+
+## Trial and terminology conventions
+
+- The three trials are named **MISAME-III** (Burkina Faso), **Mumta-LW** (Pakistan), and **ELICIT** (Tanzania) throughout the prose. Note that the harmonised dataset stores the Mumta-LW trial under the internal `studyid` **`VITAL-Lactation`** (abbreviated `Vital` in some factor levels); code chunks filter on that identifier, but every reader-facing label is "Mumta-LW". `CHILD` appears only as an external reference cohort for nutrient reference distributions, not as an IMiC intervention arm.
+- The milk analyses (§1–§9) span all three trials (each trial's arms are shown both pooled against control and stratified by randomised arm). The **cross-compartment blood extension (§10) is MISAME-III only** — the maternal plasma, dried-blood VAMS metabolomics, and blood proteomics were collected only in MISAME-III.
+- Two different mass tolerances appear and are **not** interchangeable: pathway annotation (Mummichog, §9) uses a **10 ppm** database tolerance; cross-platform feature matching (§10) uses a **±25 ppm** tolerance following Kim's experimental-over-experimental formula `ppm = |m1 − m2| / m × 1e6 ≤ 25`.
 
 ## Outstanding TODOs (revision round 1)
 
@@ -16,20 +22,24 @@ It provides full analytical outputs (interactive forest and volcano plots, searc
 
 ## Section map
 
-The chapter Rmd files are numbered to match the manuscript's `Online Appendix N` references — in particular, the manuscript citations *"Online Appendix 3"* (BMI subgroup) and *"Online Appendix 4"* (microbiome individual taxa) resolve directly to §3 and §4 of the rendered book.
+The chapter Rmd files are numbered to match the manuscript's `Section N` / `Online Appendix N` references — in particular, the manuscript citations *"Online Appendix 3"* (BMI subgroup) and *"Online Appendix 4"* (microbiome individual taxa) resolve directly to §3 and §4 of the rendered book. The appendix now has **ten numbered sections**: §1–§8 mirror the original submission, and §9–§10 were added in revision round 1.
 
 | # | Section | Source Rmd |
 |---|---|---|
-| – | Overview (with outcome dictionary, methods recap, citation info) | `index.Rmd` |
+| – | Overview (chapter map, methods recap, citation info, TODOs) | `index.Rmd` |
 | 1 | Baseline characteristics by study and intervention arm | `01_baseline_characteristics.Rmd` |
-| 2 | Human milk component distributions (Figure S2) | `02_milk_distributions.Rmd` |
+| 2 | Outcomes and human milk component distributions (Figure S2) | `02_milk_distributions.Rmd` |
 | 3 | Subgroup analyses stratified by maternal BMI | `03_subgroup_bmi.Rmd` |
-| 4 | Microbiome and exploratory high-dimensional outcomes (Figure S6) | `04_exploratory_outcomes.Rmd` |
+| 4 | Exploratory high-dimensional outcomes: microbiome, untargeted proteomics, untargeted metabolomics (Figure S6) | `04_exploratory_outcomes.Rmd` |
 | 5 | Adjusted intervention effects on individual milk components | `05_intervention_effects.Rmd` |
-| 6 | Reductions in HM nutrient deficiency relative to MILQ standards (Figure S3) | `06_milq_deficiency.Rmd` |
+| 6 | Targeted-metabolite metadata and reductions in HM nutrient deficiency (Figure S3) | `06_milq_deficiency.Rmd` |
 | 7 | Trajectory analyses of HM component change across lactation | `07_trajectory_plots.Rmd` |
-| 8 | Sensitivity analyses and additional outputs (unadjusted, unscaled, fat-adjusted TGs [Figure S5], SuperLearner, PCA, pathway enrichment [Tables S2/S3/S5/S6], infant growth [Figure S1]) | `08_sensitivity_supplementary.Rmd` |
+| 8 | Sensitivity analyses and additional outputs (unadjusted, unscaled [Table S7], fat-adjusted TGs [Figure S5], SuperLearner [Fig. 2A], PCA [Fig. 2B], pathway-network views, infant growth [Figure S1]) | `08_sensitivity_supplementary.Rmd` |
+| 9 | Reproducible pathway and enrichment analyses (MetaboAnalystR ORA / MSEA / Mummichog / GO; Tables S1–S6, Fig. 3B, 5B, 6B–C) | `09_pathway_enrichment.Rmd` |
+| 10 | Cross-compartment analyses in maternal and infant blood (MISAME-III; Fig. S7, Table S8) | `10_cross_compartment_blood.Rmd` |
 | – | Reproducibility / sessionInfo | `99_session_info.Rmd` |
+
+The scripted pathway-enrichment tables that were previously described under §8.6 now live in full in **§9**; §8 retains only the pathway-network views and a pointer.
 
 ## Display conventions
 
@@ -40,16 +50,19 @@ The chapter Rmd files are numbered to match the manuscript's `Online Appendix N`
 
 ## Data inputs
 
-Each chapter consumes one of three types of upstream artefact:
+Each chapter consumes one of these types of upstream artefact:
 
 | Path | Contents | Produced by |
 |---|---|---|
 | `data/merged_analysis_datasets.RDS` | Harmonised dyad-level dataset (one row per mother × visit) with every HM component, infant anthropometry, and baseline covariate | Upstream analysis repo (data-cleaning step) |
 | `results/...RDS` and `results/subsetted results/*.csv` | Cleaned TMLE estimate tables (ATE, 95% CI, p, FDR q) by outcome group | Upstream analysis repo (TMLE step) |
+| `results/metaboanalyst/*` | Scripted MetaboAnalystR enrichment tables (§9) | Upstream analysis repo (`src/metaboanalyst/`) |
+| `results/*cross_compartment*`, `results/blood_*`, `results/*mediation*` | Blood / cross-compartment outputs (§10) | Upstream analysis repo (`src/2 analysis/`, blood pipeline) |
 | `figure-data/*.RDS` | Pre-rendered ggplot / plotly / data.frame objects backing specific manuscript figures (S1–S7 etc.) | Upstream analysis repo (figure-prep step) |
+| `figures/**/*.png` | Pre-rendered static figures (blood volcanoes, cross-compartment panels) | Upstream analysis repo (figure scripts) |
 | `metadata/milk_component.Rdata` | Canonical mapping of biomarker name → outcome class (macro / micro / B-vit / HMO / protein / metabolomics) | Maintained alongside this repo |
 
-Paths consumed by each chapter are referenced via `here::here(...)` in the source Rmd. The full TMLE / SuperLearner / enrichment pipelines that produce these inputs live in the upstream analysis repository:
+Paths consumed by each chapter are referenced via `here::here(...)` in the source Rmd. The full TMLE / SuperLearner / enrichment / blood pipelines that produce these inputs live in the upstream analysis repository:
 
 <https://github.com/amertens/imic_intervention_effects>
 
@@ -63,7 +76,7 @@ options(imic.upstream = "C:/path/to/imic_intervention_effects")  # optional over
 source("port_results.R")
 ```
 
-`port_results.R` copies every file the bookdown chapters consume into the supplement at the path each chapter expects. The script reports which files were copied, which were skipped (missing upstream), and lists the few outputs the supplement still needs that aren't yet produced by the upstream pipeline (currently the four `pathway_enrichment_*` RDS files for §8.6).
+`port_results.R` copies every file the bookdown chapters consume into the supplement at the path each chapter expects. The script reports which files were copied, which were skipped (missing upstream), and lists any outputs the supplement still needs that aren't yet produced by the upstream pipeline.
 
 ## Reproducing the supplement
 
@@ -83,7 +96,7 @@ bookdown::render_book("index.Rmd")          # full build
 bookdown::serve_book(".")
 ```
 
-The book is published to GitHub Pages from the `docs/` output directory; the deploy is handled by a GitHub Actions workflow (`.github/workflows/`) when present, or by pushing the rendered `docs/` to the `gh-pages` branch.
+The book is published to GitHub Pages from the `docs/` output directory; the deploy is handled by a GitHub Actions workflow (`.github/workflows/`) when present, or by pushing the rendered `docs/` to the `gh-pages` branch. Because `docs/` is regenerated by every build, do not hand-edit files there.
 
 The final page of the rendered book prints `sessionInfo()` so that the exact R and package versions used to produce any given build are part of the public record.
 
@@ -91,16 +104,16 @@ The final page of the rendered book prints `sessionInfo()` so that the exact R a
 
 ```
 .
-├── index.Rmd                  Overview / chapter map / outcome dictionary / TODOs
-├── 01_..._08_*.Rmd            Section sources (one per book section)
+├── index.Rmd                  Overview / chapter map / methods recap / TODOs
+├── 01_..._10_*.Rmd            Section sources (one per book section)
 ├── 99_session_info.Rmd        Reproducibility appendix
 ├── _bookdown.yml              Bookdown TOC + output dir
 ├── _output.yml                Per-format output options (gitbook, pdf, epub)
-├── functions.R                Shared helpers: forest_plot, volcano_plot, clean_tab, safe_readRDS …
+├── functions.R                Shared helpers: forest_plot, volcano_capped, clean_tab, safe_img, safe_readRDS …
 ├── port_results.R             Copy upstream analysis outputs into expected paths
 ├── metadata/                  milk_component.Rdata — biomarker → outcome-class map
 ├── figure-data/               Pre-rendered figure objects (RDS) — gitignored copy of upstream figures/figure-data
-├── docs/                      Rendered HTML output (GitHub Pages source)
+├── docs/                      Rendered HTML output (GitHub Pages source; build artefact, do not hand-edit)
 ├── book.bib, packages.bib     Bibliography
 ├── style.css                  Site styling
 └── IMiC-intervention-effects-supplement.Rproj

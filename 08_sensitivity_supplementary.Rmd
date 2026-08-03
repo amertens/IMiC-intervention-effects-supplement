@@ -1,16 +1,16 @@
 # Sensitivity analyses and additional outputs
 
-This chapter collects the robustness analyses and supplementary outputs referenced from the manuscript. It is organised by analysis class, with each subsection answering a distinct "would the headline conclusions still hold?" question against the primary, adjusted, standardised TMLE analyses presented earlier:
+The robustness analyses and supplementary outputs referenced from the manuscript are gathered here, grouped by analysis class. Each subsection asks a version of the same question of the primary adjusted, standardised TMLE analyses presented earlier: would the headline conclusions still hold?
 
-- **8.1 Unadjusted intervention effects** — same TMLE framework, no covariate adjustment. Detects whether confounder adjustment is doing meaningful work in the primary analyses.
-- **8.2 Unscaled (natural-unit) intervention effects** — adjusted TMLE ATEs in the native assay units (e.g. g/100 mL, µg/L) so readers can interpret effect magnitudes clinically.
-- **8.3 Fat-adjusted triglyceride effects (Figure S5)** — disentangles changes in triglyceride composition from transient changes in total milk fat.
-- **8.4 SuperLearner CV-AUC treatment-arm prediction** — multivariate test of whether the *joint* distribution of HM components carries intervention signal beyond per-component testing.
-- **8.5 PCA-based composite outcome scores** — ATEs on the first principal component of each modality, testing whether each modality moved as a whole.
-- **8.6 Pathway enrichment analyses** — biological interpretation of the high-dimensional metabolomic and proteomic signals (Tables S2, S3, S5, S6 of the printed Word supplement).
+- **8.1 Unadjusted intervention effects** — the same TMLE framework with covariate adjustment removed, which shows whether adjustment is doing meaningful work in the primary analyses.
+- **8.2 Unscaled (natural-unit) intervention effects** — adjusted TMLE ATEs in the native assay units (e.g. g/100 mL, µg/L), letting readers interpret effect magnitudes clinically.
+- **8.3 Fat-adjusted triglyceride effects (Figure S5)** — separating changes in triglyceride composition from transient changes in total milk fat.
+- **8.4 SuperLearner CV-AUC treatment-arm prediction** (manuscript **Fig. 2A**) — a multivariate test of whether the *joint* distribution of HM components carries intervention signal beyond per-component testing.
+- **8.5 PCA-based composite outcome scores** (manuscript **Fig. 2B**) — ATEs on the first principal component of each modality, asking whether each modality moved as a whole.
+- **8.6 Pathway enrichment analyses** — now reported in full in [§9 *Reproducible pathway and enrichment analyses*](#reproducible-pathway-and-enrichment-analyses); only the network views and a pointer remain here.
 - **8.7 Infant growth analyses (Figure S1)** — intervention effects on infant anthropometry within the IMiC subsamples, as a within-trial sanity check.
 
-Primary inference about the presence and consistency of intervention effects rests on the adjusted analyses in §5. The analyses in this chapter contextualise those findings rather than replace them.
+Primary inference about whether intervention effects are present and consistent rests on the adjusted analyses in §5. The analyses in this chapter contextualise those findings rather than replace them.
 
 ```{r sens-setup, include=FALSE}
 library(tidyverse)
@@ -28,7 +28,7 @@ metadata_loaded <- safe_load(here::here("metadata/milk_component.Rdata"))
 
 ## Unadjusted intervention effects
 
-Unadjusted estimates use the same TMLE framework but omit covariate adjustment. Differences between adjusted and unadjusted estimates may reflect confounding by baseline maternal, infant, or household characteristics, differences in sampling structure across studies and visits, or chance. For randomised comparisons within a single trial, large divergences would be unexpected and would warrant scrutiny of the adjustment set; readers should compare these forest plots side-by-side with those in §5.
+Unadjusted estimates use the same TMLE framework but omit covariate adjustment. Where adjusted and unadjusted estimates differ, the gap may reflect confounding by baseline maternal, infant, or household characteristics, differences in sampling structure across studies and visits, or chance. Within a single randomised trial a large divergence would be surprising and would warrant a closer look at the adjustment set; these forest plots are best read alongside those in §5.
 
 ```{r sens-unadjusted, echo=FALSE, message=FALSE, warning=FALSE, fig.height=10}
 res_unadj <- safe_readRDS(here::here("results/unadjusted_intervention_effects_results_clean.RDS"),
@@ -60,7 +60,7 @@ if (!is.null(res_unadj) && isTRUE(metadata_loaded)) {
 
 ## Unscaled (natural-unit) intervention effects
 
-Unscaled estimates are adjusted TMLE ATEs reported on the **native assay scale** of each milk component (for example, g/100 mL for macronutrients; µg/L or mg/L for micronutrients; relative abundance for HMOs). The standardised, SD-unit estimates in §5 are designed for cross-component comparison; the natural-unit estimates here translate them into biologically meaningful units, so readers can ask, for example, "how much did B3 actually go up, in mg/L?" rather than only "by how many SD units did B3 go up?". This section is the **absolute-concentration view** of the §5 results.
+Unscaled estimates are adjusted TMLE ATEs reported on the **native assay scale** of each milk component (for example, g/100 mL for macronutrients; µg/L or mg/L for micronutrients; relative abundance for HMOs). The standardised, SD-unit estimates in §5 are built for cross-component comparison. The natural-unit estimates here restate them in biologically meaningful units, so a reader can ask "how much did B3 actually go up, in mg/L?" rather than only "by how many SD units did B3 go up?". Think of this section as the **absolute-concentration view** of the §5 results. These native-unit estimates correspond to **Table S7** of the manuscript (per-arm sample sizes, means, SDs, medians and IQRs, alongside native-unit ATEs, 95% CIs, and FDR-adjusted *q*-values for all primary and secondary outcomes).
 
 ```{r sens-unscaled, echo=FALSE, message=FALSE, warning=FALSE, fig.height=10}
 res_unscaled <- safe_readRDS(here::here("results/adjusted_combined_arms_intervention_effects_unscaled_results_clean.RDS"),
@@ -90,11 +90,23 @@ if (!is.null(res_unscaled) && isTRUE(metadata_loaded)) {
 }
 ```
 
+### Table S7 — per-arm native-unit concentrations and descriptive statistics
+
+The full manuscript **Table S7** is reproduced below as a searchable table. For every primary and secondary milk component, by study × visit × arm, it gives the sample size, the covariate-adjusted mean and 95% CI (`mean`, `mean_cil`, `mean_ciu`), and the raw distributional summary (`raw_mean`, `raw_sd`, `raw_median`, `raw_q25`, `raw_q75`) in native assay units. It provides the tabular backing for the concentration **distributions** in manuscript Fig. 4 and the effect estimates in Figs. 2–3.
+
+```{r sens-table-s7, echo=FALSE, message=FALSE, warning=FALSE}
+s7 <- safe_read_csv(here::here("results/tables/table_s7_primary_secondary_native_units.csv"))
+if (!is.null(s7)) {
+  nice_dt(s7,
+          caption = "Manuscript Table S7 — native-unit (absolute) concentrations and adjusted means for all primary and secondary milk outcomes, by study, visit, and intervention arm.")
+}
+```
+
 ## Fat-adjusted triglyceride effects (Figure S5)
 
-The largest tertiary-outcome signal in the manuscript is on **triglycerides (TGs)**: the same TGs were *increased* at 14–21 days and 3–4 months in MISAME-III but *decreased* at the 1–2 month visit. This temporal inversion disappears when concentrations are expressed as a fraction of total fat content — implying that the apparent 1–2 month decrease reflects the transient reduction in total fat at that visit rather than a compositional change in the TG pool. The plot below reproduces Figure S5 (treatment-specific TG means with and without fat adjustment), and the forest plot beneath shows the fat-adjusted ATEs that drive that interpretation.
+The largest tertiary-outcome signal in the manuscript is on **triglycerides (TGs)**. In MISAME-III the same TGs were *increased* at 14–21 days and 3–4 months but *decreased* at the 1–2 month visit. This temporal inversion disappears once concentrations are expressed as a fraction of total fat content, which implies that the apparent 1–2 month decrease reflects the transient drop in total fat at that visit rather than a compositional change in the TG pool. The plot below reproduces Figure S5 (treatment-specific TG means with and without fat adjustment), and the forest plot beneath it shows the fat-adjusted ATEs behind that interpretation.
 
-> **Milk-volume caveat.** Total milk *output* was not measured in any of the three IMiC trials. The transient reduction in milk fat concentration observed at 1–2 months in MISAME-III may therefore reflect a dilution effect from increased milk volume in the supplemented arm rather than a true reduction in fat synthesis or secretion. Concentration-based effects on macronutrients (and any fat-dependent metabolite) should be interpreted with this in mind: without a denominator on total daily output, concentration changes cannot be unambiguously translated into changes in infant nutrient delivery. The fat-adjusted analysis below removes one form of this confounding (proportional re-allocation across TGs) but cannot address the absent volume term.
+> **Milk-volume caveat.** Total milk *output* was not measured in any of the three IMiC trials. The transient reduction in milk fat concentration seen at 1–2 months in MISAME-III may therefore reflect dilution from increased milk volume in the supplemented arm rather than a true reduction in fat synthesis or secretion. Concentration-based effects on macronutrients, and on any fat-dependent metabolite, should be read with this in mind: without a denominator on total daily output, a change in concentration cannot be translated cleanly into a change in infant nutrient delivery. The fat-adjusted analysis below removes one form of this confounding, proportional re-allocation across TGs, but it cannot recover the missing volume term.
 
 ```{r sens-fat-tg-figure, echo=FALSE, message=FALSE, warning=FALSE, fig.height=8}
 p_s5 <- safe_readRDS(here::here("figure-data/figure_s7_tri_pattern.RDS"),
@@ -108,11 +120,13 @@ p_s6 <- safe_readRDS(here::here("figure-data/figure_sX_forest_plot_fat_adjusted.
 show_any(p_s6)
 ```
 
+**Figure S5.** Treatment-specific means (and 95% CIs) of milk triglycerides (N = 235 TG species from the targeted-metabolomics panel) in MISAME-III, with and without adjustment for total milk fat. *Top:* treatment-specific mean TG-species concentrations; points are coloured by significance of the ATE estimate, and TGs are sorted by the mean Z-scored control-arm concentration at the first visit. The reductions seen at the second timepoint in the postnatal BEP arms (panels O and U) dissipate when concentrations are expressed as a percentage of total fat (panels P and V), revealing the same TG-species pattern as at the first and third timepoints. *Bottom:* fat-adjusted adjusted ATEs (SD units, 95% CI) for individual TG species, confirming a consistent direction of effect across visits once total milk fat is accounted for.
+
 ## SuperLearner multi-class treatment-arm prediction
 
-The Methods describe a **SuperLearner ensemble** trained to predict multi-class randomised treatment-arm membership from the full set of measured primary, secondary, and tertiary HM outcomes within each study × visit. Cross-validated AUC (CV-AUC) above chance indicates that the joint distribution of HM components contains intervention signal beyond what any single component carries. Variable-importance (VIMP) measures identify the components carrying the most predictive signal.
+The Methods describe a **SuperLearner ensemble** trained to predict multi-class randomised treatment-arm membership from the full set of measured primary, secondary, and tertiary HM outcomes within each study × visit. A cross-validated AUC (CV-AUC) above chance indicates that the joint distribution of HM components contains intervention signal beyond what any single component carries, and variable-importance (VIMP) measures identify which components carry most of that predictive signal.
 
-This is a multivariate counterpart to the univariate forest plots in §5: it asks whether the per-component signals, taken together, predict arm assignment, and which components drive prediction.
+This is the multivariate counterpart to the univariate forest plots in §5. It asks whether the per-component signals, taken together, predict arm assignment, and which components drive the prediction.
 
 ```{r sens-sl-vimp, echo=FALSE, message=FALSE, warning=FALSE, fig.height=8}
 sl <- safe_readRDS(here::here("figure-data/SL_vim_plot_data.RDS"),
@@ -151,9 +165,11 @@ if (!is.null(sl) && is.data.frame(sl)) {
 }
 ```
 
+**Figure 2A.** Cross-validated AUC (CV-AUC) from SuperLearner ensembles trained to predict randomized treatment arm from each class of milk components (and from all classes combined), by study and milk-collection visit. CV-AUC ≈ 0.5 (dashed line) is chance-level; higher values indicate that the joint distribution of that component class carries intervention signal. B-vitamins and targeted metabolites give the strongest signals, while azithromycin-only and prenatal-BEP arms show none.
+
 ### Per-study variable importance
 
-The pre-built per-study variable-importance plots (one per IMiC trial) are reproduced below for completeness.
+The pre-built per-study variable-importance plots, one per IMiC trial, are reproduced below for completeness.
 
 ```{r sens-sl-vimp-perstudy, echo=FALSE, message=FALSE, warning=FALSE, fig.height=8}
 sl_plots <- safe_readRDS(here::here("results/SLvim_lab_plots.RDS"),
@@ -163,7 +179,7 @@ show_any(sl_plots)
 
 ## PCA-based composite outcome scores
 
-ATEs were also estimated for the **first principal component** of each modality (macronutrients, B-vitamins, HMOs, bioactives, targeted metabolites). PCA-based composites collapse correlated within-modality components into a single scalar that captures the dominant axis of variation, and are sensitive to coordinated multivariate shifts that may not survive per-component FDR. They serve as a single-summary check on whether each modality moved as a whole.
+ATEs were also estimated for the **first principal component** of each modality (macronutrients, B-vitamins, HMOs, bioactives, targeted metabolites). A PCA-based composite collapses correlated within-modality components into a single scalar capturing the dominant axis of variation, which makes it sensitive to coordinated multivariate shifts that may not survive per-component FDR. It offers a one-number check on whether each modality moved as a whole.
 
 ```{r sens-pca, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7}
 pca <- safe_readRDS(here::here("figure-data/pca_intervention_effects_results.RDS"),
@@ -206,6 +222,8 @@ if (!is.null(pca) && is.data.frame(pca)) {
   )
 }
 ```
+
+**Figure 2B.** Adjusted ATEs (95% CI) on the first principal component (PC1) of each milk-component class, pooled intervention vs. control, by study and visit. Effects are oriented positive for comparability across classes; filled symbols are significant after FDR correction. B-vitamin PC1 is increased across trials and timepoints, with no consistent effect on the other component classes.
 
 ### Arm-stratified PCA composites
 
@@ -253,99 +271,13 @@ if (!is.null(pca_strat) && is.data.frame(pca_strat)) {
 
 ## Pathway enrichment analyses
 
-Four complementary enrichment analyses convert the high-dimensional metabolomic and proteomic feature-level signals (per-feature volcano plots in §4) into **biologically interpretable pathway summaries**. They back **Tables S2, S3, S5, and S6** of the printed Word supplement:
+The pathway- and enrichment-level interpretation of the high-dimensional milk signals now lives in its own chapter, **[§9 *Reproducible pathway and enrichment analyses*](#reproducible-pathway-and-enrichment-analyses)**. That work covers MetaboAnalyst over-representation/MSEA of the primary, tertiary, and untargeted metabolome, Mummichog functional enrichment, and Gene Ontology enrichment of the milk proteome. It is built directly from the scripted MetaboAnalystR CSV outputs (`results/metaboanalyst/`, copied in by `port_results.R`) and covers manuscript **Tables S1–S6** and the enrichment panels of **Fig. 3B, Fig. 5B, and Fig. 6A–C**. It replaces an earlier placeholder here that loaded not-yet-produced `pathway_enrichment_*.RDS` objects.
 
-1. **MetaboAnalyst over-representation analysis (ORA)** of untargeted-metabolomics feature lists (positive and negative ionization modes), stratified by study, timepoint, and direction of effect.
-2. **Mummichog functional enrichment** of the same untargeted-metabolomics feature lists, run with mass-accuracy tolerance of 10 ppm against the `human_mfn` reference, stratified by study, timepoint, ionisation mode, and direction.
-3. **Gene Ontology Biological Process (GO BP) enrichment** of intervention-associated untargeted proteomic features (UniProt IDs → Entrez IDs → `enrichGO` against the full proteomics universe as background).
-4. **Compositional fatty-acid enrichment** of intervention-responsive triglycerides — testing whether specific fatty acids are over- or under-represented among TGs that respond to supplementation, using parsed sn-1/sn-2/sn-3 annotations from the Biocrates MxP Quant 500 panel.
-
-"Signed enrichment" plots place upregulated pathways on the positive x-axis and downregulated pathways on the negative x-axis to preserve directionality.
-
-> **Proteomic-interpretation caveat (GO BP).** Milk proteomic features draw from a heterogeneous mixture of cellular debris (mammary epithelial cells, leukocytes, exosomes) and secreted proteins. Enrichment of GO terms such as "telomere organisation and maintenance" or "negative regulation of peptidase activity" therefore indicates a **signature consistent with** changes in cellular composition or proteolytic balance, not a demonstration that the named biological process is being executed in milk. These signatures should be read as hypothesis-generating; mechanistic claims require functional assays (e.g. antimicrobial / antioxidant activity, paired serum measurements) that were not part of the IMiC protocol.
-
-```{r path-setup, include=FALSE}
-signed_enrichment_plot <- function(df, title = "Pathway enrichment",
-                                   x_lab = "Signed enrichment ratio",
-                                   pathway_col = NULL) {
-  if (is.null(df) || !is.data.frame(df) || !nrow(df)) {
-    cat("*No enrichment results to display.*"); return(invisible(NULL))
-  }
-  if (is.null(pathway_col)) {
-    pathway_col <- intersect(c("Pathway","pathway","term","Description"), names(df))[1]
-  }
-  ratio_col <- intersect(c("signed_enrichment","signed_ratio","signed_fold","Impact"), names(df))[1]
-  p_col     <- intersect(c("p_value","P.Value","p","Pvalue","raw_p","pval"), names(df))[1]
-  if (any(vapply(list(pathway_col, ratio_col, p_col), is.null, logical(1)))) {
-    cat("*Enrichment table missing required columns; showing raw table.*"); print(nice_dt(df)); return(invisible(NULL))
-  }
-  df$.neglog10p <- -log10(pmax(df[[p_col]], .Machine$double.eps))
-  df$.label     <- df[[pathway_col]]
-  df$.tooltip   <- paste0(df$.label,
-                          if ("Study" %in% names(df)) paste0("<br>Study: ", df$Study) else "",
-                          if ("study" %in% names(df)) paste0("<br>Study: ", df$study) else "",
-                          if ("Time.Point" %in% names(df)) paste0("<br>Visit: ", df$Time.Point) else "",
-                          "<br>signed enrichment: ", signif(df[[ratio_col]], 3),
-                          "<br>p: ", signif(df[[p_col]], 3))
-  p <- ggplot2::ggplot(df,
-                       ggplot2::aes(x = .data[[ratio_col]], y = .neglog10p,
-                                    color = if ("Study" %in% names(df)) Study else if ("study" %in% names(df)) study else NULL,
-                                    text = .tooltip)) +
-    ggplot2::geom_point(alpha = 0.75, size = 1.6) +
-    ggplot2::geom_hline(yintercept = -log10(0.05), linetype = "dotted", color = "grey50") +
-    ggplot2::geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
-    ggplot2::scale_color_manual(values = tableau10) +
-    ggplot2::labs(title = title, x = x_lab, y = "-log10(p)", color = "Study")
-  if (knitr::is_html_output() && requireNamespace("plotly", quietly = TRUE)) {
-    conv <- try(plotly::ggplotly(p, tooltip = "text"), silent = TRUE)
-    if (!inherits(conv, "try-error")) return(conv)
-  }
-  p
-}
-```
-
-### Untargeted metabolomics — MetaboAnalyst ORA (Table S2)
-
-```{r path-msea, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7}
-msea <- safe_readRDS(here::here("results/pathway_enrichment_msea.RDS"),
-                     label = "pathway_enrichment_msea.RDS")
-print(signed_enrichment_plot(msea, title = "MetaboAnalyst ORA — signed enrichment"))
-if (is.data.frame(msea)) print(nice_dt(msea %>% dplyr::mutate(dplyr::across(where(is.numeric), ~ signif(.x, 3))),
-                                       caption = "Full MetaboAnalyst ORA results, all studies × visits × directions."))
-```
-
-### Untargeted metabolomics — Mummichog functional enrichment (Table S5)
-
-```{r path-mummichog, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7}
-mum <- safe_readRDS(here::here("results/pathway_enrichment_mummichog.RDS"),
-                    label = "pathway_enrichment_mummichog.RDS")
-print(signed_enrichment_plot(mum, title = "Mummichog — signed pathway coverage"))
-if (is.data.frame(mum)) print(nice_dt(mum %>% dplyr::mutate(dplyr::across(where(is.numeric), ~ signif(.x, 3))),
-                                      caption = "Mummichog functional enrichment results, all study × timepoint × ionization × direction strata."))
-```
-
-### Untargeted proteomics — GO Biological Process enrichment (Table S6)
-
-```{r path-go, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7}
-go <- safe_readRDS(here::here("results/pathway_enrichment_go_bp.RDS"),
-                   label = "pathway_enrichment_go_bp.RDS")
-print(signed_enrichment_plot(go, title = "GO Biological Process — signed fold enrichment"))
-if (is.data.frame(go)) print(nice_dt(go %>% dplyr::mutate(dplyr::across(where(is.numeric), ~ signif(.x, 3))),
-                                     caption = "GO Biological Process enrichment for intervention-associated proteomic features (Word supplement Table S6)."))
-```
-
-### Compositional fatty-acid enrichment of intervention-responsive triglycerides (Table S3)
-
-For each study × timepoint × contrast stratum, fatty acids represented across sn-1/sn-2/sn-3 positions of significantly regulated TGs are compared with those of non-significant TGs using a Wilcoxon rank-sum test on within-TG proportional representation; p-values are FDR-corrected. **This is not an absolute fatty-acid concentration analysis** — it identifies fatty acids *compositionally enriched or depleted* within TG species responsive to supplementation. Positive mean differences in upregulated TGs indicate fatty acids preferentially represented in TGs increased by intervention; negative differences in downregulated TGs indicate fatty acids preferentially lost from TGs reduced by intervention.
-
-```{r path-fa, echo=FALSE, message=FALSE, warning=FALSE}
-fa <- safe_readRDS(here::here("results/fatty_acid_composition_enrichment.RDS"),
-                   label = "fatty_acid_composition_enrichment.RDS")
-if (is.data.frame(fa)) print(nice_dt(fa %>% dplyr::mutate(dplyr::across(where(is.numeric), ~ signif(.x, 3))),
-                                     caption = "Compositional enrichment of fatty acids within intervention-responsive triglycerides."))
-```
+The compositional fatty-acid enrichment of intervention-responsive triglycerides (manuscript **Table S3 / Fig. 5C**) is the compositional companion to the fat-adjusted triglyceride analysis in §8.3 above; its reproducible table is in [§9.5](#reproducible-pathway-and-enrichment-analyses).
 
 ### Network views of pathway and feature relationships
+
+The network diagrams below summarise how intervention-responsive pathways and features relate to one another for the primary outcomes and the metabolome. Nodes are pathways or features, and edges denote shared members or co-occurrence, as defined in the upstream enrichment workflow.
 
 ```{r path-networks, echo=FALSE, message=FALSE, warning=FALSE, fig.height=8}
 net_primary <- safe_readRDS(here::here("figure-data/figures8_network_plots_primary.RDS"),
@@ -356,11 +288,13 @@ show_any(net_primary)
 show_any(net_metab)
 ```
 
+**Network views.** Intervention-responsive pathway/feature networks for the primary outcomes (top) and the metabolome (bottom). Nodes are pathways or features; edges denote shared members or co-occurrence.
+
 ## Infant growth analyses (Figure S1)
 
-This section presents the effects of maternal nutritional supplementation on infant anthropometric outcomes within the IMiC subsamples of each trial: length-for-age z-score (LAZ), weight-for-length z-score (WLZ), weight-for-age z-score (WAZ), head-circumference-for-age z-score (HCAZ), and mid-upper-arm-circumference-for-age z-score (MUACZ). Estimates use the same covariate-adjusted TMLE framework as the primary milk-component analyses. These IMiC-subsample growth analyses are within-trial sanity checks: they document the plausibility of the IMiC subsample as a representative window onto the parent trial, and situate the manuscript's HM-composition findings against the corresponding infant phenotype.
+Here we report the effects of maternal nutritional supplementation on infant anthropometric outcomes within the IMiC subsamples of each trial: length-for-age z-score (LAZ), weight-for-length z-score (WLZ), weight-for-age z-score (WAZ), head-circumference-for-age z-score (HCAZ), and mid-upper-arm-circumference-for-age z-score (MUACZ). Estimates use the same covariate-adjusted TMLE framework as the primary milk-component analyses. These growth analyses act as within-trial sanity checks. They document whether the IMiC subsample is a plausible, representative window onto the parent trial, and they set the manuscript's HM-composition findings against the corresponding infant phenotype.
 
-> **Negative-control note (ELICIT).** Infant azithromycin and infant nicotinamide were administered after 6 months of age. Their effects on the 1-month and 5-month HM-collection visits are null by design and serve as a within-trial negative control on the analytic pipeline. Non-null estimates in those contrasts should be read as noise.
+> **Negative-control note (ELICIT).** Infant azithromycin and infant nicotinamide were administered only after 6 months of age. Their effects on the 1-month and 5-month HM-collection visits are therefore null by design and act as a within-trial negative control on the analytic pipeline. Any non-null estimate in those contrasts should be read as noise.
 
 ```{r growth-forest, echo=FALSE, message=FALSE, warning=FALSE, fig.height=8}
 g <- safe_readRDS(here::here("figure-data/primary_growth_plot.RDS"),
@@ -404,6 +338,8 @@ if (!is.null(g) && is.data.frame(g)) {
   out
 }
 ```
+
+**Figure S1.** Adjusted intervention effects (ATE on anthropometric z-score, with 95% CI) on infant length-for-age (LAZ), weight-for-length (WLZ), weight-for-age (WAZ), head-circumference-for-age (HCAZ), and MUAC-for-age (MUACZ), by study, randomized contrast, and infant age at measurement. Filled symbols are significant after FDR correction. In ELICIT, infant azithromycin and nicotinamide were administered after 6 months, so their effects at the 1- and 5-month visits are null by design and serve as a within-trial negative control.
 
 ```{r growth-table, echo=FALSE, message=FALSE, warning=FALSE}
 if (!is.null(g) && is.data.frame(g)) {

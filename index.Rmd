@@ -16,31 +16,33 @@ This online appendix is the **complete, searchable companion** to the manuscript
 
 > **Nutritional interventions' impacts on human milk: three trial analyses from low-resource settings** (Dailey-Chwalibóg, Mertens et al., 2025). International Milk Composition (IMiC) Consortium.
 
-It provides every analytical output that supports the main manuscript — interactive forest and volcano plots, searchable estimate tables (filter and CSV-download enabled), longitudinal trajectory visualisations, MILQ-anchored deficiency analyses, BMI-stratified subgroup analyses, and pathway-level enrichment results — at a level of detail that does not fit in the printed article PDF.
+It provides every analytical output that supports the main manuscript, in more detail than the printed article PDF can hold: interactive forest and volcano plots, searchable estimate tables (filter and CSV-download enabled), longitudinal trajectory visualisations, MILQ-anchored deficiency analyses, BMI-stratified subgroup analyses, reproducible pathway-enrichment results, and the cross-compartment maternal/infant blood analyses.
 
-The appendix is organised into **eight numbered sections** matching the references in the printed paper (Sections 1–8), preceded by this unnumbered overview and followed by a reproducibility appendix.
+The appendix is organised into **ten numbered sections** matching the references in the printed paper (Sections 1–10), preceded by this unnumbered overview and followed by a reproducibility appendix. Sections 1–8 mirror the original submission; **§9 (reproducible pathway and enrichment analyses)** and **§10 (cross-compartment analyses in maternal and infant blood)** are added in this revision to report, respectively, the scripted MetaboAnalystR enrichment pipeline behind the manuscript's pathway figures and the maternal-plasma / dried-blood-VAMS / blood-proteomics analyses behind manuscript Fig. S7 and Table S8.
 
 ## Outstanding TODOs (revision round 1) {-}
 
 The following items remain open while the manuscript revision is in progress; the supplement will be updated as soon as the upstream actions complete:
 
 - **TODO (revision item 3): Zenodo / Code-Ocean DOI archive.** Science's revision checklist requires that code in a GitHub repository be permanently archived in Zenodo or Code Ocean and cited with a DOI in the reference list. The supplement repository needs a tagged release linked to Zenodo, and the resulting DOI needs to be embedded in this overview, the [README](https://github.com/amertens/IMiC-intervention-effects-supplement), and the reference list of the main paper. Until that hook-up is in place, citing this supplement should use the repository URL (above) as a placeholder.
-- **TODO (revision item 8): Re-target figure cross-references after Fig. S2 promotion.** Reviewer 2 recommended promoting Fig. S2 (the B-vitamin biomarker panel) from the printed Word supplement to a main-text figure. If that change is accepted by the editor, every "Figure S#" cross-reference in this online appendix — currently *Figure S1* (growth), *Figure S2* (HM distributions), *Figure S3* (MILQ deficiency RR), *Figure S4* (HMOs/bioactives), *Figure S5* (TG fat-adjustment), and *Figure S6* (microbiome α-diversity) — must be renumbered to match the post-revision figure list.
+- **TODO (revision item 8): Re-target figure cross-references after Fig. S2 promotion.** Reviewer 2 recommended promoting Fig. S2 (the significant primary-outcome panel) from the printed Word supplement to a main-text figure. If that change is accepted by the editor, every "Figure S#" cross-reference in this online appendix — currently *Figure S1* (growth), *Figure S2* (significant primary-outcome distributions), *Figure S3* (MILQ deficiency RR), *Figure S4* (HMOs/bioactives), *Figure S5* (TG fat-adjustment), and *Figure S6* (microbiome α-diversity) — must be renumbered to match the post-revision figure list.
 
 ## How this appendix maps to the manuscript
 
 | Manuscript reference | Section here |
 |---|---|
 | Methods: "baseline participant characteristics … (Section 1)" | [§1 Baseline characteristics by study and intervention arm](#baseline-characteristics-by-study-and-intervention-arm) |
-| Methods: "outcomes list … (Section 2)" + manuscript Fig. S2 | [§2 Outcomes and human milk component distributions](#outcomes-and-human-milk-component-distributions) |
+| Methods: "outcomes list … (Section 2)"; Fig. 4A "metadata in Online Supplement 5" (primary-component metadata); manuscript Fig. S2 | [§2 Outcomes and human milk component distributions](#outcomes-and-human-milk-component-distributions) |
 | Results: "Online Appendix 3" (effect modification by maternal BMI) | [§3 Subgroup analyses stratified by maternal BMI](#subgroup-analyses-stratified-by-maternal-bmi) |
 | Results: "Online Appendix 4" (individual microbial taxa); Fig. S6 | [§4 Microbiome and exploratory high-dimensional outcomes](#exploratory-high-dimensional-outcomes-microbiome-untargeted-proteomics-untargeted-metabolomics) |
-| Fig. 4A: "metadata in Online Supplement 5" (primary milk components) | [§5 Adjusted intervention effects on individual milk components](#adjusted-intervention-effects-on-individual-milk-components) |
+| manuscript Fig. 3 (primary-outcome forest plots), Fig. S4 (secondary outcomes), and the per-component estimates underlying Fig. 5A (tertiary metabolites) | [§5 Adjusted intervention effects on individual milk components](#adjusted-intervention-effects-on-individual-milk-components) |
 | Fig. 5A: "metadata in Online Supplement 6" (targeted metabolites); manuscript Fig. S3 (MILQ deficiency) | [§6 Targeted-metabolite metadata and reductions in HM nutrient deficiency](#targeted-metabolite-metadata-and-reductions-in-hm-nutrient-deficiency) |
 | Longitudinal change in HM composition | [§7 Trajectory analyses of HM component change across lactation](#trajectory-analyses-of-human-milk-component-change-across-lactation) |
-| Fig. S1 (growth); Fig. S5 (TG fat adjustment); Tables S2/S3/S5/S6 (pathway enrichment); sensitivity analyses | [§8 Sensitivity analyses and additional outputs](#sensitivity-analyses-and-additional-outputs) |
+| manuscript Fig. 2 (treatment-arm prediction & PCA composites); Fig. S1 (growth); Fig. S5 (TG fat adjustment); sensitivity analyses | [§8 Sensitivity analyses and additional outputs](#sensitivity-analyses-and-additional-outputs) |
+| manuscript Fig. 3B (primary MSEA), Fig. 5B–C and Fig. 6A–C (tertiary/untargeted enrichment); **Tables S1–S6** (pathway enrichment) | [§9 Reproducible pathway and enrichment analyses](#reproducible-pathway-and-enrichment-analyses) |
+| Results: "intervention effects are mirrored in maternal and infant circulation"; manuscript **Fig. S7** and **Table S8** (cross-compartment maternal/infant blood) | [§10 Cross-compartment analyses in maternal and infant blood](#cross-compartment-analyses-in-maternal-and-infant-blood) |
 
-The manuscript's section-numbered citations — *"Section 1"*, *"Section 2"*, *"Online Appendix 3"*, *"Online Appendix 4"*, *"Online Supplement 5"*, *"Online Supplement 6"* — resolve directly to **§1–§6** of this build.
+The manuscript's section-numbered citations resolve as follows: *"Section 1"* → §1; *"Section 2"* and Fig. 4A's *"Online Supplement 5"* (primary-component metadata) → §2; *"Online Appendix 3"* → §3; *"Online Appendix 4"* → §4; and Fig. 5A's *"Online Supplement 6"* (targeted-metabolite metadata) → §6. The modelling and sensitivity outputs the manuscript cites collectively as *"Sections 3–8"* span **§3–§8** of this build.
 
 ## Methods recap
 
@@ -48,7 +50,9 @@ We conducted a harmonised individual-participant data meta-analysis of human mil
 
 Primary outcomes are macronutrients and micronutrients; secondary are HMOs and bioactive proteins; tertiary are targeted metabolites (Biocrates MxP Quant 500); exploratory are untargeted metabolomics, untargeted proteomics, and microbiome composition. All components were expressed in native assay units, then standardised to study × visit z-scores before TMLE. Effect estimates from the primary chapter therefore represent **mean differences in SD units**, with FDR correction applied within each outcome group × study × visit. The complete methods are in the manuscript and its Methods supplement.
 
-The full outcomes list — every milk component analysed in this supplement, grouped by prespecified outcome class with per-study availability — is now in [§2 *Outcomes and human milk component distributions*](#outcomes-and-human-milk-component-distributions), so that the manuscript Methods reference *"A list of all outcomes and descriptions is available in the Online Appendix (Section 2)"* resolves to a numbered section rather than an unnumbered overview.
+Two different mass tolerances appear in the enrichment and cross-compartment chapters and are **not** interchangeable: pathway/compound annotation in §9 (Mummichog) uses a **10 ppm** database tolerance against the `human_mfn` library, whereas cross-platform feature matching in §10 uses a **±25 ppm** experimental-over-experimental tolerance (Kim's formula, `ppm = |m₁ − m₂| / m × 10⁶ ≤ 25`). The 10 ppm annotation tolerance and the ±25 ppm feature-matching tolerance are distinct quantities.
+
+The full outcomes list (every milk component analysed in this supplement, grouped by prespecified outcome class with per-study availability) now lives in [§2 *Outcomes and human milk component distributions*](#outcomes-and-human-milk-component-distributions). The manuscript Methods reference *"A list of all outcomes and descriptions is available in the Online Appendix (Section 2)"* therefore resolves to a numbered section rather than an unnumbered overview.
 
 ## How to read interactive figures
 
