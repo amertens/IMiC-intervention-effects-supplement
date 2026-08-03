@@ -26,6 +26,7 @@ untargeted-proteomics
 untargeted-metabolomics
 pre-rendered-volcano-plot-objects-manuscript-figure-panels
 adjusted-intervention-effects-on-individual-milk-components
+effect-explorer-app
 macronutrients
 combined-intervention-arms-2
 stratified-by-randomized-arm-2
