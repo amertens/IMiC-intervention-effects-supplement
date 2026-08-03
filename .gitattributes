@@ -1,0 +1,2 @@
+# shinylive/webR runtime — store byte-exact, no EOL conversion, no diff
+docs/apps/** -text -diff
