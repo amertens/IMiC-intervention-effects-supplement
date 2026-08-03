@@ -15,4 +15,6 @@ rmd_files:
   - 06_milq_deficiency.Rmd
   - 07_trajectory_plots.Rmd
   - 08_sensitivity_supplementary.Rmd
+  - 09_pathway_enrichment.Rmd
+  - 10_cross_compartment_blood.Rmd
   - 99_session_info.Rmd

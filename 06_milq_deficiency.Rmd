@@ -1,14 +1,14 @@
 # Targeted-metabolite metadata and reductions in HM nutrient deficiency
 
-This section contains two distinct types of content. The first subsection, *Targeted-metabolite metadata*, is the inventory of the Biocrates MxP Quant 500 panel called out in the **manuscript Fig. 5A legend** (*"metadata in Online Supplement 6"*) — every targeted metabolite analysed as a tertiary outcome, grouped by Biocrates category and annotated with per-study availability.
+Two kinds of content follow. The first subsection, *Targeted-metabolite metadata*, gives the inventory of the Biocrates MxP Quant 500 panel called out in the **manuscript Fig. 5A legend** (*"metadata in Online Supplement 6"*): every targeted metabolite analysed as a tertiary outcome, grouped by Biocrates category and annotated with per-study availability.
 
-The remainder of this section presents effects of maternal nutritional supplementation on the **prevalence of human milk (HM) nutrient deficiency**, defined as concentrations below the 10th percentile of age-specific reference distributions from the Mothers, Infants, and Lactation Quality (MILQ) study. For each milk sample, infant age at collection was mapped to a MILQ age band (0–3, 4–17, 18–31 days; 1–2, 2–3, 3–4, 4–5, 5–6 months), concentrations were harmonized to MILQ units, and deficiency was operationalized as a binary indicator at the 10th percentile threshold. Components with fewer than five inadequate samples within a study × visit stratum were excluded to avoid sparse-data bias. Relative risks (RRs) were estimated using TMLE with adjustment for the same prespecified baseline prognostic factors as in the primary analyses, contrasting pooled maternal nutritional intervention arms against the corresponding control. FDR correction was applied within visit × outcome group. The MILQ-deficiency analyses correspond to **Figure S3** in the printed Word supplement.
+The rest of the section examines how maternal nutritional supplementation affects the **prevalence of human milk (HM) nutrient deficiency**, defined as concentrations below the 10th percentile of age-specific reference distributions from the Mothers, Infants, and Lactation Quality (MILQ) study. For each milk sample, infant age at collection was mapped to a MILQ age band (0–3, 4–17, 18–31 days; 1–2, 2–3, 3–4, 4–5, 5–6 months), concentrations were harmonized to MILQ units, and deficiency was scored as a binary indicator at the 10th percentile threshold. Components with fewer than five inadequate samples within a study × visit stratum were excluded to avoid sparse-data bias. Relative risks (RRs) were estimated using TMLE with adjustment for the same prespecified baseline prognostic factors as in the primary analyses, contrasting pooled maternal nutritional intervention arms against the corresponding control. FDR correction was applied within visit × outcome group. These MILQ-deficiency analyses correspond to **Figure S3** in the printed Word supplement.
 
 ## Targeted-metabolite metadata (Online Supplement 6)
 
-The Biocrates MxP Quant 500 panel was used to measure tertiary outcomes — a broad targeted metabolomics panel covering acylcarnitines, amino acids and biogenic amines, bile acids, ceramides, cholesteryl esters, di- and triglycerides, free fatty acids, lysophosphatidyl- and phosphatidylcholines, sphingomyelins, hexosyl- and trihexosylceramides, and other classes. The table below enumerates every metabolite analysed in this supplement, grouped by Biocrates category, with indicators for whether the metabolite was measured in each of the three IMiC trials.
+Tertiary outcomes were measured on the Biocrates MxP Quant 500 panel, a broad targeted metabolomics assay covering acylcarnitines, amino acids and biogenic amines, bile acids, ceramides, cholesteryl esters, di- and triglycerides, free fatty acids, lysophosphatidyl- and phosphatidylcholines, sphingomyelins, hexosyl- and trihexosylceramides, and other classes. The table below lists every metabolite analysed in this supplement, grouped by Biocrates category, with indicators for whether the metabolite was measured in each of the three IMiC trials.
 
-This metadata is the resource cited from **Fig. 5A** of the manuscript. The intervention-effect estimates for these metabolites are in [§5 *Adjusted intervention effects on individual milk components*](#adjusted-intervention-effects-on-individual-milk-components) (tertiary-outcome subsections, pooled and per-arm); their effects on within-mother trajectories are in [§7 *Trajectory analyses*](#trajectory-analyses-of-human-milk-component-change-across-lactation); and pathway-level enrichment summaries (MetaboAnalyst ORA, Mummichog, fatty-acid compositional enrichment) are in [§8.6 *Pathway enrichment analyses*](#pathway-enrichment-analyses).
+This inventory is the resource cited from **Fig. 5A** of the manuscript. The intervention-effect estimates for these metabolites are in [§5 *Adjusted intervention effects on individual milk components*](#adjusted-intervention-effects-on-individual-milk-components) (tertiary-outcome subsections, pooled and per-arm); their effects on within-mother trajectories are in [§7 *Trajectory analyses*](#trajectory-analyses-of-human-milk-component-change-across-lactation); and pathway-level enrichment summaries (MetaboAnalyst ORA/MSEA, Mummichog, GO) are in [§9 *Reproducible pathway and enrichment analyses*](#reproducible-pathway-and-enrichment-analyses).
 
 ```{r milq-metabolite-metadata, echo=FALSE, message=FALSE, warning=FALSE}
 metadata_loaded <- safe_load(here::here("metadata/milk_component.Rdata"))
@@ -51,9 +51,34 @@ if (isTRUE(metadata_loaded) && exists("all_milk_components") &&
 
 ## MILQ-deficiency reductions — headline findings
 
-- **ELICIT — high-dose nicotinamide** reduced HM vitamin B3 deficiency at both timepoints (1-month RR 0.10, 95% CI 0.01–0.76, q = 0.162; 5-month RR 0.22, 95% CI 0.13–0.39, q < 0.001), with the FDR-significant signal at the second timepoint.
+```{r milq-headline-data, include=FALSE}
+suppressPackageStartupMessages({ library(dplyr); library(here) })
+source(here::here("functions.R"))
+milq_df <- safe_readRDS(here::here("figure-data/fig-milq-deficiency-reduction-data.RDS"),
+                        label = "fig-milq-deficiency-reduction-data.RDS")
+
+## Format "RR x.xx, 95% CI lo–hi, q = ..." directly from the MILQ
+## deficiency-reduction data so the headline figures below cannot drift from
+## the forest plot and table further down this chapter.
+milq_rr <- function(study_pat, label_pat, visit_val) {
+  if (is.null(milq_df) || !is.data.frame(milq_df)) return("[data unavailable]")
+  r <- milq_df %>% dplyr::filter(grepl(study_pat, study, ignore.case = TRUE),
+                                 grepl(label_pat, label_f, ignore.case = TRUE),
+                                 as.character(visit) == as.character(visit_val))
+  if (!nrow(r)) return("[not estimated]")
+  r <- r[1, ]
+  qtxt <- if (is.na(r$pval_adj)) "q = NA" else if (r$pval_adj < 0.001) "q < 0.001" else sprintf("q = %.3f", r$pval_adj)
+  sprintf("RR %.2f, 95%% CI %.2f–%.2f, %s", r$RR, r$ci.lb, r$ci.ub, qtxt)
+}
+milq_se_range <- if (is.null(milq_df) || !is.data.frame(milq_df)) "[data unavailable]" else {
+  se <- milq_df %>% dplyr::filter(grepl("selen", label_f, ignore.case = TRUE))
+  if (!nrow(se)) "[not estimated]" else sprintf("%.2f–%.2f", min(se$RR, na.rm = TRUE), max(se$RR, na.rm = TRUE))
+}
+```
+
+- **ELICIT — high-dose nicotinamide** reduced HM vitamin B3 deficiency at both timepoints (1-month `r milq_rr("ELICIT", "Vitamin B3", 1)`; 5-month `r milq_rr("ELICIT", "Vitamin B3", 5)`), with the FDR-significant signal at the second timepoint.
 - **Mumta-LW — postnatal BEP** reduced pantothenic acid, B2, and B3 deficiencies, although only at the first visit.
-- **MISAME-III — postnatal BEP** reduced pantothenic acid, B2, and B3 deficiencies at 14–21 days; pantothenic acid and B3 at 1–2 months; B3 at 4–5 months. Selenium deficiency was significantly reduced at all three timepoints (RR range 0.43–0.86).
+- **MISAME-III — postnatal BEP** reduced pantothenic acid, B2, and B3 deficiencies at 14–21 days; pantothenic acid and B3 at 1–2 months; B3 at 4–5 months. Selenium deficiency was significantly reduced at all three timepoints (RR range `r milq_se_range`).
 
 ```{r milq-setup, include=FALSE}
 library(tidyverse)
@@ -115,6 +140,8 @@ if (!is.null(milq_df) && is.data.frame(milq_df)) {
 }
 ```
 
+**Figure S3.** Relative risk (RR, log scale) of human-milk nutrient deficiency — defined as a concentration below the 10th percentile of the age-specific MILQ reference distribution — for pooled maternal nutritional intervention vs. control, by study and visit. RR < 1 indicates reduced deficiency risk under intervention. Filled symbols are significant after FDR correction (q < 0.05, applied within visit × outcome group); open symbols are non-significant. Components with fewer than five deficient samples within a study × visit stratum are omitted. Hover (HTML) for the exact RR, 95% CI, p, and q.
+
 ## Searchable table of MILQ-deficiency effects
 
 ```{r milq-table, echo=FALSE, message=FALSE, warning=FALSE}
@@ -133,8 +160,8 @@ if (!is.null(milq_df) && is.data.frame(milq_df)) {
 
 ## Interpretation
 
-The MILQ-anchored analysis differs from the continuous-scale TMLE in two important ways. First, by binarizing at a clinically anchored threshold rather than estimating mean shifts in SD units, it asks whether supplementation moves the *tail* of the HM distribution that is most likely to be associated with inadequate infant supply. Second, the reference is exogenous (an external population studied under harmonized conditions) rather than within-trial, so effects measured here reflect movement *toward an external adequacy standard* rather than within-trial contrasts.
+The MILQ-anchored analysis differs from the continuous-scale TMLE in two important ways. By binarizing at a clinically anchored threshold rather than estimating mean shifts in SD units, it asks whether supplementation moves the *tail* of the HM distribution most likely to be associated with inadequate infant supply. And because the reference is exogenous — an external population studied under harmonized conditions rather than a within-trial comparison — the effects measured here reflect movement *toward an external adequacy standard*.
 
-This pairing is informative: the components for which the manuscript reports the largest mean-scale ATE (B-vitamins, particularly B3 in ELICIT; pantothenic acid and B3 in BEP trials; selenium in MISAME-III) are the same components for which deficiency prevalence is materially reduced here, supporting a consistent biological interpretation.
+The two views line up: the components for which the manuscript reports the largest mean-scale ATE (B-vitamins, particularly B3 in ELICIT; pantothenic acid and B3 in BEP trials; selenium in MISAME-III) are the same components whose deficiency prevalence is materially reduced here, which supports a consistent biological reading.
 
-Two caveats apply. Components excluded for sparse-data reasons (fewer than five deficient samples within stratum) are dropped from the plot and table — this is more likely for components on which the IMiC populations already exceed the MILQ 10th percentile (e.g. several macronutrients), so absence of a row should not be read as a null result. And RRs cannot resolve direction-of-effect questions at the upper tail of the distribution; readers interested in supra-physiological enrichment (most clearly seen for B3 in ELICIT) should consult the continuous-scale forest plots in the *Adjusted intervention effects* chapter.
+Two caveats apply. Components excluded for sparse-data reasons (fewer than five deficient samples within stratum) drop out of the plot and table. Such exclusions are more likely for components on which the IMiC populations already exceed the MILQ 10th percentile (e.g. several macronutrients), so a missing row should not be read as a null result. RRs also cannot resolve direction-of-effect questions at the upper tail of the distribution; readers interested in supra-physiological enrichment, seen most clearly for B3 in ELICIT, should consult the continuous-scale forest plots in the *Adjusted intervention effects* chapter.

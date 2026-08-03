@@ -1,12 +1,12 @@
 # Adjusted intervention effects on individual milk components
 
-This chapter presents the **primary, covariate-adjusted estimates** of the effects of maternal nutritional interventions on individual human milk components. Results are shown as interactive forest plots and accompanying searchable tables, stratified by study and milk collection visit. Average treatment effects (ATEs) are estimated using targeted maximum likelihood estimation (TMLE) with adjustment for prespecified baseline prognostic factors, and the Benjamini–Hochberg false-discovery rate (FDR) correction is applied within each outcome group × study × visit.
+Here we report the **primary, covariate-adjusted estimates** of how maternal nutritional interventions affect individual human milk components. Each component appears as an interactive forest plot alongside a searchable table, stratified by study and milk collection visit. We estimate average treatment effects (ATEs) using targeted maximum likelihood estimation (TMLE), adjusting for prespecified baseline prognostic factors, and apply the Benjamini–Hochberg false-discovery rate (FDR) correction within each outcome group × study × visit. Every result table also carries `pval_adj_global`, a more conservative correction pooled across all studies and visits within an outcome group (the pre-revision scheme), which we retain for sensitivity; significance flags (`sigFDR`) rest on the per-visit `pval_adj`.
 
-For each modality, results are presented twice: (i) with intervention arms **pooled** (all maternal nutritional intervention arms combined vs. the corresponding control), to maximize precision, and (ii) **stratified by randomized arm**, where each post-randomization nutritional arm is contrasted against the trial's control. In the forest plots, solid filled symbols mark effects that remain significant after FDR correction; open symbols are not significant; intermediate ("Sig before FDR") symbols indicate nominal *p* < 0.05 that did not survive multiplicity correction. Hover over any point in the HTML version to see the exact estimate, 95% CI, and q-value; use the column filters in each table to drill into specific components, studies, or visits.
+Each modality appears twice. The first view **pools** the intervention arms (all maternal nutritional intervention arms combined vs. the corresponding control) to maximize precision. The second **stratifies by randomized arm**, contrasting each post-randomization nutritional arm against its trial's control. Within the forest plots, solid filled symbols mark effects that survive FDR correction and open symbols do not, while intermediate ("Sig before FDR") symbols flag nominal *p* < 0.05 that fell short of the multiplicity threshold. In the HTML version, hovering over a point reveals the exact estimate, 95% CI, and q-value, and the column filters in each table let you drill into specific components, studies, or visits.
 
-This chapter corresponds to **Figure 2 and Figure S4** in the manuscript.
+These outputs map to **Figure 3** (primary-outcome forest plots) and **Figure S4** (secondary outcomes) in the manuscript, and they supply the per-component estimates behind the **Figure 5A** targeted-metabolite volcano. For the multivariate treatment-arm prediction and PCA composites of manuscript Figure 2, see §8.
 
-> **Looking for absolute concentrations?** The estimates below are on the **standardised (SD) scale** for cross-component comparison. For the same intervention effects expressed in the **native assay units** (g/100 mL for macronutrients; µg/L or mg/L for micronutrients; relative abundance for HMOs), see **§8.2 "Unscaled (natural-unit) intervention effects"** in the *Sensitivity analyses and additional outputs* chapter. The result tables below also include an `ATE_unscaled` column reporting the per-component natural-unit estimate alongside the standardised one. Unadjusted estimates are in **§8.1** for sensitivity.
+> **Looking for absolute concentrations?** The estimates below sit on the **standardised (SD) scale** so that components can be compared directly. To read the same intervention effects in their **native assay units** (g/100 mL for macronutrients; µg/L or mg/L for micronutrients; relative abundance for HMOs), see **§8.2 "Unscaled (natural-unit) intervention effects"** in the *Sensitivity analyses and additional outputs* chapter. Each result table below carries an `ATE_unscaled` column giving the per-component natural-unit estimate next to the standardised one. Unadjusted estimates appear in **§8.1** for sensitivity.
 
 ```{r effects-setup, include=FALSE}
 library(tidyverse)
@@ -19,13 +19,23 @@ source(here::here("functions.R"))
 ## Returns an htmltools tagList so that htmlwidgets (plotly and DT) are picked
 ## up by knit_print at the chunk top level — print() of widgets from inside
 ## a function does not trigger the htmlwidget rendering path.
-show_forest_and_table <- function(csv_path, arm_strat = FALSE, title = NULL) {
+show_forest_and_table <- function(csv_path, arm_strat = FALSE, title = NULL,
+                                  fig_legend = NULL, tab_caption = NULL) {
   df <- safe_read_csv(here::here(csv_path))
   if (is.null(df) || !nrow(df)) return(htmltools::tagList())
+  ttl <- title %||% "Forest plot of adjusted ATEs"
+  legend <- fig_legend %||% paste0(
+    "Each point is the adjusted average treatment effect (ATE, SD units) with 95% CI for one milk component, ",
+    "faceted by study and milk-collection visit. ",
+    if (arm_strat)
+      "Symbols are coloured by randomised contrast; solid filled symbols mark effects significant after FDR correction (q<0.05), intermediate symbols nominal p<0.05, and open symbols non-significant. "
+    else
+      "Solid orange symbols mark effects significant after FDR correction (q<0.05); grey filled symbols are nominally significant (p<0.05); open symbols are non-significant. ",
+    "FDR correction is applied within outcome group, study, and visit. Hover (HTML) for the exact estimate, 95% CI, and q-value.")
   htmltools::tagList(
-    forest_plot(df, arm_strat = arm_strat,
-                title = title %||% "Forest plot of adjusted ATEs"),
-    clean_tab(df)
+    forest_plot(df, arm_strat = arm_strat, title = ttl),
+    htmltools::tags$p(htmltools::tags$strong("Figure legend. "), htmltools::tags$em(legend)),
+    clean_tab(df, caption = tab_caption %||% paste0("Adjusted ATEs, 95% CIs, and FDR-adjusted q-values — ", ttl, "."))
   )
 }
 ```
@@ -119,7 +129,7 @@ show_forest_and_table("results/subsetted results/secondary_bioactives_arm_strat.
 
 ## Targeted metabolites (tertiary outcomes)
 
-The targeted-metabolomics panel (Biocrates MxP Quant 500) is large; pathway-level views in the *Pathway enrichment* chapter and the trajectory volcano plots in the *Trajectory analyses* chapter provide higher-level summaries. The forest plots below show the same metabolites as a long, hover-searchable forest, primarily useful for filtering to a specific compound class via the table search.
+The targeted-metabolomics panel (Biocrates MxP Quant 500) is large, so higher-level summaries live elsewhere: pathway-level views in the *Pathway enrichment* chapter and volcano plots in the *Trajectory analyses* chapter. The forest plots below lay out the same metabolites as a long, hover-searchable forest, most useful when you filter the table to a specific compound class.
 
 ### Combined intervention arms
 

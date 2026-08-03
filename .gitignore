@@ -12,3 +12,6 @@ boxplot_files/
 /figures
 /boxplot_files/
 02_descriptive_statistics.Rmd
+
+# Claude Code session artifacts
+.claude/

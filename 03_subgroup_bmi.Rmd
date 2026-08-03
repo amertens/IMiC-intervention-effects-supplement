@@ -1,10 +1,10 @@
 # Subgroup analyses stratified by maternal BMI
 
-This chapter presents subgroup analyses evaluating whether the effects of maternal nutritional interventions on human milk components differed by maternal nutritional status at baseline, operationalized using **maternal body mass index (BMI)**. BMI was dichotomized a priori into *underweight* (BMI ≤ 18.5 kg/m²) and *normal or overweight* (BMI > 18.5 kg/m²) strata. Stratum-specific ATEs were estimated using the same TMLE framework as in the primary adjusted analyses, and **interaction p-values** were computed by comparing stratum-specific estimates with a Wald-type test on the difference in estimates scaled by the pooled standard error.
+Did the intervention effects on human milk components depend on maternal nutritional status at baseline? We addressed this using **maternal body mass index (BMI)** as a marker of that status. BMI was dichotomized a priori into *underweight* (BMI ≤ 18.5 kg/m²) and *normal or overweight* (BMI > 18.5 kg/m²) strata. We estimated stratum-specific ATEs with the same TMLE framework used in the primary adjusted analyses. **Interaction p-values** come from a Wald-type test comparing the two stratum-specific estimates, taking the difference in estimates scaled by the pooled standard error.
 
-This section is cited as **"Online Appendix 3"** in the main manuscript (Results paragraphs on macronutrient and micronutrient effects). The manuscript reports **no consistent evidence of effect modification by maternal BMI** for primary, secondary, or tertiary outcomes. The plots and tables below allow that conclusion to be verified at the per-component level.
+The main manuscript cites this section as **"Online Appendix 3"** in the Results paragraphs on macronutrient and micronutrient effects, where it reports **no consistent evidence of effect modification by maternal BMI** across primary, secondary, and tertiary outcomes. The plots and tables below let a reader check that conclusion component by component.
 
-> **Interpretation note.** These subgroup analyses are exploratory and not powered to detect modest interactions, particularly within studies where the underweight stratum is small. Per-component point estimates that differ in magnitude or direction across BMI strata should be interpreted cautiously, especially where the corresponding 95% CIs are wide.
+> **Interpretation note.** These subgroup analyses are exploratory and not powered to detect modest interactions, particularly within studies where the underweight stratum is small. Where per-component point estimates differ in magnitude or direction across BMI strata, read them cautiously, especially when the corresponding 95% CIs are wide.
 
 ```{r bmi-setup, include=FALSE}
 library(tidyverse)
@@ -50,6 +50,8 @@ bmi_df <- safe_readRDS(here::here("figure-data/subgroup_results.RDS"),
 ```
 
 ## Per-component stratified forest plots
+
+**Figure (Online Appendix 3).** Adjusted ATEs (SD units, with 95% CI) within maternal-BMI strata (underweight, BMI ≤ 18.5 kg/m²; normal/overweight, BMI > 18.5 kg/m²), by study and milk-collection visit, shown separately for primary, secondary, and tertiary outcomes. Points are coloured by BMI stratum; hover (HTML) for the stratum-specific estimate, q-value, and the Wald-type interaction *p*-value. As noted above, these analyses are exploratory and not powered to detect modest interactions.
 
 ```{r bmi-primary, echo=FALSE, message=FALSE, warning=FALSE, fig.height=14}
 if (!is.null(bmi_df) && is.data.frame(bmi_df)) {
