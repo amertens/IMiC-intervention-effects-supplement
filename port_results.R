@@ -131,6 +131,22 @@ files[[length(files) + 1]] <- list("figures/figure4_combined_arms.png",
 files[[length(files) + 1]] <- list("figures/figure4_stratified_supplement.png",
                                    "figures/figure4_stratified_supplement.png")
 
+## Direction-split ORA composite figures (§9 primary/tertiary subsections).
+files[[length(files) + 1]] <- list("figures/figureS_primary_ora_by_direction.png",
+                                   "figures/figureS_primary_ora_by_direction.png")
+files[[length(files) + 1]] <- list("figures/figureS_tertiary_ora_by_direction.png",
+                                   "figures/figureS_tertiary_ora_by_direction.png")
+
+## Finalized milk-Mummichog feature-level annotation (§9 mummichog subsection).
+## These live at results/ top-level upstream; relocate under mummichog_s5/ here
+## so §9 loads them alongside the Table S5 pathway grid. (The direction-split
+## primary/tertiary ORA CSVs already live under results/metaboanalyst/ upstream
+## and are picked up by the copy_tree("results/metaboanalyst") call below.)
+files[[length(files) + 1]] <- list("results/milk_mummichog_annotation_finalized.csv",
+                                   "results/metaboanalyst/mummichog_s5/milk_mummichog_annotation_finalized.csv")
+files[[length(files) + 1]] <- list("results/milk_mummichog_annotation_summary.csv",
+                                   "results/metaboanalyst/mummichog_s5/milk_mummichog_annotation_summary.csv")
+
 ## ---- NEW: cross-compartment blood result CSVs (ch 10) --------------------
 ## Only the CSVs that §10 actually renders are ported. Full per-feature tables
 ## (per-pair cross_compartment_metab_*, fdr_sig_updown_lists,

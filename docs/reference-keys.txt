@@ -74,14 +74,17 @@ reproducible-pathway-and-enrichment-analyses
 pathway-explorer-app
 path-primary
 arm-stratified
+direction-split-ora-up--vs-down-regulated
 path-ora-vs-pathway
 path-secondary
 path-tertiary
 msea-combined-and-arm-stratified
 ora-counterpart
+direction-split-ora-up--vs-down-regulated-1
 path-tg-fa
 path-untargeted-msea
 path-mummichog
+path-mummichog-annotation
 path-go
 cross-compartment-analyses-in-maternal-and-infant-blood
 cc-volcanoes

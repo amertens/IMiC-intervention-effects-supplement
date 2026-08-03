@@ -89,6 +89,26 @@ enrich_dt(read_enrich("results/metaboanalyst/primary_stratified/primary_stratifi
           caption = "Primary-outcome MetaboAnalyst ORA, arm-stratified contrasts vs. control.")
 ```
 
+### Direction-split ORA (up- vs down-regulated)
+
+These standalone tables run the over-representation separately on the up- and down-regulated primary feature lists (combined arms): the §9.1 ORA already splits the *foreground* by direction internally when it builds the enrichment, and here that split is reported directly, recovering **nicotinate and nicotinamide metabolism** among the up-regulated features (ELICIT) and **lactose synthesis and superoxide degradation** among the down-regulated features (MISAME-III).
+
+```{r path-primary-dirsplit-fig, echo=FALSE, message=FALSE, warning=FALSE}
+safe_img("figures/figureS_primary_ora_by_direction.png", label = "figureS_primary_ora_by_direction.png")
+```
+
+***Figure. Primary-outcome ORA split by direction of effect (combined arms).** Enriched pathways among up- vs. down-regulated primary features. Nicotinate/nicotinamide metabolism (ELICIT) dominates the up-regulated side; lactose synthesis and superoxide degradation (MISAME-III) appear among the down-regulated side.*
+
+```{r path-primary-ora-up, echo=FALSE, message=FALSE, warning=FALSE}
+enrich_dt(read_enrich("results/metaboanalyst/primary_combined/primary_ora_upregulated.csv"),
+          caption = "Primary-outcome ORA, up-regulated features (combined arms).")
+```
+
+```{r path-primary-ora-down, echo=FALSE, message=FALSE, warning=FALSE}
+enrich_dt(read_enrich("results/metaboanalyst/primary_combined/primary_ora_downregulated.csv"),
+          caption = "Primary-outcome ORA, down-regulated features (combined arms).")
+```
+
 ## Primary outcomes — over-representation vs. quantitative pathway/impact analysis {#path-ora-vs-pathway}
 
 MetaboAnalyst supports two related enrichment styles that answer subtly different questions, and comparing them makes the **background dependence** of enrichment explicit:
@@ -146,6 +166,26 @@ enrich_dt(read_enrich("results/metaboanalyst/tertiary_stratified/tertiary_strati
           caption = "Tertiary targeted-metabolome over-representation analysis, arm-stratified contrasts.")
 ```
 
+### Direction-split ORA (up- vs down-regulated)
+
+As for the primary outcomes, these standalone tables run the over-representation separately on the up- and down-regulated tertiary (targeted-metabolite) feature lists (combined arms) — the per-direction companion to the MSEA and ORA views above, with the composite figure alongside.
+
+```{r path-tertiary-dirsplit-fig, echo=FALSE, message=FALSE, warning=FALSE}
+safe_img("figures/figureS_tertiary_ora_by_direction.png", label = "figureS_tertiary_ora_by_direction.png")
+```
+
+***Figure. Tertiary targeted-metabolome ORA split by direction of effect (combined arms).** Enriched pathways among up- vs. down-regulated tertiary features.*
+
+```{r path-tertiary-ora-up, echo=FALSE, message=FALSE, warning=FALSE}
+enrich_dt(read_enrich("results/metaboanalyst/tertiary_combined/tertiary_ora_upregulated.csv"),
+          caption = "Tertiary-outcome ORA, up-regulated features (combined arms).")
+```
+
+```{r path-tertiary-ora-down, echo=FALSE, message=FALSE, warning=FALSE}
+enrich_dt(read_enrich("results/metaboanalyst/tertiary_combined/tertiary_ora_downregulated.csv"),
+          caption = "Tertiary-outcome ORA, down-regulated features (combined arms).")
+```
+
 ## Triglyceride fatty-acid composition {#path-tg-fa}
 
 The compositional companion to the fat-adjusted triglyceride analysis in §8.3, corresponding to manuscript **Table S3** and **Fig. 5C**. For each study × timepoint × contrast × direction stratum, the fatty-acyl moieties carried by the intervention-responsive triglycerides are compared against the background TG pool (a Wilcoxon test on within-TG proportional representation across the sn-1/sn-2/sn-3 positions). This identifies fatty acids **compositionally enriched or depleted** among the BEP-responsive triglycerides — *not* absolute fatty-acid concentrations. The consistent signal is enrichment of **polyunsaturated fatty acids** — α-linolenic (18:3n-3), γ-linolenic, and related PUFAs — among the triglycerides increased under BEP across MISAME-III contrasts and timepoints. The signal resolves in the **arm-stratified** analysis (the combined-arm table is empty).
@@ -180,6 +220,24 @@ if (!is.null(mum) && nrow(mum)) {
               format(nrow(mum_sig), big.mark = ","), format(nrow(mum), big.mark = ",")))
   print(enrich_dt(mum_sig,
         caption = "Milk untargeted-metabolome Mummichog enrichment, FDR-significant strata (manuscript Table S5 / Fig. 6B)."))
+}
+```
+
+### Feature-level putative annotation {#path-mummichog-annotation}
+
+The pathway view above is complemented by the finalized per-feature annotation of the same untargeted milk features. Across **1,034 FDR-significant** features, organised by direction × ionisation mode, **243 carry a name** (48 curated + 195 Mummichog-putative) and the remainder are unresolved; the strongest named up-regulated signal is a vitamin/cofactor cluster (pantothenate/B5, nicotinamide, ascorbate). Every name is **putative** — mass-based, MSI ~level 3 — not a confirmed identification.
+
+```{r path-mummichog-annot-summary, echo=FALSE, message=FALSE, warning=FALSE}
+enrich_dt(read_enrich("results/metaboanalyst/mummichog_s5/milk_mummichog_annotation_summary.csv"),
+          caption = "FDR-significant milk features by direction and ionization mode: named vs unresolved.")
+```
+
+```{r path-mummichog-annot-full, echo=FALSE, message=FALSE, warning=FALSE}
+annot <- read_enrich("results/metaboanalyst/mummichog_s5/milk_mummichog_annotation_finalized.csv")
+if (!is.null(annot) && nrow(annot)) {
+  DT::datatable(annot, filter = "top", rownames = FALSE,
+                options = list(pageLength = 10, scrollX = TRUE),
+                caption = "Finalized putative annotation of FDR-significant untargeted milk features.")
 }
 ```
 
