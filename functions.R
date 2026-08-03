@@ -381,6 +381,60 @@ linked_volcano_table <- function(df, fdr_thresh = 0.05,
     p, dt)
 }
 
+## Interactive LINKED scatter (feature map) + table (crosstalk). A general
+## companion to linked_volcano_table for tables that aren't volcanoes — e.g.
+## an m/z-vs-effect feature map of putatively annotated features. Brushing the
+## scatter filters the table and vice versa. Client-side only (static-Pages safe).
+linked_scatter_table <- function(df, x_col, y_col, color_col = NULL, key_col,
+                                 title = "", x_lab = x_col, y_lab = y_col,
+                                 filter_cols = character(0),
+                                 show_cols = names(df)) {
+  if (is.null(df) || !nrow(df)) return(htmltools::tags$em("No rows to display."))
+  if (!all(c(x_col, y_col, key_col) %in% names(df))) {
+    return(htmltools::tags$em("Table lacks the columns needed for this feature map."))
+  }
+  df$tooltip <- paste0(df[[key_col]],
+                       "<br>", x_lab, ": ", signif(df[[x_col]], 5),
+                       " | ", y_lab, ": ", signif(df[[y_col]], 3))
+  keep <- union(intersect(show_cols, names(df)),
+                c(x_col, y_col, color_col, "tooltip", key_col))
+  df   <- df[, intersect(keep, names(df)), drop = FALSE]
+
+  if (!knitr::is_html_output() || !requireNamespace("crosstalk", quietly = TRUE)) {
+    return(nice_dt(df[, setdiff(names(df), "tooltip"), drop = FALSE]))
+  }
+  sd <- crosstalk::SharedData$new(df)
+  args <- list(sd, x = stats::as.formula(paste0("~`", x_col, "`")),
+               y = stats::as.formula(paste0("~`", y_col, "`")),
+               type = "scatter", mode = "markers", text = ~tooltip, hoverinfo = "text",
+               marker = list(size = 6, opacity = 0.6))
+  if (!is.null(color_col) && color_col %in% names(df)) {
+    args$color  <- stats::as.formula(paste0("~`", color_col, "`"))
+    args$colors <- tableau10
+  }
+  p <- do.call(plotly::plot_ly, args) %>%
+    plotly::layout(title = list(text = title), xaxis = list(title = x_lab),
+                   yaxis = list(title = y_lab), legend = list(orientation = "h"),
+                   shapes = list(list(type = "line", xref = "paper", x0 = 0, x1 = 1,
+                                      y0 = 0, y1 = 0, line = list(dash = "dash", color = "grey50")))) %>%
+    plotly::highlight(on = "plotly_selected", off = "plotly_deselect", persistent = FALSE)
+
+  hide_idx <- which(names(df) %in% "tooltip") - 1
+  dt <- DT::datatable(sd, extensions = "FixedHeader",
+                      options = list(pageLength = 10, dom = "frtip",
+                                     fixedHeader = TRUE, scrollX = TRUE,
+                                     columnDefs = list(list(visible = FALSE, targets = hide_idx))),
+                      filter = "top", rownames = FALSE) %>%
+    DT::formatStyle(columns = names(df), fontSize = "11px")
+
+  fcols <- intersect(filter_cols, names(df))
+  filt  <- lapply(fcols, function(cc)
+    crosstalk::filter_select(cc, cc, sd, stats::as.formula(paste0("~`", cc, "`"))))
+  htmltools::tagList(
+    if (length(filt)) do.call(crosstalk::bscols, filt) else NULL,
+    p, dt)
+}
+
 ## Unnest the upstream nested intervention-effects results (study, visit, res),
 ## where `res` is a list whose second element ("res") is the per-feature
 ## estimates data.frame. Returns a flat tibble with study and visit attached.
