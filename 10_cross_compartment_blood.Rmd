@@ -267,6 +267,21 @@ cc_dt(read_cc("results/cross_compartment_pathways_adjusted.csv"), page_length = 
 
 Because the metabolomic platforms are untargeted, the FDR-significant features carry only **putative** annotations, assigned by accurate mass against reference libraries (MSI level ≈ 3), with most features returning several candidates or none. The tables below list the mass-based candidate annotations for the blood and milk FDR-significant features; the curated milk list includes ~48 named metabolites (e.g. pantothenate/B5, ascorbate, fumarate). Treat every name as provisional.
 
+The interactive **feature map** below plots each FDR-significant milk feature by its *m/z* against its standardized effect, coloured by direction. Brush a mass region (Plotly *Box Select*) to filter the annotation table to those features, or use the dropdowns; this is the quickest way to see which masses carry the up- vs down-regulated signal and read their putative names.
+
+```{r cc-annotation-milk-map, echo=FALSE, message=FALSE, warning=FALSE, fig.height=6}
+milk_ann <- read_cc("results/milk_fdr_sig_putative_annotation.csv")
+linked_scatter_table(milk_ann, x_col = "mz", y_col = "est",
+                     color_col = "direction", key_col = "feature",
+                     title = "Milk FDR-significant features — m/z vs. effect (brush to filter the table)",
+                     x_lab = "m/z", y_lab = "Effect (SD units)",
+                     filter_cols = c("visit", "contrast", "direction", "mode"),
+                     show_cols = c("visit","contrast","direction","curated_name",
+                                   "best_annotation","est","q","mz","mode"))
+```
+
+The complete annotation table (all columns, searchable) is below.
+
 ```{r cc-annotation-milk, echo=FALSE, message=FALSE, warning=FALSE}
 cc_dt(read_cc("results/milk_fdr_sig_putative_annotation.csv"), page_length = 15,
       caption = "Putative annotation of FDR-significant untargeted-milk features (curated names where assigned).")
