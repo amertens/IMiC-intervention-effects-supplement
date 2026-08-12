@@ -226,9 +226,13 @@ cc_dt(read_cc("results/carnitine_annotation_support.csv"), page_length = 10,
 
 ## Pathway-level signals across compartments {#cc-pathways}
 
-> **Exploratory — read as hypothesis, not confirmation.** Mummichog pathway enrichment is direction-agnostic and unstable on the short feature lists here (3–18 features per stratum); it is putative-annotation / hypothesis-generation only. The load-bearing cross-compartment results are the identity-anchored concordance (§10.2), the selenoprotein chain (§10.3), and the octenoylcarnitine transfer + mediation (§10.4) above — not the enrichment heatmap below.
+> **Exploratory — read as hypothesis, not confirmation.** Mummichog pathway enrichment is direction-agnostic and unstable on the short feature lists here (3–18 features per stratum); it is putative-annotation / hypothesis-generation only. The load-bearing cross-compartment results are the identity-anchored concordance (§10.2), the selenoprotein chain (§10.3), and the octenoylcarnitine transfer + mediation (§10.4) above — not the pathway enrichment below.
 
-We ran Mummichog functional enrichment (direction-agnostic) and complementary **signed** sign-tests on the blood and milk feature lists. The picture that emerges is a **fat-synthesis redistribution**: de novo fatty-acid biosynthesis and related lipid pathways are **down in milk** but **up in maternal blood**, consistent with mothers making less milk fat themselves and drawing more on circulating or dietary fat. The signed sign-tests confirm this direction, which the direction-agnostic Mummichog enrichment cannot, and it holds across the three milk timepoints.
+We ran three complementary analyses on the blood and milk feature lists: direction-agnostic **Mummichog** pathway enrichment, **signed sign-tests** of pathway direction, and — for the maternal-blood platforms — **chemical-class** over-representation. They must be read at different evidential weights:
+
+- **The blood Mummichog is nominal only — no pathway survives FDR.** In the adjusted models the lowest-FDR blood pathway is *androgen and estrogen biosynthesis and metabolism* (raw *p* ≈ 5 × 10⁻⁴, *Q* ≈ 0.06), and every other pathway sits above it; the direction-agnostic Mummichog enrichment simply does not clear multiple testing in blood. Treat the pathway grid below as directional corroboration, not as an FDR-significant finding.
+- **The FDR-significant maternal-blood result is at the chemical-class level.** Testing over-representation of curated compound classes among the BEP-responsive features, maternal plasma shows **oxylipins** (*Q* ≈ 0.005) and **free fatty acids and conjugates** (*Q* ≈ 0.005) enriched among *up*-regulated features and **acylcarnitines** enriched among *down*-regulated features (*Q* ≈ 0.03), while maternal postnatal VAMS shows **phosphoethanolamines** enriched *up* (*Q* ≈ 0.03) and **diglycerides** enriched *down* (*Q* ≈ 0.02) — all surviving FDR.
+- **The signed sign-tests tie the two together** into a coherent **fat-synthesis redistribution**: de novo fatty-acid biosynthesis and related lipid pathways are **down in milk** but **up in maternal blood**, consistent with mothers making less milk fat themselves and drawing more on circulating or dietary fat (raised oxylipins / free fatty acids), and it holds across the three milk timepoints. The Mummichog grid is directionally consistent with this but, on its own, does not reach FDR.
 
 ```{r cc-pathway-figs, echo=FALSE, message=FALSE, warning=FALSE, out.width="49%", fig.show="hold"}
 safe_img("figures/cross_compartment/pathway_milk_vs_blood_adjusted.png", "pathway milk vs blood")
@@ -236,6 +240,32 @@ safe_img("figures/cross_compartment/fig_G_signed_pathway_heatmap.png", "signed p
 ```
 
 ***Figure.** Left: pathway enrichment, milk vs. maternal blood (adjusted). Right: signed-direction heatmap — milk lipid pathways down (negative), maternal-blood lipid pathways up (positive).*
+
+**Chemical-class enrichment (the FDR-significant maternal-blood result).** The tables below give the compound-class over-representation among BEP-responsive maternal-blood features — the non-directional test (is a class enriched among responsive features at all?) and its directional split (up- vs down-regulated). The FDR-significant classes are named in the section intro above; this is the pathway-level result in blood that actually survives multiple-testing correction, unlike the Mummichog grid.
+
+```{r cc-class-fig, echo=FALSE, message=FALSE, warning=FALSE, out.width="70%", fig.align="center"}
+safe_img("figures/cross_compartment/blood_class_enrichment_figure.png", "blood chemical-class enrichment")
+```
+
+***Figure.** Chemical-class over-representation among BEP-responsive blood features. Maternal plasma: oxylipins and free fatty acids enriched up, acylcarnitines enriched down; maternal postnatal VAMS: phosphoethanolamines up, diglycerides down (all FDR < 0.05).*
+
+```{r cc-class-enrichment, echo=FALSE, message=FALSE, warning=FALSE}
+ce <- read_cc("results/blood_chemical_class_enrichment.csv")
+if (!is.null(ce) && nrow(ce)) {
+  ce <- ce %>% dplyr::arrange(.data[["fdr"]])
+  cc_dt(ce, page_length = 15, sci = c("p", "fdr"),
+        caption = "Chemical-class over-representation among BEP-responsive blood features (non-directional). OR = odds of a class member being responsive; pct_up = % of responsive class members up-regulated; fdr = BH-adjusted. FDR-significant: maternal-plasma acylcarnitines and phosphoethanolamines.")
+}
+```
+
+```{r cc-class-enrichment-dir, echo=FALSE, message=FALSE, warning=FALSE}
+ced <- read_cc("results/blood_chemical_class_enrichment_directional.csv")
+if (!is.null(ced) && nrow(ced)) {
+  ced <- ced %>% dplyr::arrange(.data[["fdr"]])
+  cc_dt(ced, page_length = 15, sci = c("p", "fdr"),
+        caption = "Chemical-class over-representation split by direction of effect. FDR-significant (Q<0.05): maternal plasma — oxylipins up, free fatty acids up, acylcarnitines down; maternal postnatal VAMS — phosphoethanolamines up, diglycerides down.")
+}
+```
 
 ```{r cc-blood-mummichog, echo=FALSE, message=FALSE, warning=FALSE}
 bm <- read_cc("results/blood_mummichog_pathways_adjusted.csv")
@@ -245,10 +275,11 @@ if (!is.null(bm) && nrow(bm)) {
   ordcol <- if (!is.na(pcol)) pcol else fdrcol
   n_sig  <- sum(bm[[fdrcol]] < 0.05, na.rm = TRUE)
   bm_top <- bm %>% dplyr::arrange(.data[[ordcol]]) %>% dplyr::slice_head(n = 40)
-  cat(sprintf("\n*No blood-compartment Mummichog pathway reached FDR significance in the adjusted models (%d of %s strata at Q<0.05); the direction-agnostic enrichment is weak in blood, and the directional signal is instead carried by the signed sign-tests below. The 40 lowest-p strata are shown.*\n\n",
-              n_sig, format(nrow(bm), big.mark = ",")))
+  top_path <- as.character(bm_top[[intersect(c("pathway","Pathway"), names(bm))[1]]][1])
+  cat(sprintf("\n*No blood-compartment Mummichog pathway reached FDR significance in the adjusted models (%d of %s strata at Q<0.05); the lowest-FDR pathway is %s (Q ≈ %.2f). The direction-agnostic enrichment is weak in blood — the FDR-significant blood result is the chemical-class enrichment above, and the directional signal is carried by the signed sign-tests below. The 40 lowest-p strata are shown.*\n\n",
+              n_sig, format(nrow(bm), big.mark = ","), top_path, min(bm[[fdrcol]], na.rm = TRUE)))
   print(cc_dt(bm_top, page_length = 15,
-        caption = "Blood-compartment Mummichog pathway enrichment (adjusted), 40 lowest-p strata."))
+        caption = "Blood-compartment Mummichog pathway enrichment (adjusted), 40 lowest-p strata (nominal only — none survive FDR)."))
 }
 ```
 
