@@ -147,6 +147,23 @@ files[[length(files) + 1]] <- list("results/milk_mummichog_annotation_finalized.
 files[[length(files) + 1]] <- list("results/milk_mummichog_annotation_summary.csv",
                                    "results/metaboanalyst/mummichog_s5/milk_mummichog_annotation_summary.csv")
 
+## CORRECTED untargeted milk proteome GO enrichment (Table S6 / Fig 6C, §9.8).
+## These live at results/ TOP-LEVEL upstream (NOT under metaboanalyst/), so the
+## copy_tree("results/metaboanalyst") call below does NOT pick them up. They are
+## the UniProt-native over-representation results that SUPERSEDE the retracted
+## gene-level proteomics_go_tableS6.csv. Relocate under proteomics_go/ here so
+## §9.8 reads the corrected, predominantly down-regulated GO-BP signature.
+files[[length(files) + 1]] <- list("results/proteomics_go_uniprot.csv",
+                                   "results/metaboanalyst/proteomics_go/proteomics_go_uniprot.csv")
+files[[length(files) + 1]] <- list("results/proteomics_go_uniprot_fdrsig.csv",
+                                   "results/metaboanalyst/proteomics_go/proteomics_go_uniprot_fdrsig.csv")
+
+## Chemical-class enrichment figure (§10.5) — lives at results/ top-level
+## upstream; relocate under figures/cross_compartment/ here so §10.5 loads it
+## alongside the other cross-compartment figures.
+files[[length(files) + 1]] <- list("results/blood_class_enrichment_figure.png",
+                                   "figures/cross_compartment/blood_class_enrichment_figure.png")
+
 ## ---- NEW: cross-compartment blood result CSVs (ch 10) --------------------
 ## Only the CSVs that §10 actually renders are ported. Full per-feature tables
 ## (per-pair cross_compartment_metab_*, fdr_sig_updown_lists,
@@ -174,11 +191,17 @@ blood_csvs <- c(
   "results/acylcarnitine_composition.csv",
   "results/carnitine_annotation_support.csv",
   # pathway analyses (§10.5, adjusted / signed)
+  "results/blood_mummichog_pathways.csv",
   "results/blood_mummichog_pathways_adjusted.csv",
   "results/cross_compartment_pathways_adjusted.csv",
   "results/signed_pathway_direction.csv",
   "results/signed_pathway_direction_milk.csv",
   "results/fat_synthesis_timepoint_table.csv",
+  # chemical-class enrichment (§10.5): the FDR-significant maternal-blood result
+  # (blood mummichog is nominal-only, 0 pathways survive FDR). Non-directional +
+  # directional (up/down) class over-representation by compartment.
+  "results/blood_chemical_class_enrichment.csv",
+  "results/blood_chemical_class_enrichment_directional.csv",
   # putative annotation (§10.6)
   "results/fdr_sig_putative_annotation.csv",
   "results/milk_fdr_sig_putative_annotation.csv",
