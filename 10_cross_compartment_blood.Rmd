@@ -1,6 +1,6 @@
 # Cross-compartment analyses in maternal and infant blood
 
-This chapter reports the **cross-compartment** analyses in the MISAME-III subset with paired **maternal plasma**, **maternal and infant dried-blood microsample (VAMS)** metabolomics, and **maternal blood proteomics**, alongside the milk measurements analysed elsewhere in this appendix. It supports the manuscript Results subsection *"Intervention effects are mirrored in maternal and infant circulation"* and corresponds to manuscript **Table S8**, **Table S9**, **Table S10**, and **Table S11** (§10.5's cross-compartment feature tracking and pathway enrichment, the basis for main-text **Fig. 6D**). The submitted supplement carries four figures drawn from this chapter: **Fig. S7** (cross-compartment transfer, the one exhibit not reproduced online), **Fig. S8** (chemical-class enrichment, §10.6), **Fig. S10** (feature tracking, §10.5), and **Fig. S11** (cross-compartment volcanoes, §10.5). Figures here that carry no submitted-supplement number are labelled **online-only**.
+This chapter reports the **cross-compartment** analyses in the MISAME-III subset with paired **maternal plasma**, **maternal and infant dried-blood microsample (VAMS)** metabolomics, and **maternal blood proteomics**, alongside the milk measurements analysed elsewhere in this appendix. It supports the manuscript Results subsection *"Intervention effects are mirrored in maternal and infant circulation"* and corresponds to manuscript **Table S8**, **Table S9**, **Table S10**, and **Table S11** (§10.5's cross-compartment feature tracking and pathway enrichment, the basis for main-text **Fig. 6D**). The printed supplement carries **no figure** for this chapter: the blood cross-compartment exhibits were withdrawn from the submitted supplement, whose figures run S1–S5 only. Every figure in this chapter is therefore **online-only**, and labelled as such.
 
 **Scope.** The milk analyses in the rest of this appendix (§1–§9) pool all three trials (MISAME-III, Mumta-LW, ELICIT). The **blood and cross-compartment work in this chapter is MISAME-III only**: maternal plasma, dried-blood VAMS metabolomics, and blood proteomics were collected only in MISAME-III, so there is no Mumta-LW or ELICIT blood. MISAME-III used a 2×2 randomisation of prenatal × postnatal balanced energy–protein (BEP) supplementation, giving four arms (Control = IFA/IFA, prenatal-only = BEP/IFA, postnatal-only = IFA/BEP, both periods = BEP/BEP); the *postnatal* exposure is the lactation-period contrast of interest for milk-borne transfer.
 
@@ -227,7 +227,7 @@ Where §10.2–§10.4 above test concordance and transfer for specific matched-f
 safe_img("figures/cross_compartment/figureS11_crosscompartment_volcanoes.png", "cross-compartment volcano grid")
 ```
 
-***Figure S11.** Adjusted intervention-effect volcanoes for milk, maternal blood, and infant blood, with the cross-compartment-tracked features (below) highlighted.*
+***Figure (online-only).** Adjusted intervention-effect volcanoes for milk, maternal blood, and infant blood, with the cross-compartment-tracked features (below) highlighted.*
 
 **Twenty** BEP-up features are detected in **≥2** of the three compartments (of 27 compartment × visit cells tracked in the figure below); **16 (80.0%)** of these are reliably detected in the BEP-supplement composition itself (the §10.8 provenance framing applies here too: detection in the product does not by itself imply direct dietary passage rather than a maternal metabolic response). Only **two** features recur in **all three** compartments (maternal blood, milk, and infant blood): **citrate** and **4-hydroxy-2-oxoglutarate**.
 
@@ -235,9 +235,7 @@ safe_img("figures/cross_compartment/figureS11_crosscompartment_volcanoes.png", "
 safe_img("figures/cross_compartment/figureS10_compartment_tracking.png", "cross-compartment feature tracking")
 ```
 
-***Figure S10.** Every BEP-up feature tracked across ≥2 of milk, maternal blood, and infant blood, grouped by putative name. Features spanning all three compartments (citrate, 4-hydroxy-2-oxoglutarate) are marked.*
-
-> **Counts differ from the submitted Fig. S10 caption.** The submitted caption reports 22 features matched across ≥2 compartments, 18 (81.8%) reliably supplement-matched, and three features shared across all three compartments (citrate, dehydroascorbate, and 4-hydroxy-2-oxoglutarate). Those counts came from a grouping rule that has since been superseded. The 2026-08-25 reconciliation placed this figure, Table S11, and main-text Fig. 6D on a single rule (name-based grouping, Dailey-Chwalibóg's original method), which gives the **20 / 16 (80.0%) / two shared** counts reported above. Dehydroascorbate remains a tracked, supplement-matched feature, but under this rule it is not among those recurring in all three compartments.
+***Figure (supplementary; not assigned a main-text or print-supplement figure number in this revision, see the appendix Overview's numbering note).** Every BEP-up feature tracked across ≥2 of milk, maternal blood, and infant blood, grouped by putative name. Features spanning all three compartments (citrate, 4-hydroxy-2-oxoglutarate) are marked.*
 
 The complete row-level tracking data (compartment, visit, effect size, direction, and BEP-supplement match status for every tracked feature) is below.
 
@@ -287,7 +285,7 @@ safe_img("figures/cross_compartment/fig_G_signed_pathway_heatmap.png", "signed p
 safe_img("figures/cross_compartment/blood_class_enrichment_figure.png", "blood chemical-class enrichment")
 ```
 
-***Figure S8.** Chemical-class over-representation among BEP-responsive blood features. Maternal plasma: oxylipins and free fatty acids enriched up, acylcarnitines enriched down; maternal postnatal VAMS: phosphoethanolamines up, diglycerides down (all FDR < 0.05).*
+***Figure.** Chemical-class over-representation among BEP-responsive blood features. Maternal plasma: oxylipins and free fatty acids enriched up, acylcarnitines enriched down; maternal postnatal VAMS: phosphoethanolamines up, diglycerides down (all FDR < 0.05).*
 
 ```{r cc-class-enrichment, echo=FALSE, message=FALSE, warning=FALSE}
 ce <- read_cc("results/blood_chemical_class_enrichment.csv")
@@ -393,20 +391,17 @@ cc_dt(read_cc("results/supplement_mummichog_pathways.csv"), page_length = 10,
       caption = "Mummichog pathways for the supplement-matched feature set.")
 ```
 
-## Dyadic whole-profile similarity and growth (negative controls) {#cc-nulls}
+## Infant growth (negative control) {#cc-nulls}
 
-Two negative-control checks bound the interpretation. First, does BEP raise the **whole-profile** metabolomic similarity between a mother and her own infant, beyond the specific transferred features? It does not; dyadic distance and correlation do not differ by arm. Second, is the transferred infant carnitine signal associated with **6-month infant growth**? It is not. So a specific, milk-borne transfer of individual features can coexist with **no** global dyadic convergence and **no** downstream growth effect: transmission ≠ growth effect.
+A negative-control check bounds the interpretation: is the transferred infant carnitine signal associated with **6-month infant growth**? It is not. A specific, milk-borne transfer of individual features can therefore coexist with **no** downstream growth effect: transmission ≠ growth effect.
 
 ```{r cc-null-figs, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%", fig.show="hold"}
-safe_img("figures/cross_compartment/dyadic_distance_by_arm.png", "dyadic distance by arm")
 safe_img("figures/cross_compartment/fig_H_metabolome_growth.png", "infant carnitine vs growth")
 ```
 
-***Figure.** Left: mother–infant whole-profile metabolomic distance by arm (no separation). Right: infant carnitine vs. 6-month growth (no association).*
+***Figure.** Infant carnitine vs. 6-month growth (no association).*
 
 ```{r cc-nulls, echo=FALSE, message=FALSE, warning=FALSE}
-cc_dt(read_cc("results/dyadic_blood_distance_armtest.csv"),
-      caption = "Dyadic whole-profile similarity by arm (Wilcoxon tests on mother–infant correlation and Euclidean distance).")
 cc_dt(read_cc("results/infant_carnitine_growth_assoc.csv"),
       caption = "Association between infant carnitine features and 6-month anthropometric growth (correlation, per lab).")
 cc_dt(read_cc("results/detectability_proxy_infant_carnitine.csv"), page_length = 10,

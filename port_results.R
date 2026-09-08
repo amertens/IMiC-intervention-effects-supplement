@@ -231,8 +231,7 @@ blood_csvs <- c(
   "results/bep_supplement_composition_xref.csv",
   "results/four_compartment_bep_shortlist.csv",
   "results/supplement_mummichog_pathways.csv",
-  # dyadic whole-profile + growth null (§10.8)
-  "results/dyadic_blood_distance_armtest.csv",
+  # infant growth null control (§10.9)
   "results/infant_carnitine_growth_assoc.csv",
   "results/detectability_proxy_infant_carnitine.csv",
   # consolidated cross-compartment table (§10.9)

@@ -20,23 +20,17 @@ It provides every analytical output that supports the main manuscript, in more d
 
 The appendix is organised into **ten numbered sections**, preceded by this unnumbered overview and followed by a reproducibility appendix. The paper cites Sections 1–8 by name in its Methods and Results; **§9 (reproducible pathway and enrichment analyses)** and **§10 (cross-compartment analyses in maternal and infant blood)** were added in this revision and are cited without a section number, as the "Online Appendix" behind the manuscript's pathway tables (Tables S1–S6) and its cross-compartment tables (Tables S8–S11, main-text Fig. 6D).
 
-**Figure and table numbering.** Cross-references throughout this appendix follow the **submitted supplement** (Figs. S1–S11, Tables S1–S11), so a number cited in the submitted PDF resolves to the same exhibit here. Two of the submitted figures have no counterpart in this appendix: **Fig. S1** (study design and sampling timeline) and **Fig. S7** (the cross-compartment transfer composite), neither of which is regenerated from the analysis pipeline.
+**Figure and table numbering.** Table cross-references throughout this appendix match the printed supplement one-for-one: **Tables S1–S11**. Figures need more care. The printed supplement carries **Figures S1–S5 only**, renumbered contiguously after several exhibits were withdrawn during revision, so a figure discussed here may sit at a different number than in an earlier draft you have seen:
 
-| Submitted supplement | Subject | Reported here in |
+| Printed supplement | Subject | Reported here in |
 |---|---|---|
-| **Fig. S1** | Study design, component classes, sampling timeline | not reproduced online |
-| **Fig. S2** | Infant growth (LAZ / WLZ / WAZ / HCAZ / MUACZ) | §8.7 |
-| **Fig. S3** | MILQ-referenced micronutrient deficiency (relative risks) | §6 |
-| **Fig. S4** | HMOs and bioactive proteins (secondary outcomes) | §5 |
-| **Fig. S5** | Milk triglycerides, with and without fat adjustment | §8.3 |
-| **Fig. S6** | Milk-microbiome α-diversity | §4 |
-| **Fig. S7** | Cross-compartment transfer of BEP-responsive metabolites | not reproduced online |
-| **Fig. S8** | Chemical-class enrichment of blood metabolite effects | §10.6 |
-| **Fig. S9** | Direction-split ORA, (A) primary and (B) tertiary outcomes | §9.1 (A), §9.4 (B) |
-| **Fig. S10** | Cross-compartment feature tracking and supplement origin | §10.5 |
-| **Fig. S11** | Cross-compartment volcanoes across compartments and visits | §10.5 |
+| **Fig. S1** | Infant growth (LAZ / WLZ / WAZ / HCAZ / MUACZ) | §8.7 |
+| **Fig. S2** | MILQ-referenced micronutrient deficiency (relative risks) | §6 |
+| **Fig. S3** | HMOs and bioactive proteins (secondary outcomes) | §5 |
+| **Fig. S4** | Milk triglycerides, with and without fat adjustment | §8.3 |
+| **Fig. S5** | Milk-microbiome α-diversity | §4 |
 
-Figures in this appendix that carry no submitted-supplement number are labelled *online-only* where they appear. Main-text figures are cited as **Fig. 1–6** and match the article: machine-learning / PCA composites are **Fig. 1** (§8.4–§8.5), the primary-outcome forest plots **Fig. 2** (§5), the primary-outcome volcano and pathway panels **Fig. 3A–B** (§5, §9.1), the MILQ-referenced distributions **Fig. 4** (§2), the targeted-metabolite panels **Fig. 5A–C** (§5, §9.4–§9.5), and the untargeted metabolome/proteome panels **Fig. 6A–D** (§9.6–§9.8, §10.5).
+Content in this appendix that has **no** printed-supplement figure (the direction-split pathway ORA panels in §9, and every figure in §10) is labelled *online-only* where it appears. Main-text figures are cited as **Fig. 1–6** and match the article: machine-learning / PCA composites are **Fig. 1** (§8.4–§8.5), the primary-outcome forest plots **Fig. 2** (§5), the primary-outcome volcano and pathway panels **Fig. 3A–B** (§5, §9.1), the MILQ-referenced distributions **Fig. 4** (§2), the targeted-metabolite panels **Fig. 5A–C** (§5, §9.4–§9.5), and the untargeted metabolome/proteome panels **Fig. 6A–D** (§9.6–§9.8, §10.5).
 
 ## How this appendix maps to the manuscript
 
@@ -45,12 +39,12 @@ Figures in this appendix that carry no submitted-supplement number are labelled 
 | Methods: "baseline participant characteristics … (Section 1)" | [§1 Baseline characteristics by study and intervention arm](#baseline-characteristics-by-study-and-intervention-arm) |
 | Methods: "outcomes list … (Section 2)"; manuscript **Fig. 4** (MILQ-referenced distributions) | [§2 Outcomes and human milk component distributions](#outcomes-and-human-milk-component-distributions) |
 | Results: "Online Appendix 3" (effect modification by maternal BMI) | [§3 Subgroup analyses stratified by maternal BMI](#subgroup-analyses-stratified-by-maternal-bmi) |
-| Results: "Online Appendix 4" (individual microbial taxa); Fig. S6 (α-diversity) | [§4 Microbiome and exploratory high-dimensional outcomes](#exploratory-high-dimensional-outcomes-microbiome-untargeted-proteomics-untargeted-metabolomics) |
-| manuscript Fig. 2 (primary-outcome forest plots), Fig. S4 (secondary outcomes), the per-component estimates underlying Fig. 5A (tertiary metabolites), and Fig. 3A's "metadata in Online Appendix 5" pointer (§5.1) | [§5 Adjusted intervention effects on individual milk components](#adjusted-intervention-effects-on-individual-milk-components) |
-| Fig. 5A: "metadata in Online Appendix 6" (targeted metabolites); manuscript Fig. S3 (MILQ deficiency) | [§6 Targeted-metabolite metadata and reductions in HM nutrient deficiency](#targeted-metabolite-metadata-and-reductions-in-hm-nutrient-deficiency) |
+| Results: "Online Appendix 4" (individual microbial taxa); Fig. S5 (α-diversity) | [§4 Microbiome and exploratory high-dimensional outcomes](#exploratory-high-dimensional-outcomes-microbiome-untargeted-proteomics-untargeted-metabolomics) |
+| manuscript Fig. 2 (primary-outcome forest plots), Fig. S3 (secondary outcomes), the per-component estimates underlying Fig. 5A (tertiary metabolites), and Fig. 3A's "metadata in Online Appendix 5" pointer (§5.1) | [§5 Adjusted intervention effects on individual milk components](#adjusted-intervention-effects-on-individual-milk-components) |
+| Fig. 5A: "metadata in Online Appendix 6" (targeted metabolites); manuscript Fig. S2 (MILQ deficiency) | [§6 Targeted-metabolite metadata and reductions in HM nutrient deficiency](#targeted-metabolite-metadata-and-reductions-in-hm-nutrient-deficiency) |
 | Longitudinal change in HM composition | [§7 Trajectory analyses of HM component change across lactation](#trajectory-analyses-of-human-milk-component-change-across-lactation) |
-| manuscript Fig. 1 (treatment-arm prediction & PCA composites); Fig. S2 (growth); Fig. S5 (TG fat adjustment); **Table S7** (native-unit concentrations); sensitivity analyses | [§8 Sensitivity analyses and additional outputs](#sensitivity-analyses-and-additional-outputs) |
-| manuscript Fig. 3B (primary MSEA), Fig. 5B–C and Fig. 6A–C (tertiary/untargeted enrichment); **Tables S1–S6** (pathway enrichment); direction-split ORA panels (**Fig. S9A–B**) | [§9 Reproducible pathway and enrichment analyses](#reproducible-pathway-and-enrichment-analyses) |
+| manuscript Fig. 1 (treatment-arm prediction & PCA composites); Fig. S1 (growth); Fig. S4 (TG fat adjustment); **Table S7** (native-unit concentrations); sensitivity analyses | [§8 Sensitivity analyses and additional outputs](#sensitivity-analyses-and-additional-outputs) |
+| manuscript Fig. 3B (primary MSEA), Fig. 5B–C and Fig. 6A–C (tertiary/untargeted enrichment); **Tables S1–S6** (pathway enrichment); direction-split ORA panels (online-only) | [§9 Reproducible pathway and enrichment analyses](#reproducible-pathway-and-enrichment-analyses) |
 | Results: "intervention effects are mirrored in maternal and infant circulation"; **Table S8** (cross-compartment features), **Table S9** (chemical-class enrichment), **Table S10** (temporal persistence), and **Table S11**/main-text **Fig. 6D** (cross-compartment feature tracking and pathway enrichment). No printed-supplement figure; all figures here are online-only | [§10 Cross-compartment analyses in maternal and infant blood](#cross-compartment-analyses-in-maternal-and-infant-blood) |
 
 The manuscript's section-numbered citations resolve as follows: *"Section 1"* → §1; *"Section 2"* (outcomes list) → §2; *"Online Appendix 3"* → §3; *"Online Appendix 4"* → §4; Fig. 3A's *"Online Appendix 5"* (primary/secondary component metadata) → §5.1; and Fig. 5A's *"Online Appendix 6"* (targeted-metabolite metadata) → §6.1. The abstract-level pointer to *"Sections 1–8"* covers the outputs carried over from the original submission; §9 and §10, added in this revision, are the "Online Appendix" cited without a number elsewhere in the Results.

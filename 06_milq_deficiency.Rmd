@@ -2,7 +2,7 @@
 
 Two kinds of content follow. The first subsection, *Targeted-metabolite metadata*, gives the inventory of the Biocrates MxP Quant 500 panel called out in the **manuscript Fig. 5A legend** (*"metadata in Online Supplement 6"*): every targeted metabolite analysed as a tertiary outcome, grouped by Biocrates category and annotated with per-study availability.
 
-The rest of the section examines how maternal nutritional supplementation affects the **prevalence of human milk (HM) nutrient deficiency**, defined as concentrations below the 10th percentile of age-specific reference distributions from the Mothers, Infants, and Lactation Quality (MILQ) study. For each milk sample, infant age at collection was mapped to a MILQ age band (0–3, 4–17, 18–31 days; 1–2, 2–3, 3–4, 4–5, 5–6 months), concentrations were harmonized to MILQ units, and deficiency was scored as a binary indicator at the 10th percentile threshold. Components with fewer than five inadequate samples within a study × visit stratum were excluded to avoid sparse-data bias. Relative risks (RRs) were estimated using TMLE with adjustment for the same prespecified baseline prognostic factors as in the primary analyses, contrasting pooled maternal nutritional intervention arms against the corresponding control. FDR correction was applied within visit × outcome group. These MILQ-deficiency analyses correspond to **Figure S3** in the submitted supplement.
+The rest of the section examines how maternal nutritional supplementation affects the **prevalence of human milk (HM) nutrient deficiency**, defined as concentrations below the 10th percentile of age-specific reference distributions from the Mothers, Infants, and Lactation Quality (MILQ) study. For each milk sample, infant age at collection was mapped to a MILQ age band (0–3, 4–17, 18–31 days; 1–2, 2–3, 3–4, 4–5, 5–6 months), concentrations were harmonized to MILQ units, and deficiency was scored as a binary indicator at the 10th percentile threshold. Components with fewer than five inadequate samples within a study × visit stratum were excluded to avoid sparse-data bias. Relative risks (RRs) were estimated using TMLE with adjustment for the same prespecified baseline prognostic factors as in the primary analyses, contrasting pooled maternal nutritional intervention arms against the corresponding control. FDR correction was applied within visit × outcome group. These MILQ-deficiency analyses correspond to **Figure S2** in the printed Word supplement.
 
 ## Targeted-metabolite metadata (Online Appendix 6)
 
@@ -90,7 +90,7 @@ ggplot2::theme_set(ggplot2::theme_minimal(base_size = 14))
 knitr::opts_chunk$set(fig.width = 12, fig.height = 10, dpi = 110)
 ```
 
-## Forest plot of relative risks (Figure S3)
+## Forest plot of relative risks (Figure S2)
 
 ```{r milq-forest, echo=FALSE, message=FALSE, warning=FALSE, fig.height=10}
 milq_df <- safe_readRDS(here::here("figure-data/fig-milq-deficiency-reduction-data.RDS"),
@@ -140,7 +140,7 @@ if (!is.null(milq_df) && is.data.frame(milq_df)) {
 }
 ```
 
-**Figure S3.** Relative risk (RR, log scale) of human-milk nutrient deficiency, defined as a concentration below the 10th percentile of the age-specific MILQ reference distribution, for pooled maternal nutritional intervention vs. control, by study and visit. RR < 1 indicates reduced deficiency risk under intervention. Filled symbols are significant after FDR correction (q < 0.05, applied within visit × outcome group); open symbols are non-significant. Components with fewer than five deficient samples within a study × visit stratum are omitted. Hover (HTML) for the exact RR, 95% CI, p, and q.
+**Figure S2.** Relative risk (RR, log scale) of human-milk nutrient deficiency, defined as a concentration below the 10th percentile of the age-specific MILQ reference distribution, for pooled maternal nutritional intervention vs. control, by study and visit. RR < 1 indicates reduced deficiency risk under intervention. Filled symbols are significant after FDR correction (q < 0.05, applied within visit × outcome group); open symbols are non-significant. Components with fewer than five deficient samples within a study × visit stratum are omitted. Hover (HTML) for the exact RR, 95% CI, p, and q.
 
 ## Searchable table of MILQ-deficiency effects
 

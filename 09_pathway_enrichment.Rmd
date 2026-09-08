@@ -89,7 +89,7 @@ enrich_dt(read_enrich("results/metaboanalyst/primary_stratified/primary_stratifi
           caption = "Primary-outcome MetaboAnalyst ORA, arm-stratified contrasts vs. control.")
 ```
 
-### Direction-split ORA (up- vs down-regulated; Fig. S9A)
+### Direction-split ORA (up- vs down-regulated; online-only)
 
 These standalone tables run the over-representation separately on the up- and down-regulated primary feature lists (combined arms). The §9.1 ORA already splits the *foreground* by direction internally; here that split is reported directly, recovering **nicotinate and nicotinamide metabolism** among the up-regulated features (ELICIT) and **lactose synthesis and superoxide degradation** among the down-regulated features (MISAME-III).
 
@@ -97,7 +97,7 @@ These standalone tables run the over-representation separately on the up- and do
 safe_img("figures/figureS_primary_ora_by_direction.png", label = "figureS_primary_ora_by_direction.png")
 ```
 
-***Figure S9A.** Primary-outcome ORA split by direction of effect, combined arms. Enriched pathways among up- vs. down-regulated primary features. Nicotinate/nicotinamide metabolism (ELICIT) dominates the up-regulated side; lactose synthesis and superoxide degradation (MISAME-III) appear among the down-regulated side. Points are coloured by study, non-significant pathways are grey, and enrichment was tested per study, time point, and direction with Benjamini–Hochberg correction of the pathway-level p-values. (Numbered **Fig. S9A** in the submitted supplement. Dropped from the print supplement in the 2026-08-26 revision, where the searchable tables below became the primary record.)*
+***Figure (online-only; primary-outcome ORA split by direction of effect, combined arms).** Enriched pathways among up- vs. down-regulated primary features. Nicotinate/nicotinamide metabolism (ELICIT) dominates the up-regulated side; lactose synthesis and superoxide degradation (MISAME-III) appear among the down-regulated side. Points are coloured by study, non-significant pathways are grey, and enrichment was tested per study, time point, and direction with Benjamini–Hochberg correction of the pathway-level p-values. (Dropped from the print manuscript/supplement entirely on 2026-08-26 per author decision, as there was not enough content to justify a numbered figure; the searchable tables below are the primary record.)*
 
 ```{r path-primary-ora-up, echo=FALSE, message=FALSE, warning=FALSE}
 enrich_dt(read_enrich("results/metaboanalyst/primary_combined/primary_ora_upregulated.csv"),
@@ -186,7 +186,7 @@ enrich_dt(read_enrich("results/metaboanalyst/tertiary_stratified/tertiary_strati
           caption = "Tertiary targeted-metabolome over-representation analysis, arm-stratified contrasts.")
 ```
 
-### Direction-split ORA (up- vs down-regulated; Fig. S9B)
+### Direction-split ORA (up- vs down-regulated; online-only)
 
 As for the primary outcomes, these tables run the over-representation separately on the up- and down-regulated tertiary (targeted-metabolite) feature lists (combined arms): the per-direction companion to the MSEA and ORA views above.
 
@@ -194,7 +194,7 @@ As for the primary outcomes, these tables run the over-representation separately
 safe_img("figures/figureS_tertiary_ora_by_direction.png", label = "figureS_tertiary_ora_by_direction.png")
 ```
 
-***Figure S9B.** Tertiary targeted-metabolome ORA split by direction of effect, combined arms. Enriched pathways among up- vs. down-regulated tertiary features, with the same study colouring, grey non-significant points, and per-study/time-point/direction BH correction as the primary-outcome panel above. (Numbered **Fig. S9B** in the submitted supplement. Dropped from the print supplement in the 2026-08-26 revision; see the note on that panel.)*
+***Figure (online-only; tertiary targeted-metabolome ORA split by direction of effect, combined arms).** Enriched pathways among up- vs. down-regulated tertiary features, with the same study colouring, grey non-significant points, and per-study/time-point/direction BH correction as the primary-outcome panel above. (Dropped from the print manuscript/supplement entirely on 2026-08-26 per author decision; see the note on that panel.)*
 
 ```{r path-tertiary-ora-up, echo=FALSE, message=FALSE, warning=FALSE}
 enrich_dt(read_enrich("results/metaboanalyst/tertiary_combined/tertiary_ora_upregulated.csv"),
