@@ -17,7 +17,14 @@ ANALYSES <- list(
     type = "ora_primary",
     files = c(Combined = "primary_combined_supplementary_table.csv",
               `Arm-stratified` = "primary_stratified_supplementary_table.csv")),
+  # Table S2 is the DUAL-LIBRARY run (SMPDB small-molecule + lipid sets), which is
+  # also what Fig. 5B is built from. The single-library combined/stratified runs
+  # below use a different background and do NOT reproduce the printed table --
+  # they are offered separately so the two are not confused. See section 9.4.
   "Tertiary MSEA (Table S2)" = list(
+    type = "msea",
+    files = c(`All contrasts` = "tertiary_msea_dual.csv")),
+  "Tertiary MSEA - single-library view (not Table S2)" = list(
     type = "msea",
     files = c(Combined = "tertiary_msea_combined.csv",
               `Arm-stratified` = "tertiary_msea_stratified.csv")),

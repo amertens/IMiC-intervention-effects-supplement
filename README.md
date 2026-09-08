@@ -15,10 +15,15 @@ It provides full analytical outputs — interactive forest and volcano plots, se
 - The milk analyses (§1–§9) span all three trials (each trial's arms are shown both pooled against control and stratified by randomised arm). The **cross-compartment blood extension (§10) is MISAME-III only** — the maternal plasma, dried-blood VAMS metabolomics, and blood proteomics were collected only in MISAME-III.
 - Two different mass tolerances appear and are **not** interchangeable: pathway annotation (Mummichog, §9) uses a **10 ppm** database tolerance; cross-platform feature matching (§10) uses a **±25 ppm** tolerance following Kim's experimental-over-experimental formula `ppm = |m1 − m2| / m × 1e6 ≤ 25`.
 
-## Outstanding TODOs (revision round 1)
+## Manuscript cross-references
 
-- **Zenodo / Code-Ocean DOI archive.** Science's revision checklist requires GitHub-hosted code to be permanently archived with a DOI. Tag a release of this repo, hook it to Zenodo, then embed the DOI in this README, in `index.Rmd`, and in the main paper's reference list.
-- **Figure cross-references.** If the manuscript revision promotes Fig. S2 to a main-text figure (per Reviewer 2), every "Figure S#" cross-reference inside the chapter Rmds will need to be retargeted to the post-revision figure list.
+Cross-references throughout the book match the submitted package: the printed supplement carries
+**Figures S1–S5** and **Tables S1–S11**, and the main text **Figures 1–6**. The Overview page of the
+rendered book carries the figure-by-figure mapping. Content in §9 and §10 that has no printed-supplement
+figure is labelled *online-only* where it appears.
+
+Open working items are kept in `TODO.local.md`, which is untracked and never published — the appendix
+is reader-facing and cited from the paper, so it should not carry an internal task list.
 
 ## Section map
 
@@ -28,15 +33,15 @@ The chapter Rmd files are numbered to match the manuscript's `Section N` / `Onli
 |---|---|---|
 | – | Overview (chapter map, methods recap, citation info, TODOs) | `index.Rmd` |
 | 1 | Baseline characteristics by study and intervention arm | `01_baseline_characteristics.Rmd` |
-| 2 | Outcomes and human milk component distributions (Figure S2) | `02_milk_distributions.Rmd` |
+| 2 | Outcomes and human milk component distributions (Figure 4) | `02_milk_distributions.Rmd` |
 | 3 | Subgroup analyses stratified by maternal BMI | `03_subgroup_bmi.Rmd` |
 | 4 | Exploratory high-dimensional outcomes: microbiome, untargeted proteomics, untargeted metabolomics (Figure S6) | `04_exploratory_outcomes.Rmd` |
 | 5 | Adjusted intervention effects on individual milk components | `05_intervention_effects.Rmd` |
 | 6 | Targeted-metabolite metadata and reductions in HM nutrient deficiency (Figure S3) | `06_milq_deficiency.Rmd` |
 | 7 | Trajectory analyses of HM component change across lactation | `07_trajectory_plots.Rmd` |
-| 8 | Sensitivity analyses and additional outputs (unadjusted, unscaled [Table S7], fat-adjusted TGs [Figure S5], SuperLearner [Fig. 2A], PCA [Fig. 2B], pathway-network views, infant growth [Figure S1]) | `08_sensitivity_supplementary.Rmd` |
-| 9 | Reproducible pathway and enrichment analyses (MetaboAnalystR ORA / MSEA / Mummichog / GO; Tables S1–S6, Fig. 3B, 5B, 6B–C) | `09_pathway_enrichment.Rmd` |
-| 10 | Cross-compartment analyses in maternal and infant blood (MISAME-III; Fig. S7, Table S8) | `10_cross_compartment_blood.Rmd` |
+| 8 | Sensitivity analyses and additional outputs (unadjusted, unscaled [Table S7], fat-adjusted TGs [Figure S4], SuperLearner [Fig. 1A], PCA [Fig. 1B], pathway-network views, infant growth [Figure S1]) | `08_sensitivity_supplementary.Rmd` |
+| 9 | Reproducible pathway and enrichment analyses (MetaboAnalystR ORA / MSEA / Mummichog / GO; Tables S1–S6, Fig. 3B, 5B, 6B–C; direction-split ORA panels are online-only) | `09_pathway_enrichment.Rmd` |
+| 10 | Cross-compartment analyses in maternal and infant blood (MISAME-III; Tables S8–S11 and main-text Fig. 6D; no printed-supplement figure, all figures here are online-only) | `10_cross_compartment_blood.Rmd` |
 | – | Reproducibility / sessionInfo | `99_session_info.Rmd` |
 
 The scripted pathway-enrichment tables that were previously described under §8.6 now live in full in **§9**; §8 retains only the pathway-network views and a pointer.
@@ -121,7 +126,7 @@ The final page of the rendered book prints `sessionInfo()` so that the exact R a
 
 ## Citation
 
-This supplement is released alongside the main manuscript. When citing analytical outputs from the supplement, please cite the main manuscript and include the appendix URL (and Zenodo DOI once available).
+This supplement is released alongside the main manuscript. When citing analytical outputs from the supplement, please cite the main manuscript and include the appendix URL (and the Zenodo DOI once it is minted — see `TODO.local.md`).
 
 ## Issues
 

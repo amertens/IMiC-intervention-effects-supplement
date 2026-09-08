@@ -4,7 +4,7 @@ Here we report the **primary, covariate-adjusted estimates** of how maternal nut
 
 Each modality appears twice. The first view **pools** the intervention arms (all maternal nutritional intervention arms combined vs. the corresponding control) to maximize precision. The second **stratifies by randomized arm**, contrasting each post-randomization nutritional arm against its trial's control. Within the forest plots, solid filled symbols mark effects that survive FDR correction and open symbols do not, while intermediate ("Sig before FDR") symbols flag nominal *p* < 0.05 that fell short of the multiplicity threshold. In the HTML version, hovering over a point reveals the exact estimate, 95% CI, and q-value, and the column filters in each table let you drill into specific components, studies, or visits.
 
-These outputs map to **Figure 3** (primary-outcome forest plots) and **Figure S4** (secondary outcomes) in the manuscript, and they supply the per-component estimates behind the **Figure 5A** targeted-metabolite volcano. For the multivariate treatment-arm prediction and PCA composites of manuscript Figure 2, see §8.
+These outputs map to **Figure 2** (primary-outcome forest plots) and **Figure S3** (secondary outcomes) in the manuscript, and they supply the per-component estimates behind the **Figure 5A** targeted-metabolite volcano. For the multivariate treatment-arm prediction and PCA composites of manuscript Figure 1, see §8.
 
 > **Looking for absolute concentrations?** The estimates below sit on the **standardised (SD) scale** so that components can be compared directly. To read the same intervention effects in their **native assay units** (g/100 mL for macronutrients; µg/L or mg/L for micronutrients; relative abundance for HMOs), see **§8.2 "Unscaled (natural-unit) intervention effects"** in the *Sensitivity analyses and additional outputs* chapter. Each result table below carries an `ATE_unscaled` column giving the per-component natural-unit estimate next to the standardised one. Unadjusted estimates appear in **§8.1** for sensitivity.
 
@@ -37,6 +37,43 @@ show_forest_and_table <- function(csv_path, arm_strat = FALSE, title = NULL,
     htmltools::tags$p(htmltools::tags$strong("Figure legend. "), htmltools::tags$em(legend)),
     clean_tab(df, caption = tab_caption %||% paste0("Adjusted ATEs, 95% CIs, and FDR-adjusted q-values — ", ttl, "."))
   )
+}
+```
+
+## Primary and secondary component metadata (Online Appendix 5) {#primary-component-metadata}
+
+Primary outcomes are the macronutrients, micronutrients, and B-vitamins; secondary outcomes are the human milk oligosaccharides and bioactive proteins. The table below lists every one of them, grouped by prespecified outcome class, with indicators for whether the component was measured in each of the three IMiC trials.
+
+This inventory is the resource cited from **Fig. 3A** of the manuscript. It is the primary/secondary counterpart to the targeted-metabolite metadata cited from Fig. 5A, which lives in [§6](#targeted-metabolite-metadata-and-reductions-in-hm-nutrient-deficiency); the complete inventory across all outcome classes, including tertiary, is in [§2 *Outcomes and human milk component distributions*](#outcomes-and-human-milk-component-distributions). The intervention-effect estimates for these components follow in the rest of this section.
+
+```{r primary-component-metadata, echo=FALSE, message=FALSE, warning=FALSE}
+metadata_loaded <- safe_load(here::here("metadata/milk_component.Rdata"))
+if (isTRUE(metadata_loaded) && exists("all_milk_components")) {
+  groups <- list(
+    "Macronutrients (primary)"                = all_milk_components$macro,
+    "Micronutrients (primary)"                = all_milk_components$micro,
+    "B-vitamins (primary)"                    = all_milk_components$bvit,
+    "Human milk oligosaccharides (secondary)" = all_milk_components$hmo,
+    "Bioactive proteins (secondary)"          = all_milk_components$protein
+  )
+  groups <- groups[!vapply(groups, is.null, logical(1))]
+  ps_tbl <- dplyr::bind_rows(lapply(names(groups), function(g) {
+    tibble::tibble(outcome_group = g,
+                   component     = unlist(groups[[g]], use.names = FALSE))
+  })) %>% dplyr::distinct()
+  per_study <- list(
+    "MISAME-III" = if (exists("misame_milk_components")) unlist(misame_milk_components, use.names = FALSE) else NULL,
+    "Mumta-LW"   = if (exists("vital_milk_components"))  unlist(vital_milk_components,  use.names = FALSE) else NULL,
+    "ELICIT"     = if (exists("elicit_milk_components")) unlist(elicit_milk_components, use.names = FALSE) else NULL
+  )
+  for (s in names(per_study)) {
+    if (is.null(per_study[[s]])) next
+    ps_tbl[[paste0("measured_in_", s)]] <- ps_tbl$component %in% per_study[[s]]
+  }
+  nice_dt(ps_tbl,
+          caption = "Primary and secondary human milk component metadata: outcome class and per-study availability. Referenced from Fig. 3A of the manuscript.")
+} else {
+  cat("*Component metadata is not available in this build (`metadata/milk_component.Rdata` did not load).*")
 }
 ```
 

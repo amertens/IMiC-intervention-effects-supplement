@@ -86,7 +86,7 @@ if (!is.null(traj_combined) && is.data.frame(traj_combined)) {
 
 The figures below trace human milk components over successive visits by intervention arm within each study. Line plots display mean milk component levels across visits, aggregated within biologically defined component categories (e.g. macronutrients, B-vitamins, HMOs, amino acids, other metabolite classes) and stratified by randomized intervention arm. To build the category-level summaries, we averaged component values across all available biomarkers within a category in each study. Plots appear on two scales: a standardized scale (z-scored within study × visit) for cross-category comparison, and the original measurement scale, which keeps absolute concentrations interpretable.
 
-```{r traj-lineplots, echo=FALSE, message=FALSE, warning=FALSE, fig.height=8}
+```{r traj-lineplots, echo=FALSE, message=FALSE, warning=FALSE, fig.height=8, results='asis'}
 p_s5 <- safe_readRDS(here::here("figure-data/figure_s4_trajectory_plots.RDS"),
                      label = "figure_s4_trajectory_plots.RDS")
 show_any(p_s5)

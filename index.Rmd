@@ -18,31 +18,36 @@ This online appendix is the **complete, searchable companion** to the manuscript
 
 It provides every analytical output that supports the main manuscript, in more detail than the printed article PDF can hold: interactive forest and volcano plots, searchable and filterable estimate tables, longitudinal trajectory visualisations, MILQ-anchored deficiency analyses, BMI-stratified subgroup analyses, reproducible pathway-enrichment results, and the cross-compartment maternal/infant blood analyses.
 
-The appendix is organised into **ten numbered sections** matching the references in the printed paper (Sections 1–10), preceded by this unnumbered overview and followed by a reproducibility appendix. Sections 1–8 mirror the original submission; **§9 (reproducible pathway and enrichment analyses)** and **§10 (cross-compartment analyses in maternal and infant blood)** are added in this revision to report, respectively, the scripted MetaboAnalystR enrichment pipeline behind the manuscript's pathway figures and the maternal-plasma / dried-blood-VAMS / blood-proteomics analyses behind manuscript Fig. S7 and Table S8.
+The appendix is organised into **ten numbered sections**, preceded by this unnumbered overview and followed by a reproducibility appendix. The paper cites Sections 1–8 by name in its Methods and Results; **§9 (reproducible pathway and enrichment analyses)** and **§10 (cross-compartment analyses in maternal and infant blood)** were added in this revision and are cited without a section number, as the "Online Appendix" behind the manuscript's pathway tables (Tables S1–S6) and its cross-compartment tables (Tables S8–S11, main-text Fig. 6D).
 
-## Outstanding TODOs (revision round 1) {-}
+**Figure and table numbering.** Table cross-references throughout this appendix match the printed supplement one-for-one: **Tables S1–S11**. Figures need more care. The printed supplement carries **Figures S1–S5 only**, renumbered contiguously after several exhibits were withdrawn during revision, so a figure discussed here may sit at a different number than in an earlier draft you have seen:
 
-The following items remain open while the manuscript revision is in progress; the supplement will be updated as soon as the upstream actions complete:
+| Printed supplement | Subject | Reported here in |
+|---|---|---|
+| **Fig. S1** | Infant growth (LAZ / WLZ / WAZ / HCAZ / MUACZ) | §8.7 |
+| **Fig. S2** | MILQ-referenced micronutrient deficiency (relative risks) | §6 |
+| **Fig. S3** | HMOs and bioactive proteins (secondary outcomes) | §5 |
+| **Fig. S4** | Milk triglycerides, with and without fat adjustment | §8.3 |
+| **Fig. S5** | Milk-microbiome α-diversity | §4 |
 
-- **TODO (revision item 3): Zenodo / Code-Ocean DOI archive.** Science's revision checklist requires that code in a GitHub repository be permanently archived in Zenodo or Code Ocean and cited with a DOI in the reference list. The supplement repository needs a tagged release linked to Zenodo, and the resulting DOI needs to be embedded in this overview, the [README](https://github.com/amertens/IMiC-intervention-effects-supplement), and the reference list of the main paper. Until that hook-up is in place, citing this supplement should use the repository URL (above) as a placeholder.
-- **TODO (revision item 8): Re-target figure cross-references after Fig. S2 promotion.** Reviewer 2 recommended promoting Fig. S2 (the significant primary-outcome panel) from the printed Word supplement to a main-text figure. If that change is accepted by the editor, every "Figure S#" cross-reference in this online appendix — currently *Figure S1* (growth), *Figure S2* (significant primary-outcome distributions), *Figure S3* (MILQ deficiency RR), *Figure S4* (HMOs/bioactives), *Figure S5* (TG fat-adjustment), and *Figure S6* (microbiome α-diversity) — must be renumbered to match the post-revision figure list.
+Content in this appendix that has **no** printed-supplement figure — the direction-split pathway ORA panels in §9, and every figure in §10 — is labelled *online-only* where it appears. Main-text figures are cited as **Fig. 1–6** and match the article: machine-learning / PCA composites are **Fig. 1** (§8.4–§8.5), the primary-outcome forest plots **Fig. 2** (§5), the primary-outcome volcano and pathway panels **Fig. 3A–B** (§5, §9.1), the MILQ-referenced distributions **Fig. 4** (§2), the targeted-metabolite panels **Fig. 5A–C** (§5, §9.4–§9.5), and the untargeted metabolome/proteome panels **Fig. 6A–D** (§9.6–§9.8, §10.5).
 
 ## How this appendix maps to the manuscript
 
 | Manuscript reference | Section here |
 |---|---|
 | Methods: "baseline participant characteristics … (Section 1)" | [§1 Baseline characteristics by study and intervention arm](#baseline-characteristics-by-study-and-intervention-arm) |
-| Methods: "outcomes list … (Section 2)"; Fig. 4A "metadata in Online Supplement 5" (primary-component metadata); manuscript Fig. S2 | [§2 Outcomes and human milk component distributions](#outcomes-and-human-milk-component-distributions) |
+| Methods: "outcomes list … (Section 2)"; manuscript **Fig. 4** (MILQ-referenced distributions) | [§2 Outcomes and human milk component distributions](#outcomes-and-human-milk-component-distributions) |
 | Results: "Online Appendix 3" (effect modification by maternal BMI) | [§3 Subgroup analyses stratified by maternal BMI](#subgroup-analyses-stratified-by-maternal-bmi) |
-| Results: "Online Appendix 4" (individual microbial taxa); Fig. S6 | [§4 Microbiome and exploratory high-dimensional outcomes](#exploratory-high-dimensional-outcomes-microbiome-untargeted-proteomics-untargeted-metabolomics) |
-| manuscript Fig. 3 (primary-outcome forest plots), Fig. S4 (secondary outcomes), and the per-component estimates underlying Fig. 5A (tertiary metabolites) | [§5 Adjusted intervention effects on individual milk components](#adjusted-intervention-effects-on-individual-milk-components) |
-| Fig. 5A: "metadata in Online Supplement 6" (targeted metabolites); manuscript Fig. S3 (MILQ deficiency) | [§6 Targeted-metabolite metadata and reductions in HM nutrient deficiency](#targeted-metabolite-metadata-and-reductions-in-hm-nutrient-deficiency) |
+| Results: "Online Appendix 4" (individual microbial taxa); Fig. S5 (α-diversity) | [§4 Microbiome and exploratory high-dimensional outcomes](#exploratory-high-dimensional-outcomes-microbiome-untargeted-proteomics-untargeted-metabolomics) |
+| manuscript Fig. 2 (primary-outcome forest plots), Fig. S3 (secondary outcomes), the per-component estimates underlying Fig. 5A (tertiary metabolites), and Fig. 3A's "metadata in Online Appendix 5" pointer (§5.1) | [§5 Adjusted intervention effects on individual milk components](#adjusted-intervention-effects-on-individual-milk-components) |
+| Fig. 5A: "metadata in Online Appendix 6" (targeted metabolites); manuscript Fig. S2 (MILQ deficiency) | [§6 Targeted-metabolite metadata and reductions in HM nutrient deficiency](#targeted-metabolite-metadata-and-reductions-in-hm-nutrient-deficiency) |
 | Longitudinal change in HM composition | [§7 Trajectory analyses of HM component change across lactation](#trajectory-analyses-of-human-milk-component-change-across-lactation) |
-| manuscript Fig. 2 (treatment-arm prediction & PCA composites); Fig. S1 (growth); Fig. S5 (TG fat adjustment); sensitivity analyses | [§8 Sensitivity analyses and additional outputs](#sensitivity-analyses-and-additional-outputs) |
-| manuscript Fig. 3B (primary MSEA), Fig. 5B–C and Fig. 6A–C (tertiary/untargeted enrichment); **Tables S1–S6** (pathway enrichment) | [§9 Reproducible pathway and enrichment analyses](#reproducible-pathway-and-enrichment-analyses) |
-| Results: "intervention effects are mirrored in maternal and infant circulation"; manuscript **Fig. S7** and **Table S8** (cross-compartment maternal/infant blood) | [§10 Cross-compartment analyses in maternal and infant blood](#cross-compartment-analyses-in-maternal-and-infant-blood) |
+| manuscript Fig. 1 (treatment-arm prediction & PCA composites); Fig. S1 (growth); Fig. S4 (TG fat adjustment); **Table S7** (native-unit concentrations); sensitivity analyses | [§8 Sensitivity analyses and additional outputs](#sensitivity-analyses-and-additional-outputs) |
+| manuscript Fig. 3B (primary MSEA), Fig. 5B–C and Fig. 6A–C (tertiary/untargeted enrichment); **Tables S1–S6** (pathway enrichment); direction-split ORA panels (online-only) | [§9 Reproducible pathway and enrichment analyses](#reproducible-pathway-and-enrichment-analyses) |
+| Results: "intervention effects are mirrored in maternal and infant circulation"; **Table S8** (cross-compartment features), **Table S9** (chemical-class enrichment), **Table S10** (temporal persistence), and **Table S11**/main-text **Fig. 6D** (cross-compartment feature tracking and pathway enrichment). No printed-supplement figure; all figures here are online-only | [§10 Cross-compartment analyses in maternal and infant blood](#cross-compartment-analyses-in-maternal-and-infant-blood) |
 
-The manuscript's section-numbered citations resolve as follows: *"Section 1"* → §1; *"Section 2"* and Fig. 4A's *"Online Supplement 5"* (primary-component metadata) → §2; *"Online Appendix 3"* → §3; *"Online Appendix 4"* → §4; and Fig. 5A's *"Online Supplement 6"* (targeted-metabolite metadata) → §6. The modelling and sensitivity outputs the manuscript cites collectively as *"Sections 3–8"* span **§3–§8** of this build.
+The manuscript's section-numbered citations resolve as follows: *"Section 1"* → §1; *"Section 2"* (outcomes list) → §2; *"Online Appendix 3"* → §3; *"Online Appendix 4"* → §4; Fig. 3A's *"Online Appendix 5"* (primary/secondary component metadata) → §5.1; and Fig. 5A's *"Online Appendix 6"* (targeted-metabolite metadata) → §6.1. The abstract-level pointer to *"Sections 1–8"* covers the outputs carried over from the original submission; §9 and §10, added in this revision, are the "Online Appendix" cited without a number elsewhere in the Results.
 
 ## Methods recap
 
@@ -60,12 +65,47 @@ In the HTML build, forest and volcano plots are rendered as `plotly` widgets. Ho
 
 Where a section relies on an upstream data artefact that is not present in the current build, the section prints an inline notice naming the missing file rather than failing. Re-run the upstream analysis pipeline (see *Reproducing the supplement* in the repository README) to regenerate those artefacts.
 
+## Machine-readable data files {#data-files}
+
+Four supplementary tables were too large to print in full, so the printed supplement gives a short caption and points here for the complete data. Each is a plain CSV, downloadable directly:
+
+```{r appendix-data-files, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+## Publish appendix-data/ alongside the book so the filenames the printed
+## supplement names are actually downloadable from the rendered site.
+src <- here::here("appendix-data")
+dst <- here::here("docs", "appendix-data")
+if (dir.exists(src)) {
+  dir.create(dst, recursive = TRUE, showWarnings = FALSE)
+  file.copy(list.files(src, full.names = TRUE), dst, overwrite = TRUE)
+}
+files <- list(
+  c("table_s2_tertiary_msea_full.csv",
+    "Table S2 — tertiary targeted-metabolome MSEA, every pathway x study x visit x contrast x direction row (see §9.4)"),
+  c("table_s5_mummichog_full.csv",
+    "Table S5 — milk untargeted-metabolome Mummichog enrichment, pathways at raw P < 0.05 (see §9.7)"),
+  c("table_s6_proteomics_go_full.csv",
+    "Table S6 — milk-proteome GO Biological Process enrichment, terms at nominal P < 0.05 and Storey q < 0.20 (see §9.8)"),
+  c("table_s7_primary_secondary_native_units.csv",
+    "Table S7 — native-unit concentrations and intervention effects for all primary and secondary outcomes, long format (see §8.4)"),
+  c("table_s7_primary_secondary_native_units_wide.csv",
+    "Table S7 — the same data in wide format, one row per component x study x visit with the arms side by side")
+)
+for (f in files) {
+  p <- file.path(src, f[1])
+  n <- if (file.exists(p)) max(0, length(readLines(p, warn = FALSE)) - 1L) else NA_integer_
+  cat(sprintf("- [`%s`](appendix-data/%s) — %s%s\n", f[1], f[1], f[2],
+              if (is.na(n)) " *(not present in this build)*" else ""))
+}
+```
+
+Every one of these is also rendered as a searchable table in the section named beside it; the CSVs are for readers who want the numbers in a spreadsheet or script.
+
 ## Citation and reproducibility
 
 - Source for this appendix: <https://github.com/amertens/IMiC-intervention-effects-supplement>
 - Upstream analysis code (TMLE pipelines, SuperLearner, enrichment workflows): <https://github.com/amertens/imic_intervention_effects>
 - Trial registration: ClinicalTrials.gov **NCT05119166**
-- DOI (Zenodo archive): *pending — see TODO above*
+- DOI (Zenodo archive): *pending*
 
 ```{r write-bib, include=FALSE}
 knitr::write_bib(c(.packages(), "bookdown","knitr","rmarkdown","tidyverse","here",

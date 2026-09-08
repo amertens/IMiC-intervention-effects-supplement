@@ -59,6 +59,24 @@ files <- list(
   list("results/tables/table_s7_primary_secondary_native_units.csv",
        "results/tables/table_s7_primary_secondary_native_units.csv"),
 
+  ## ---- Online-Appendix data files -----------------------------------------
+  ## The printed supplement externalises four oversized tables (S2, S5, S6, S7)
+  ## and names the CSV for each, telling readers to find it "in the Online
+  ## Appendix" -- i.e. here. They are published from appendix-data/ (see the
+  ## Machine-readable data files section of index.Rmd), so they must be ported
+  ## under that name, not just left in results/. Written upstream by
+  ## src/pipeline/rebuild-submission-tables.R.
+  list("results/tables/table_s2_tertiary_msea_full.csv",
+       "appendix-data/table_s2_tertiary_msea_full.csv"),
+  list("results/tables/table_s5_mummichog_full.csv",
+       "appendix-data/table_s5_mummichog_full.csv"),
+  list("results/tables/table_s6_proteomics_go_full.csv",
+       "appendix-data/table_s6_proteomics_go_full.csv"),
+  list("results/tables/table_s7_primary_secondary_native_units.csv",
+       "appendix-data/table_s7_primary_secondary_native_units.csv"),
+  list("results/tables/table_s7_primary_secondary_native_units_wide.csv",
+       "appendix-data/table_s7_primary_secondary_native_units_wide.csv"),
+
   ## ---- trajectory (ch 10) --------------------------------------------------
   list("results/adjusted_intervention_effects_traj_results_clean.RDS",
        "results/adjusted_intervention_effects_traj_results_clean.RDS"),
@@ -182,10 +200,12 @@ blood_csvs <- c(
   "results/cross_compartment_matching_sensitivity.csv",
   # selenoproteins / proteome overlap (§10.3, adjusted models)
   "results/cross_compartment_proteome_overlap_adjusted.csv",
-  # carnitine transfer + mediation (§10.4)
-  "results/tmle_mediation.csv",
-  "results/mediation_measurement_error_sensitivity.csv",
-  "results/dyad_milk_infant_mediation.csv",
+  # carnitine transfer (§10.4). The mediation outputs that used to be ported
+  # here (tmle_mediation.csv, dyad_milk_infant_mediation.csv,
+  # mediation_measurement_error_sensitivity.csv) were withdrawn 2026-08-27
+  # along with their upstream scripts -- the analysis is not claimed by the
+  # manuscript or either response letter, and rested on an unconfirmed
+  # milk-to-infant feature identity.
   "results/targeted_carnitine_crossvalidation.csv",
   "results/targeted_acylcarnitine_class_summary.csv",
   "results/acylcarnitine_composition.csv",
@@ -216,7 +236,21 @@ blood_csvs <- c(
   "results/infant_carnitine_growth_assoc.csv",
   "results/detectability_proxy_infant_carnitine.csv",
   # consolidated cross-compartment table (§10.9)
-  "results/table_s8_cross_compartment.csv"
+  "results/table_s8_cross_compartment.csv",
+  # compartment tracking (Trenton's name-based grouping rule — the SAME rule
+  # now behind manuscript Fig. 6D, Table S11, and Fig. S10 as of the 2026-08-25
+  # reconciliation; see Manuscript/SUPPLEMENT_HANDOFF_FIG6D_RESOLUTION.md
+  # upstream). Table S11 (§10.5) and its supporting counts/compound list; the
+  # paired figure PNGs (trenton_xcompartment_tracking / _volcanoes) ride the
+  # figures/cross_compartment copy_tree below and need no explicit entry.
+  "results/tables/table_s11_compartment_pathway.csv",
+  "results/tables/figS10_tracking_counts.csv",
+  "results/compartment_tracking/trenton_linked_crosscompartment.csv",
+  "results/compartment_tracking/trenton_pathway_compound_list.csv",
+  "results/compartment_tracking/metabolite_pathways_trenton.csv"
+  # NOTE: pathway_results_local.csv / metabolite_pathways_local.csv /
+  # linked_upregulated_plot_data.csv (union-find grouping) are intentionally
+  # NOT ported — that rule was superseded by Trenton's original method above.
 )
 for (f in blood_csvs) files[[length(files) + 1]] <- list(f, f)
 

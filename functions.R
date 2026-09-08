@@ -272,27 +272,57 @@ safe_img <- function(path, label = basename(path)) {
 ## Print an object whose type may vary across builds (single ggplot, list of
 ## ggplots, plotly, data.frame). Used in chapters that consume saved RDS
 ## artefacts whose exact structure is set upstream.
-show_any <- function(x) {
+## Can this ggplot actually be drawn by the INSTALLED ggplot2? Objects saved by
+## ggplot2 3.x carry the bare S3 class c("gg","ggplot"); ggplot2 4.x moved to S7
+## and has no ggplot_build() method for them, so print() silently falls through
+## to print.default and dumps the object's internal list as thousands of lines of
+## console text instead of drawing anything. Test buildability up front so we can
+## say so in one line rather than flooding the page.
+.gg_is_drawable <- function(x) {
+  !inherits(try(ggplot2::ggplot_build(x), silent = TRUE), "try-error")
+}
+
+## Short italic notice. Requires the calling chunk to use results='asis'.
+.show_note <- function(fmt, ...) cat(sprintf(paste0("\n\n*", fmt, "*\n\n"), ...))
+
+show_any <- function(x, label = NULL) {
   if (is.null(x)) return(invisible(NULL))
   if (inherits(x, c("plotly","htmlwidget"))) { print(x); return(invisible(NULL)) }
   if (inherits(x, "gg")) {
-    ## Older saved ggplot objects sometimes fail ggplotly() conversion because
-    ## of changes to the internal S4 slots; fall back to a static print on error.
-    if (knitr::is_html_output() && requireNamespace("plotly", quietly = TRUE)) {
-      conv <- try(plotly::ggplotly(x), silent = TRUE)
-      if (!inherits(conv, "try-error")) { print(conv); return(invisible(NULL)) }
+    if (!.gg_is_drawable(x)) {
+      .show_note(paste0("Saved plot object%s cannot be drawn by the installed ggplot2 (%s): ",
+                        "it was written by an older version, and this release has no renderer ",
+                        "for it. Re-save the object from the upstream figure pipeline under the ",
+                        "current ggplot2 to restore this panel."),
+                 if (is.null(label)) "" else paste0(" `", label, "`"),
+                 as.character(utils::packageVersion("ggplot2")))
+      return(invisible(NULL))
     }
+    ## Draw statically, on purpose. These are pre-rendered manuscript figure
+    ## panels, and a static image is what the surrounding prose promises. It is
+    ## also the only reliable option here: ggplotly() returns an htmlwidget, and
+    ## print()-ing a widget from INSIDE a function does not trigger knitr's
+    ## htmlwidget path, so the plot is silently dropped from the page (the same
+    ## trap that hid the Table S5 and blood-Mummichog tables). A widget has to be
+    ## the chunk's own last auto-printed value to survive, which a side-effect
+    ## helper like this one cannot arrange. print() of a ggplot, by contrast,
+    ## draws to the graphics device and is captured wherever it is called.
     print(x); return(invisible(NULL))
   }
   if (is.data.frame(x)) { print(nice_dt(x)); return(invisible(NULL)) }
   if (is.list(x)) {
     for (i in seq_along(x)) {
-      cat(sprintf("\n\n**%s**\n\n", names(x)[i] %||% paste0("Panel ", i)))
-      show_any(x[[i]])
+      nm <- names(x)[i] %||% paste0("Panel ", i)
+      cat(sprintf("\n\n**%s**\n\n", nm))
+      show_any(x[[i]], label = if (is.null(label)) nm else paste0(label, " / ", nm))
     }
     return(invisible(NULL))
   }
-  print(x)
+  ## Anything else: name it rather than dumping its internals onto the page.
+  .show_note("Object%s is not a plot or table and is not displayed here (class: %s).",
+             if (is.null(label)) "" else paste0(" `", label, "`"),
+             paste(class(x), collapse = ", "))
+  invisible(NULL)
 }
 
 `%||%` <- function(a, b) if (is.null(a) || length(a) == 0) b else a
@@ -303,12 +333,18 @@ show_any <- function(x) {
 ## Returns the volcano widget (or static ggplot fallback). Emits a one-line
 ## sub-cap via cat() when the data has been down-sampled — requires the
 ## calling chunk to use results='asis'.
-volcano_capped <- function(df, n_show = 2000, ...) {
+##
+## `table_note` describes what the accompanying DT below the plot actually
+## contains. The default assumes the table is complete; pass an explicit string
+## whenever the table is filtered, so the sub-cap cannot promise rows the reader
+## will not find (e.g. the untargeted-metabolomics volcano, whose table is
+## restricted to q < 0.10).
+volcano_capped <- function(df, n_show = 2000, table_note = "the full table below contains every feature", ...) {
   if (is.null(df) || !nrow(df)) { cat("*No rows to plot.*\n\n"); return(invisible(NULL)) }
   if (nrow(df) > n_show && "pval" %in% names(df)) {
     df_show <- df %>% dplyr::arrange(pval) %>% dplyr::slice_head(n = n_show)
-    cat(sprintf("\n*Interactive volcano shows top %s features by raw p-value (of %s total); full table below contains every feature.*\n\n",
-                format(n_show, big.mark = ","), format(nrow(df), big.mark = ",")))
+    cat(sprintf("\n*Interactive volcano shows top %s features by raw p-value (of %s total); %s.*\n\n",
+                format(n_show, big.mark = ","), format(nrow(df), big.mark = ","), table_note))
   } else {
     df_show <- df
   }
