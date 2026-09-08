@@ -2,13 +2,13 @@
 
 The robustness analyses and supplementary outputs referenced from the manuscript are gathered here, grouped by analysis class. Each subsection asks a version of the same question of the primary adjusted, standardised TMLE analyses presented earlier: would the headline conclusions still hold?
 
-- **8.1 Unadjusted intervention effects** — the same TMLE framework with covariate adjustment removed, which shows whether adjustment is doing meaningful work in the primary analyses.
-- **8.2 Unscaled (natural-unit) intervention effects** — adjusted TMLE ATEs in the native assay units (e.g. g/100 mL, µg/L, µM), letting readers interpret effect magnitudes clinically. Covers all three outcome groups (primary, secondary, and tertiary/targeted metabolomics); the primary and secondary estimates correspond to manuscript Table S7.
-- **8.3 Fat-adjusted triglyceride effects (Figure S4)** — separating changes in triglyceride composition from transient changes in total milk fat.
-- **8.4 SuperLearner CV-AUC treatment-arm prediction** (manuscript **Fig. 1A**) — a multivariate test of whether the *joint* distribution of HM components carries intervention signal beyond per-component testing.
-- **8.5 PCA-based composite outcome scores** (manuscript **Fig. 1B**) — ATEs on the first principal component of each modality, asking whether each modality moved as a whole.
-- **8.6 Pathway enrichment analyses** — now reported in full in [§9 *Reproducible pathway and enrichment analyses*](#reproducible-pathway-and-enrichment-analyses); only the network views and a pointer remain here.
-- **8.7 Infant growth analyses (Figure S1)** — intervention effects on infant anthropometry within the IMiC subsamples, as a within-trial sanity check.
+- **8.1 Unadjusted intervention effects:** the same TMLE framework with covariate adjustment removed, which shows whether adjustment is doing meaningful work in the primary analyses.
+- **8.2 Unscaled (natural-unit) intervention effects:** adjusted TMLE ATEs in the native assay units (e.g. g/100 mL, µg/L, µM), letting readers interpret effect magnitudes clinically. Covers all three outcome groups (primary, secondary, and tertiary/targeted metabolomics); the primary and secondary estimates correspond to manuscript Table S7.
+- **8.3 Fat-adjusted triglyceride effects (Figure S4):** separating changes in triglyceride composition from transient changes in total milk fat.
+- **8.4 SuperLearner CV-AUC treatment-arm prediction** (manuscript **Fig. 1A**): a multivariate test of whether the *joint* distribution of HM components carries intervention signal beyond per-component testing.
+- **8.5 PCA-based composite outcome scores** (manuscript **Fig. 1B**): ATEs on the first principal component of each modality, asking whether each modality moved as a whole.
+- **8.6 Pathway enrichment analyses:** now reported in full in [§9 *Reproducible pathway and enrichment analyses*](#reproducible-pathway-and-enrichment-analyses); only the network views and a pointer remain here.
+- **8.7 Infant growth analyses (Figure S1):** intervention effects on infant anthropometry within the IMiC subsamples, as a within-trial sanity check.
 
 Primary inference about whether intervention effects are present and consistent rests on the adjusted analyses in §5. The analyses in this chapter contextualise those findings rather than replace them.
 
@@ -50,7 +50,7 @@ if (!is.null(res_unadj) && isTRUE(metadata_loaded)) {
     out <- htmltools::tagList(
       out,
       htmltools::h3(g),
-      forest_plot(sub, title = paste0("Unadjusted ATEs — ", g)),
+      forest_plot(sub, title = paste0("Unadjusted ATEs: ", g)),
       clean_tab(sub)
     )
   }
@@ -60,7 +60,7 @@ if (!is.null(res_unadj) && isTRUE(metadata_loaded)) {
 
 ## Unscaled (natural-unit) intervention effects
 
-Unscaled estimates are adjusted TMLE ATEs reported on the **native assay scale** of each milk component (for example, g/100 mL for macronutrients; µg/L or mg/L for micronutrients; relative abundance for HMOs; µM for the targeted metabolomics panel). The standardised, SD-unit estimates in §5 are built for cross-component comparison. The natural-unit estimates here restate them in biologically meaningful units, so a reader can ask "how much did B3 actually go up, in mg/L?" rather than only "by how many SD units did B3 go up?". Think of this section as the **absolute-concentration view** of the §5 results. The primary and secondary native-unit estimates below correspond to **Table S7** of the manuscript (per-arm sample sizes, means, SDs, medians and IQRs, alongside native-unit ATEs, 95% CIs, and FDR-adjusted *q*-values for all primary and secondary outcomes); Table S7 does not extend to the tertiary targeted-metabolomics panel, so the tertiary native-unit ATEs at the end of this section have no manuscript table counterpart — they are reported here for completeness, sourced from the same upstream unscaled-effects run.
+Unscaled estimates are adjusted TMLE ATEs reported on the **native assay scale** of each milk component (for example, g/100 mL for macronutrients; µg/L or mg/L for micronutrients; relative abundance for HMOs; µM for the targeted metabolomics panel). The standardised, SD-unit estimates in §5 are built for cross-component comparison. The natural-unit estimates here restate them in biologically meaningful units, so a reader can ask "how much did B3 actually go up, in mg/L?" rather than only "by how many SD units did B3 go up?". Think of this section as the **absolute-concentration view** of the §5 results. The primary and secondary native-unit estimates below correspond to **Table S7** of the manuscript (per-arm sample sizes, means, SDs, medians and IQRs, alongside native-unit ATEs, 95% CIs, and FDR-adjusted *q*-values for all primary and secondary outcomes); Table S7 does not extend to the tertiary targeted-metabolomics panel, so the tertiary native-unit ATEs at the end of this section have no manuscript table counterpart; they are reported here for completeness, sourced from the same upstream unscaled-effects run.
 
 ```{r sens-unscaled, echo=FALSE, message=FALSE, warning=FALSE, fig.height=10}
 res_unscaled <- safe_readRDS(here::here("results/adjusted_combined_arms_intervention_effects_unscaled_results_clean.RDS"),
@@ -116,7 +116,7 @@ if (!is.null(res_unscaled) && isTRUE(metadata_loaded)) {
 }
 ```
 
-### Table S7 — per-arm native-unit concentrations and descriptive statistics
+### Table S7: per-arm native-unit concentrations and descriptive statistics
 
 The full manuscript **Table S7** is reproduced below as a searchable table. For every primary and secondary milk component, by study × visit × arm, it gives the sample size, the covariate-adjusted mean and 95% CI (`mean`, `mean_cil`, `mean_ciu`), and the raw distributional summary (`raw_mean`, `raw_sd`, `raw_median`, `raw_q25`, `raw_q75`) in native assay units. It provides the tabular backing for the concentration **distributions** in manuscript Fig. 4 and the effect estimates in Figs. 2–3.
 
@@ -126,7 +126,7 @@ The full manuscript **Table S7** is reproduced below as a searchable table. For 
 s7 <- safe_read_csv(here::here("results/tables/table_s7_primary_secondary_native_units.csv"))
 if (!is.null(s7)) {
   nice_dt(s7,
-          caption = "Manuscript Table S7 — native-unit (absolute) concentrations and adjusted means for all primary and secondary milk outcomes, by study, visit, and intervention arm.")
+          caption = "Manuscript Table S7: native-unit (absolute) concentrations and adjusted means for all primary and secondary milk outcomes, by study, visit, and intervention arm.")
 }
 ```
 

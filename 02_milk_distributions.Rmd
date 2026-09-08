@@ -26,7 +26,7 @@ Use the column filters at the top of the table to look up a specific component, 
 ```{r outcomes-dictionary, echo=FALSE}
 build_dict <- function() {
   if (!exists("all_milk_components")) {
-    cat("*`all_milk_components` was not available — metadata file missing or out of sync.*")
+    cat("*`all_milk_components` was not available; metadata file missing or out of sync.*")
     return(invisible(NULL))
   }
   groups <- list(
@@ -65,7 +65,7 @@ Two focused subsets of this inventory are reproduced elsewhere so that the metad
 
 ## Distributions
 
-The remainder of this section shows the unadjusted distribution of each measured human milk component, stratified by study, visit, and randomized intervention arm. Two views follow: (i) density plots overlaid by intervention arm, and (ii) per-component boxplots faceted by study and visit. Density plots include grey and red reference lines at the 50th and 10th percentiles of the MILQ age-specific reference distribution where applicable. Asterisks indicate FDR-corrected statistical significance of the pooled intervention vs. control contrast for that component–visit (\\* q\\<0.05, \\*\\* q\\<0.01, \\*\\*\\* q\\<0.001). Y-axes are log-transformed where the underlying distribution is markedly right-skewed (most micronutrients and metabolites).
+The remainder of this section shows the unadjusted distribution of each measured human milk component, stratified by study, visit, and randomized intervention arm. Two views follow: density plots overlaid by intervention arm, and per-component boxplots faceted by study and visit. Where a MILQ age-specific reference distribution applies, the density plots carry grey and red reference lines at its 50th and 10th percentiles, and asterisks mark the FDR-corrected significance of the pooled intervention vs. control contrast for that component–visit (\\* q\\<0.05, \\*\\* q\\<0.01, \\*\\*\\* q\\<0.001). Y-axes are log-transformed where the underlying distribution is markedly right-skewed, as it is for most micronutrients and metabolites.
 
 ### MILQ-overlay density plots (Figure 4)
 

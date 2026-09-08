@@ -43,14 +43,14 @@ prep_explor <- function(rds_path) {
 
 ### Intervention effects on microbiome α-diversity (Figure S5)
 
-Forest plots display ATEs on z-scored α-diversity metrics (observed richness and Shannon diversity), pooled across all intervention arms and then stratified by randomized arm. Across studies and visits, **no consistent intervention-related changes in microbiome diversity were observed**, apart from a transient increase in both indices at the first Mumta-LW visit. Estimated effects varied in size and direction across timepoints and studies, and confidence intervals generally overlapped the null.
+Forest plots display ATEs on z-scored α-diversity metrics (observed richness and Shannon diversity), pooled across all intervention arms and then stratified by randomized arm. Across studies and visits, **no consistent intervention-related changes in microbiome diversity were observed**. The one exception was a transient increase in both indices at the first Mumta-LW visit; otherwise estimated effects varied in size and direction across timepoints and studies, and confidence intervals generally overlapped the null.
 
 #### Combined intervention arms
 
 ```{r microbiome-div-combined, echo=FALSE, message=FALSE, warning=FALSE, fig.height=6}
 df <- prep_explor("results/microbiome_diversity_intervention_effects_results.RDS")
 if (!is.null(df)) htmltools::tagList(
-  forest_plot(df, title = "Microbiome α-diversity — pooled"),
+  forest_plot(df, title = "Microbiome α-diversity: pooled"),
   htmltools::tags$p(htmltools::tags$strong("Figure S5. "),
     htmltools::tags$em("Maternal nutritional intervention effects on human-milk microbiota alpha diversity (observed richness and Shannon diversity), Z-scored for cross-study comparability of intervention effects, shown by study, visit, and intervention contrast (pooled intervention vs. control). Filled symbols are significant after FDR correction. Individual microbial taxa results are shown later in this chapter (cited from the manuscript as Online Appendix 4 / Section 4).")),
   clean_tab(df, caption = "Adjusted ATEs on milk-microbiome α-diversity metrics, pooled intervention vs. control (manuscript Fig. S5)."))
@@ -61,7 +61,7 @@ if (!is.null(df)) htmltools::tagList(
 ```{r microbiome-div-strat, echo=FALSE, message=FALSE, warning=FALSE, fig.height=6}
 df <- prep_explor("results/microbiome_diversity_intervention_effects_results_arm_strat.RDS")
 if (!is.null(df)) htmltools::tagList(forest_plot(df, arm_strat = TRUE,
-                                                 title = "Microbiome α-diversity — per arm"),
+                                                 title = "Microbiome α-diversity: per arm"),
                                      clean_tab(df, caption = "Adjusted ATEs on milk-microbiome α-diversity metrics, by randomized arm vs. control."))
 ```
 
@@ -74,7 +74,7 @@ The volcano plots below summarize per-taxon (or per-ASV) intervention effects. I
 ```{r microbiome-vol-combined, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7, results='asis'}
 df <- prep_explor("results/microbiome_intervention_effects_results.RDS")
 if (!is.null(df)) {
-  p <- volcano_capped(df, title = "Microbial features — pooled")
+  p <- volcano_capped(df, title = "Microbial features: pooled")
   print(htmltools::tagList(p, nice_dt(df %>% dplyr::mutate(dplyr::across(where(is.numeric), ~ signif(.x, 3))),
           caption = "Per-taxon adjusted intervention effects on milk-microbiome features, pooled intervention vs. control.")))
 }
@@ -85,7 +85,7 @@ if (!is.null(df)) {
 ```{r microbiome-vol-strat, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7, results='asis'}
 df <- prep_explor("results/microbiome_intervention_effects_results_arm_strat.RDS")
 if (!is.null(df)) {
-  p <- volcano_capped(df, title = "Microbial features — per arm")
+  p <- volcano_capped(df, title = "Microbial features: per arm")
   print(htmltools::tagList(p, nice_dt(df %>% dplyr::mutate(dplyr::across(where(is.numeric), ~ signif(.x, 3))),
           caption = "Per-taxon adjusted intervention effects on milk-microbiome features, by randomized arm vs. control.")))
 }
@@ -98,7 +98,7 @@ Untargeted proteomic analyses were run in a subset of mother–infant dyads and 
 ```{r prot-vol, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7, results='asis'}
 df <- prep_explor("results/adjusted_combined_arms_intervention_effects_proteomics_results_clean.RDS")
 if (!is.null(df)) {
-  p <- volcano_capped(df, title = "Untargeted proteomics — pooled intervention vs. control")
+  p <- volcano_capped(df, title = "Untargeted proteomics: pooled intervention vs. control")
   print(htmltools::tagList(
     p,
     nice_dt(df %>% dplyr::select(dplyr::any_of(c("study","visit","contrast","label_f","biomarker",
@@ -111,19 +111,19 @@ if (!is.null(df)) {
 
 ## Untargeted metabolomics
 
-The volcano below displays effect estimates and significance for the full untargeted metabolomics feature set (≈97,000 features across studies, visits, and ionization modes). Relative to the microbiome and proteomics analyses, untargeted metabolomics shows a higher density of features with nominal evidence of intervention association, though only a small fraction survives FDR correction. The pattern reads more clearly at the **pathway level** (MetaboAnalyst ORA and Mummichog) in the *Pathway enrichment* chapter and is summarized in the manuscript's Figure 6 (panels A–B).
+The volcano below displays effect estimates and significance for the full untargeted metabolomics feature set (≈97,000 features across studies, visits, and ionization modes). Relative to the microbiome and proteomics analyses, untargeted metabolomics shows a higher density of features with nominal evidence of intervention association. Only a small fraction survives FDR correction. The pattern reads more clearly at the **pathway level**, in the MetaboAnalyst ORA and Mummichog results of the *Pathway enrichment* chapter, and it is summarized in the manuscript's Figure 6 (panels A–B).
 
 ```{r met-vol, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7, results='asis'}
 df <- prep_explor("results/adjusted_combined_arms_intervention_effects_untargeted_results_clean.RDS")
 if (!is.null(df)) {
   p <- volcano_capped(df, n_show = 5000,
                       table_note = "the table below is restricted to the features with q < 0.10, not the full feature set",
-                      title = "Untargeted metabolomics — pooled intervention vs. control")
+                      title = "Untargeted metabolomics: pooled intervention vs. control")
   ## The full ~1M-row table is far too large to render as DT; expose the
   ## FDR-significant subset only.
   df_sig <- df %>% dplyr::filter(!is.na(pval_adj), pval_adj < 0.1) %>%
     dplyr::mutate(dplyr::across(where(is.numeric), ~ signif(.x, 3)))
-  cat(sprintf("\n\n*Table below shows the %s metabolite-feature **ATE estimates** with q < 0.10 across all study × visit strata; %s ATE estimates total (after filtering the upstream RDS to `measure==\"ATE\"`). Counts and percentages are computed on ATE rows only — the RDS file also stores `MN` (mean) rows for the control and intervention arms, which are excluded here so the denominator matches per-arm intervention-effect estimates.*\n\n",
+  cat(sprintf("\n\n*Table below shows the %s metabolite-feature **ATE estimates** with q < 0.10 across all study × visit strata; %s ATE estimates total (after filtering the upstream RDS to `measure==\"ATE\"`). Counts and percentages are computed on ATE rows only; the RDS file also stores `MN` (mean) rows for the control and intervention arms, which are excluded here so the denominator matches per-arm intervention-effect estimates.*\n\n",
               format(nrow(df_sig), big.mark = ","), format(nrow(df), big.mark = ",")))
   print(htmltools::tagList(
     p,

@@ -1,6 +1,6 @@
 # Subgroup analyses stratified by maternal BMI
 
-Did the intervention effects on human milk components depend on maternal nutritional status at baseline? We addressed this using **maternal body mass index (BMI)** as a marker of that status. BMI was dichotomized a priori into *underweight* (BMI ≤ 18.5 kg/m²) and *normal or overweight* (BMI > 18.5 kg/m²) strata. We estimated stratum-specific ATEs with the same TMLE framework used in the primary adjusted analyses. **Interaction p-values** come from a Wald-type test comparing the two stratum-specific estimates, taking the difference in estimates scaled by the pooled standard error.
+Did the intervention effects on human milk components depend on maternal nutritional status at baseline? We addressed this using **maternal body mass index (BMI)** as a marker of that status, dichotomized a priori into *underweight* (BMI ≤ 18.5 kg/m²) and *normal or overweight* (BMI > 18.5 kg/m²) strata. Stratum-specific ATEs were estimated with the same TMLE framework used in the primary adjusted analyses. **Interaction p-values** come from a Wald-type test comparing the two stratum-specific estimates, taking the difference in estimates scaled by the pooled standard error.
 
 The main manuscript cites this section as **"Online Appendix 3"** in the Results paragraphs on macronutrient and micronutrient effects, where it reports **no consistent evidence of effect modification by maternal BMI** across primary, secondary, and tertiary outcomes. The plots and tables below let a reader check that conclusion component by component.
 
@@ -24,7 +24,7 @@ stratified_forest <- function(tab, title = "BMI-stratified intervention effects"
                         " (", round(tab$cil, 3), ", ", round(tab$ciu, 3), ")",
                         if ("chi_pval_adj" %in% names(tab)) paste0("<br>q: ", signif(tab$chi_pval_adj, 3)) else "",
                         if ("interaction_pvalue" %in% names(tab)) paste0("<br>p_interaction: ", signif(tab$interaction_pvalue, 3)) else "")
-  tab$panel <- factor(paste0(tab$study, " — ", tab$visit))
+  tab$panel <- factor(paste0(tab$study, ": ", tab$visit))
   p <- ggplot2::ggplot(tab,
                        ggplot2::aes(y = stats::reorder(label_f, est), x = est,
                                     color = subgroup, text = tooltip)) +
@@ -58,7 +58,7 @@ if (!is.null(bmi_df) && is.data.frame(bmi_df)) {
   primary <- bmi_df %>%
     dplyr::filter(outcome_group %in% c("primary","Primary","Macronutrients","Micronutrients","B-vitamins"))
   stratified_forest(primary,
-                    title = "Primary outcomes (macro / micro / B-vitamins) — BMI-stratified ATEs")
+                    title = "Primary outcomes (macro / micro / B-vitamins): BMI-stratified ATEs")
 }
 ```
 
@@ -67,7 +67,7 @@ if (!is.null(bmi_df) && is.data.frame(bmi_df)) {
   sec <- bmi_df %>%
     dplyr::filter(outcome_group %in% c("secondary","Secondary","HMOs","Bioactive proteins"))
   stratified_forest(sec,
-                    title = "Secondary outcomes (HMOs and bioactive proteins) — BMI-stratified ATEs")
+                    title = "Secondary outcomes (HMOs and bioactive proteins): BMI-stratified ATEs")
 }
 ```
 
@@ -76,7 +76,7 @@ if (!is.null(bmi_df) && is.data.frame(bmi_df)) {
   tert <- bmi_df %>%
     dplyr::filter(outcome_group %in% c("tertiary","Tertiary","Targeted metabolites"))
   stratified_forest(tert,
-                    title = "Tertiary outcomes (targeted metabolites) — BMI-stratified ATEs")
+                    title = "Tertiary outcomes (targeted metabolites): BMI-stratified ATEs")
 }
 ```
 

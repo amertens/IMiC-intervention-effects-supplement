@@ -51,13 +51,13 @@ make_traj_volcano <- function(df, cat_filter, title) {
 
 make_traj_volcano(traj_combined,
                   cat_filter = c("primary","Primary"),
-                  title = "Trajectory effects — primary outcomes")
+                  title = "Trajectory effects: primary outcomes")
 make_traj_volcano(traj_combined,
                   cat_filter = c("secondary","Secondary"),
-                  title = "Trajectory effects — secondary outcomes")
+                  title = "Trajectory effects: secondary outcomes")
 make_traj_volcano(traj_combined,
                   cat_filter = c("tertiary","Tertiary"),
-                  title = "Trajectory effects — tertiary outcomes (targeted metabolites)")
+                  title = "Trajectory effects: tertiary outcomes (targeted metabolites)")
 ```
 
 **Trajectory volcano plots.** Each point is the adjusted intervention effect on the visit-to-visit *change* in one milk component (primary, secondary, and tertiary outcomes shown separately), pooled intervention vs. control. The x-axis is the ATE (SD units) and the y-axis is −log~10~(*p*), with the dotted line marking *p* = 0.05. Points are coloured by significance tier. In the high-cardinality tertiary panel, the interactive plot shows the top features by raw *p*-value, and the full set is in the searchable table below. Trajectory analyses are exploratory.

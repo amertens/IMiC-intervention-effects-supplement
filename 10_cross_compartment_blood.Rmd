@@ -1,17 +1,17 @@
 # Cross-compartment analyses in maternal and infant blood
 
-This chapter reports the **cross-compartment** analyses conducted in the MISAME-III subset with paired **maternal plasma**, **maternal and infant dried-blood microsample (VAMS)** metabolomics, and **maternal blood proteomics**, alongside the milk measurements analysed elsewhere in this appendix. It supports the manuscript Results subsection *"Intervention effects are mirrored in maternal and infant circulation"* and corresponds to manuscript **Table S8**, **Table S9**, **Table S10**, and **Table S11** (§10.5's cross-compartment feature tracking and pathway enrichment, the basis for main-text **Fig. 6D**). The printed supplement carries **no figure** for this chapter: the blood cross-compartment exhibits were withdrawn from the submitted supplement, whose figures run S1–S5 only. Everything figure-shaped in this chapter is therefore **online-only** and is labelled as such.
+This chapter reports the **cross-compartment** analyses in the MISAME-III subset with paired **maternal plasma**, **maternal and infant dried-blood microsample (VAMS)** metabolomics, and **maternal blood proteomics**, alongside the milk measurements analysed elsewhere in this appendix. It supports the manuscript Results subsection *"Intervention effects are mirrored in maternal and infant circulation"* and corresponds to manuscript **Table S8**, **Table S9**, **Table S10**, and **Table S11** (§10.5's cross-compartment feature tracking and pathway enrichment, the basis for main-text **Fig. 6D**). The printed supplement carries **no figure** for this chapter: the blood cross-compartment exhibits were withdrawn from the submitted supplement, whose figures run S1–S5 only. Every figure in this chapter is therefore **online-only**, and labelled as such.
 
-**Scope.** The milk analyses in the rest of this appendix (§1–§9) pool all three trials (MISAME-III, Mumta-LW, ELICIT). The **blood and cross-compartment work in this chapter is MISAME-III only** — maternal plasma, dried-blood VAMS metabolomics, and blood proteomics were collected only in MISAME-III, so there is no Mumta-LW or ELICIT blood. MISAME-III used a 2×2 randomisation of prenatal × postnatal balanced energy–protein (BEP) supplementation, giving four arms (Control = IFA/IFA, prenatal-only = BEP/IFA, postnatal-only = IFA/BEP, both periods = BEP/BEP); the *postnatal* exposure is the lactation-period contrast of interest for milk-borne transfer.
+**Scope.** The milk analyses in the rest of this appendix (§1–§9) pool all three trials (MISAME-III, Mumta-LW, ELICIT). The **blood and cross-compartment work in this chapter is MISAME-III only**: maternal plasma, dried-blood VAMS metabolomics, and blood proteomics were collected only in MISAME-III, so there is no Mumta-LW or ELICIT blood. MISAME-III used a 2×2 randomisation of prenatal × postnatal balanced energy–protein (BEP) supplementation, giving four arms (Control = IFA/IFA, prenatal-only = BEP/IFA, postnatal-only = IFA/BEP, both periods = BEP/BEP); the *postnatal* exposure is the lactation-period contrast of interest for milk-borne transfer.
 
 > **Visit / timepoint legend.** Blood tables use MISAME-III visit codes; milk tables use calendar labels. `tri3` = third trimester · `incl` = enrolment · `acco` = birth/accouchement · `pn12` = 1–2 months postpartum · `pn34` = 3–4 months · `pn56` = 5–6 months. In prose we use plain "months"; the codes appear only in the data tables.
 
-Two framing constraints apply to every result below:
+Two constraints apply to every result below:
 
 - **Direction, not magnitude, is comparable across platforms.** Absolute feature intensities from milk, plasma, and the two VAMS matrices come from different instruments and normalisations, so they do **not** sit on a common scale. Every cross-compartment comparison therefore concerns only the **sign** (up/down) of the within-dataset intervention effect, never the size of an intensity.
 - **These analyses are exploratory.** The **adjusted** TMLE models are the primary basis here (unadjusted models are retained upstream as sensitivity), and where both an adjusted and unadjusted table exist the `*_adjusted` input is shown. Feature identities from the untargeted platforms are **putative** (mass-based, MSI level ≈ 3) unless otherwise stated.
 
-The single most reused number below: where maternal and infant blood shared one feature catalogue at 5–6 months, BEP-responsive features agreed in direction for **16 of 18** maternally-significant features. Alongside it, a **medium-chain acylcarnitine (*m/z* 286.202)** increased across milk, maternal blood, and infant blood — the directional cross-compartment result reported in the manuscript, and the framing used throughout this chapter.
+The most reused number below: where maternal and infant blood shared one feature catalogue at 5–6 months, BEP-responsive features agreed in direction for **16 of 18** maternally-significant features. Alongside it, a **medium-chain acylcarnitine (*m/z* 286.202)** increased across milk, maternal blood, and infant blood, the directional cross-compartment result the manuscript reports.
 
 > **Scope note (2026-08-27).** This chapter previously led with a named compound identity ("octenoylcarnitine") and a mediation estimate attributing roughly 30% of the infant effect to milk. Neither is claimed by the manuscript or by either response-to-reviewers letter, and the mediation additionally rested on the weakest link in the annotation: the mass-based, MS/MS-unconfirmed match between the milk feature and the infant-blood feature. **The mediation analysis has been withdrawn** and the compound is now named only by its mass. What remains is the result the manuscript reports: a medium-chain acylcarnitine (*m/z* 286.202) increased across milk, maternal blood, and infant blood, confined to the arms supplemented after birth.
 
@@ -51,7 +51,7 @@ cc_dt <- function(df, caption = NULL, page_length = 15, sci = NULL) {
 
 ## Intervention effects on the blood compartments {#cc-volcanoes}
 
-Each blood compartment was run through the same covariate-adjusted TMLE framework used for milk. The pre-rendered volcanoes below (combined intervention arms vs. control) plot the standardized effect against significance for each compartment, with FDR-significant features highlighted. Arm-stratified versions of each panel, along with the unadjusted variants, are produced by the upstream blood pipeline (`figures/blood_volcano/`).
+Each blood compartment was run through the same covariate-adjusted TMLE framework used for milk. For each compartment, the pre-rendered volcanoes below plot the standardized effect against significance under the combined intervention arms vs. control contrast, with FDR-significant features highlighted; arm-stratified versions of each panel, along with the unadjusted variants, are produced by the upstream blood pipeline (`figures/blood_volcano/`).
 
 The per-feature blood tables run to tens of thousands of rows, and the underlying clean objects are multi-GB and gitignored upstream, so the full per-feature interactive volcanoes are **not** rendered here. Each compartment is instead summarised by its count of FDR-significant features by visit, contrast, and direction; putative annotations of those features appear in §10.7.
 
@@ -74,7 +74,7 @@ ate <- read_cc("results/blood_compartment_all_FDRsig_ATE.csv")
 if (!is.null(ate) && nrow(ate)) {
   ## This CSV stacks four analyses in its `adjustment` (adjusted/unadjusted) and
   ## `arm_coding` (combined/stratified) columns. Restrict to the adjusted models
-  ## — the reporting basis, matching the volcanoes above — and split combined
+  ## (the reporting basis, matching the volcanoes above) and split combined
   ## from arm-stratified so the pooled "BEP" contrast is not mixed with the
   ## per-arm BEP/BEP, BEP/IFA, IFA/BEP contrasts.
   ate$direction <- ifelse(ate$est > 0, "up", "down")
@@ -89,10 +89,10 @@ if (!is.null(ate) && nrow(ate)) {
     s
   }
   htmltools::tagList(
-    htmltools::tags$p(htmltools::tags$strong("Combined arms (adjusted) — pooled intervention vs. control, the manuscript framing.")),
+    htmltools::tags$p(htmltools::tags$strong("Combined arms (adjusted): pooled intervention vs. control, the manuscript framing.")),
     nice_dt(summ_tab("combined"),
             caption = "FDR-significant blood features from the adjusted, combined-arm models, by compartment (dataset), visit, contrast, and direction (online-only; e.g. infant postnatal VAMS pn12/pn34/pn56 = 3/8/18). Visit codes: tri3 = 3rd-trimester, incl = enrolment, acco = birth, pn12/pn34/pn56 = postnatal months."),
-    htmltools::tags$p(htmltools::tags$strong("Arm-stratified (adjusted) — each randomised arm vs. control, supplement view.")),
+    htmltools::tags$p(htmltools::tags$strong("Arm-stratified (adjusted): each randomised arm vs. control, supplement view.")),
     nice_dt(summ_tab("stratified"),
             caption = "FDR-significant blood features from the adjusted, arm-stratified models (BEP/BEP = both periods, BEP/IFA = prenatal-only, IFA/BEP = postnatal-only, each vs. Control), by compartment, visit, contrast, and direction.")
   )
@@ -101,20 +101,20 @@ if (!is.null(ate) && nrow(ate)) {
 
 ## Cross-compartment concordance of BEP-responsive features {#cc-concordance}
 
-Do the features that respond to BEP move in the **same direction** in different compartments? For each directed comparison ("arrow", e.g. milk → maternal plasma) and contrast, we matched features across datasets and quantified concordance at a nominal threshold and threshold-free (rank–rank hypergeometric overlap, weighted correlation, directional GSEA, and an anchored subset restricted to jointly-significant features).
+This section tests whether features that respond to BEP move in the **same direction** in different compartments. For each directed comparison ("arrow", e.g. milk → maternal plasma) and contrast, we matched features across datasets and quantified concordance at a nominal threshold and threshold-free (rank–rank hypergeometric overlap, weighted correlation, directional GSEA, and an anchored subset restricted to jointly-significant features).
 
 **How features are matched (ppm-only).** Cross-platform matching uses **accurate mass and ionisation mode only**, applying Kim's experimental-over-experimental tolerance
 
 $$\text{ppm} = \frac{|m_1 - m_2|}{m}\times 10^{6} \le 25,$$
 
-where both masses are measured (there is no theoretical/reference mass in the denominator). Retention time was made **optional** and is *not* used in the first-pass match. This deliberately departs from Kim's advice to keep RT, because the platforms run different chromatography; RT re-enters only as an annotation-support check for the carnitine feature (§10.4). Two consequences follow, and both are load-bearing for interpretation:
+where both masses are measured (there is no theoretical/reference mass in the denominator). Retention time was made **optional** and is *not* used in the first-pass match. This deliberately departs from Kim's advice to keep RT, because the platforms run different chromatography; RT re-enters only as an annotation-support check for the carnitine feature (§10.4). Two consequences follow, both load-bearing:
 
 - **±25 ppm is a hypothesis-generation screen, not proof of same-molecule identity.** A 25-ppm, RT-free match on untargeted data can pair isobaric but chemically distinct features. Every cross-platform, mass-only match here is therefore **putative** and pending Kim-level annotation.
 - **Identity-anchored links are far stronger than mass-only links.** Where maternal and infant postnatal VAMS share one feature catalogue, matches are by shared identifier (like-for-like), not by mass.
 
-> **Matching-confidence ladder (how much to trust each link).** Three kinds of link appear in this chapter, in decreasing reliability: **(1) shared identifier** — maternal ↔ infant VAMS, the same catalogue, an exact-feature match; **(2) same-method mass** — datasets on the same chromatography (e.g. milk / plasma / prenatal VAMS), where a ±25 ppm match is well-behaved; **(3) cross-method mass** — anything matched to postnatal VAMS across chromatography, where a ±25 ppm mass-only match is identity-uncertain and needs annotation. Read tier-3 rows as leads to confirm, not as established identities.
+> **Matching-confidence ladder (how much to trust each link).** Three kinds of link appear in this chapter, in decreasing reliability: **(1) shared identifier**, maternal ↔ infant VAMS, the same catalogue, an exact-feature match; **(2) same-method mass**, datasets on the same chromatography (e.g. milk / plasma / prenatal VAMS), where a ±25 ppm match is well-behaved; **(3) cross-method mass**, anything matched to postnatal VAMS across chromatography, where a ±25 ppm mass-only match is identity-uncertain and needs annotation. Read tier-3 rows as leads to confirm, not as established identities.
 
-> **Interpretation note.** Concordance is strongest where feature identity is *anchored* — maternal and infant VAMS share a single catalogue, so their agreement (16 of 18 maternally-significant features at 5–6 months) reflects like-for-like features. Cross-platform mass-matching is near chance in bulk; only the jointly-FDR-significant subset is essentially fully concordant. Read the bulk mass-matched percentages as a floor, not a biological effect size.
+> **Interpretation note.** Concordance is strongest where feature identity is *anchored*: maternal and infant VAMS share a single catalogue, so their agreement (16 of 18 maternally-significant features at 5–6 months) reflects like-for-like features. Cross-platform mass-matching is near chance in bulk; only the jointly-FDR-significant subset is essentially fully concordant. Read the bulk mass-matched percentages as a floor, not a biological effect size.
 
 ```{r cc-concordance-fig, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%", fig.show="hold"}
 safe_img("figures/cross_compartment/fig_concordance_scatter.png", "concordance scatter")
@@ -143,7 +143,7 @@ cc_dt(read_cc("results/cross_compartment_matching_sensitivity.csv"),
       caption = "Sensitivity of concordance to the mass-matching tolerance and anchoring choices.")
 ```
 
-*The full per-pair matched-feature tables (`cross_compartment_metab_*_adjusted.csv`, tens of thousands of rows each) are not shipped with this appendix — they are too large to render or download usefully; the per-arrow summaries above and the paired scatter figures (`figures/cross_compartment/metab_*_adjusted.png`) capture their content, and the full tables can be regenerated from the upstream blood pipeline.*
+*The full per-pair matched-feature tables (`cross_compartment_metab_*_adjusted.csv`, tens of thousands of rows each) are not shipped with this appendix, being too large to render or download usefully; the per-arrow summaries above and the paired scatter figures (`figures/cross_compartment/metab_*_adjusted.png`) capture their content, and the full tables can be regenerated from the upstream blood pipeline.*
 
 ## Selenoproteins concordantly increased in milk and maternal blood {#cc-selenoproteins}
 
@@ -173,21 +173,19 @@ cc_dt(read_cc("results/cross_compartment_proteome_overlap_adjusted.csv"), page_l
 
 ## Medium-chain acylcarnitine (*m/z* 286.202) across compartments {#cc-carnitine}
 
-The clearest transfer signal is a **medium-chain acylcarnitine feature at *m/z* 286.202**. It is intrinsically an **arm-stratified** result: the effect is **confined to the arms that received BEP after birth** and is absent in the prenatal-only arm.
+The clearest transfer signal is a **medium-chain acylcarnitine feature at *m/z* 286.202**. The result is **arm-stratified**: the effect is **confined to the arms that received BEP after birth** and absent in the prenatal-only arm.
 
 > **What the manuscript claims.** The manuscript's claim for this feature is **directional only**: a medium-chain acylcarnitine (*m/z* 286.202) increased across milk, maternal blood, and infant blood. It deliberately does **not** name the compound, because the identity is mass-based and unconfirmed (see the identity caveat below). This section reports that directional result and the evidence bearing on the compound's identity, and nothing beyond it.
 
 **Arm-stratified infant blood at 1–2 months (pn12), the contemporaneous lead.** Against Control (IFA/IFA), the *m/z* 286.202 feature is FDR-significantly increased in the two postnatally-supplemented arms and **not** in the prenatal-only arm:
 
-- **IFA/BEP** (postnatal-only): **+1.27 SD** (95% CI 1.00, 1.55; two co-eluting split features at 286.202, +1.26 and +1.27) — the largest effect;
+- **IFA/BEP** (postnatal-only): **+1.27 SD** (95% CI 1.00, 1.55; two co-eluting split features at 286.202, +1.26 and +1.27), the largest effect;
 - **BEP/BEP** (both periods): **+0.90 SD** (95% CI 0.64, 1.17);
 - **BEP/IFA** (prenatal-only): **not FDR-significant** (no 286.202 signal).
 
 (Per-arm analytic *n* at infant pn12: Control 78, IFA/BEP 86, BEP/IFA 57, BEP/BEP 64, all estimable.) A signal that is largest in the postnatal-only arm and null in the prenatal-only arm is the pattern expected of a **postnatal, milk-borne transfer** rather than prenatal carryover. Under the pooled postnatal-BEP contrast the same feature is increased in every measured compartment (milk **+0.95**, maternal plasma **+1.33**, postnatal maternal VAMS **+0.78**, infant VAMS **+1.04** SD); the pn34/pn56 visits are consistent but subordinate to this contemporaneous pn12 result.
 
-This directional, three-compartment increase is the result the manuscript reports.
-
-> **Identity caveat.** The *m/z* 286.202 assignment is provisional and mass-based, which is why the manuscript names no compound. Three in-repo checks (accurate mass, co-feature search, homolog elution order — mass/RT only, **no MS/MS**) favour octenoylcarnitine over the near-twin octanoylcarnitine (the feature sits within ~2.5 ppm of octenoylcarnitine [M+H]⁺ on the VAMS catalogue, and octanoylcarnitine resolves as a separate feature). But the targeted Biocrates panel does **not** corroborate a named acylcarnitine (octanoylcarnitine is null; the acylcarnitine composition is unshifted, all changes < 6%), and — most importantly for any milk → infant inference — the **milk-side feature sits ~11 ppm off the milk homolog ladder**. The milk → infant identity link therefore awaits Kim-level MS/MS annotation, and any claim resting on that link inherits this uncertainty.
+> **Identity caveat.** The *m/z* 286.202 assignment is provisional and mass-based, which is why the manuscript names no compound. Three in-repo checks (accurate mass, co-feature search, homolog elution order, mass/RT only, **no MS/MS**) favour octenoylcarnitine over the near-twin octanoylcarnitine (the feature sits within ~2.5 ppm of octenoylcarnitine [M+H]⁺ on the VAMS catalogue, and octanoylcarnitine resolves as a separate feature). But the targeted Biocrates panel does **not** corroborate a named acylcarnitine (octanoylcarnitine is null; the acylcarnitine composition is unshifted, all changes < 6%), and, most importantly for any milk → infant inference, the **milk-side feature sits ~11 ppm off the milk homolog ladder**. The milk → infant identity link therefore awaits Kim-level MS/MS annotation, and any claim resting on that link inherits this uncertainty.
 
 ```{r cc-carnitine-strat-fig, echo=FALSE, message=FALSE, warning=FALSE, out.width="70%", fig.align="center"}
 safe_img("figures/blood_volcano/blood_volcano_adjusted_stratified_VamsPostnatalInfant.png",
@@ -206,9 +204,9 @@ safe_img("figures/cross_compartment/fig_D_targeted_vs_untargeted_acylcarnitine.p
 
 ### Targeted-panel cross-validation and annotation support {#cc-carnitine-targeted}
 
-These tables are the evidence behind the identity caveat above: how the responsive untargeted feature
+These tables are the evidence behind the identity caveat: how the responsive untargeted feature
 compares with the named acylcarnitines on the targeted Biocrates panel, and what mass/retention-time
-support exists for the provisional assignment across platforms.
+support exists for the provisional assignment.
 
 ```{r cc-carnitine-targeted, echo=FALSE, message=FALSE, warning=FALSE}
 cc_dt(read_cc("results/targeted_carnitine_crossvalidation.csv"),
@@ -223,7 +221,7 @@ cc_dt(read_cc("results/carnitine_annotation_support.csv"), page_length = 10,
 
 ## Cross-compartment feature tracking and pathway enrichment (Fig. 6D, Table S11) {#cc-tracking}
 
-Where §10.2–§10.4 above test concordance and transfer for specific matched-feature pairs, this section asks a broader question: across **all** BEP-up features detected in ≥2 of milk, maternal blood, and infant blood, which molecules recur, and what pathways do they implicate? Features here are grouped by **putative name** (Dailey-Chwalibóg's original method, matched across compartment × visit cells), a stricter, identity-anchored criterion than the ±25 ppm mass-only matching used in §10.2.
+Where §10.2–§10.4 above test concordance and transfer for specific matched-feature pairs, this section covers **all** BEP-up features detected in ≥2 of milk, maternal blood, and infant blood: which molecules recur, and what pathways they implicate. Features here are grouped by **putative name** (Dailey-Chwalibóg's original method, matched across compartment × visit cells), a stricter, identity-anchored criterion than the ±25 ppm mass-only matching used in §10.2.
 
 ```{r cc-tracking-volcano-fig, echo=FALSE, message=FALSE, warning=FALSE, out.width="90%", fig.align="center"}
 safe_img("figures/cross_compartment/figureS11_crosscompartment_volcanoes.png", "cross-compartment volcano grid")
@@ -231,29 +229,29 @@ safe_img("figures/cross_compartment/figureS11_crosscompartment_volcanoes.png", "
 
 ***Figure (online-only).** Adjusted intervention-effect volcanoes for milk, maternal blood, and infant blood, with the cross-compartment-tracked features (below) highlighted.*
 
-**Twenty** BEP-up features are detected in **≥2** of the three compartments (of 27 compartment × visit cells tracked in the figure below); **16 (80.0%)** of these are reliably detected in the BEP-supplement composition itself (the §10.8 provenance framing applies here too — detection in the product does not by itself imply direct dietary passage rather than a maternal metabolic response). Only **two** features recur in **all three** compartments (maternal blood, milk, and infant blood): **citrate** and **4-hydroxy-2-oxoglutarate**.
+**Twenty** BEP-up features are detected in **≥2** of the three compartments (of 27 compartment × visit cells tracked in the figure below); **16 (80.0%)** of these are reliably detected in the BEP-supplement composition itself (the §10.8 provenance framing applies here too: detection in the product does not by itself imply direct dietary passage rather than a maternal metabolic response). Only **two** features recur in **all three** compartments (maternal blood, milk, and infant blood): **citrate** and **4-hydroxy-2-oxoglutarate**.
 
 ```{r cc-tracking-fig, echo=FALSE, message=FALSE, warning=FALSE, out.width="70%", fig.align="center"}
 safe_img("figures/cross_compartment/figureS10_compartment_tracking.png", "cross-compartment feature tracking")
 ```
 
-***Figure (supplementary — not assigned a main-text or print-supplement figure number in this revision; see the appendix Overview's numbering note).** Every BEP-up feature tracked across ≥2 of milk, maternal blood, and infant blood, grouped by putative name. Features spanning all three compartments (citrate, 4-hydroxy-2-oxoglutarate) are marked.*
+***Figure (supplementary; not assigned a main-text or print-supplement figure number in this revision, see the appendix Overview's numbering note).** Every BEP-up feature tracked across ≥2 of milk, maternal blood, and infant blood, grouped by putative name. Features spanning all three compartments (citrate, 4-hydroxy-2-oxoglutarate) are marked.*
 
-The complete row-level tracking data — compartment, visit, effect size, direction, and BEP-supplement match status for every tracked feature — is below.
+The complete row-level tracking data (compartment, visit, effect size, direction, and BEP-supplement match status for every tracked feature) is below.
 
 ```{r cc-tracking-table, echo=FALSE, message=FALSE, warning=FALSE}
 cc_dt(read_cc("results/compartment_tracking/trenton_linked_crosscompartment.csv"), page_length = 15,
       caption = "Every feature tracked across ≥2 compartments, by compartment, visit, effect size, direction, and BEP-supplement match status (name-based grouping).")
 ```
 
-**Pathway enrichment over the tracked features (manuscript Table S11).** The cross-compartment-tracked features (18 named query compounds, a superset of the 20 above; 17 successfully mapped to KEGG) were tested for pathway over-representation (mummichog, offline KEGG `metpa` library). **Fourteen** pathways are returned; none survive FDR correction (all *Q* ≈ 1 except the top row, *Q* = 0.33) — read this, like the blood Mummichog in §10.6 below, as a hypothesis-generating, direction-agnostic screen, not a confirmed pathway effect.
+**Pathway enrichment over the tracked features (manuscript Table S11).** The cross-compartment-tracked features (18 named query compounds, a superset of the 20 above; 17 successfully mapped to KEGG) were tested for pathway over-representation (mummichog, offline KEGG `metpa` library). **Fourteen** pathways are returned; none survive FDR correction (all *Q* ≈ 1 except the top row, *Q* = 0.33). Read this, like the blood Mummichog in §10.6 below, as a hypothesis-generating, direction-agnostic screen, not a confirmed pathway effect.
 
 ```{r cc-tracking-pathways, echo=FALSE, message=FALSE, warning=FALSE}
 cc_dt(read_cc("results/tables/table_s11_compartment_pathway.csv"), page_length = 15, sci = c("raw_p", "fdr"),
-      caption = "Table S11 — pathway over-representation among cross-compartment-tracked features (mummichog, offline KEGG metpa library), with the driving putative metabolite(s) for each pathway row.")
+      caption = "Table S11: pathway over-representation among cross-compartment-tracked features (mummichog, offline KEGG metpa library), with the driving putative metabolite(s) for each pathway row.")
 ```
 
-> **Two things this table does and does not support.** (1) The nicotinate/nicotinamide pathway **is** represented (driven by N1-methyl-2-pyridone-5-carboxamide, a niacin catabolite) — the pathway-level echo of the manuscript's vitamin-B3/nicotinamide finding. (2) **No ascorbate/vitamin-C pathway row exists here.** Dehydroascorbate is a tracked, reliably supplement-matched feature (milk → infant blood), but the offline KEGG `metpa` library does not map dehydroascorbate or ascorbate to any pathway, so a vitamin-C pathway signal cannot be recovered from this analysis — a reference-library limitation, not evidence against a vitamin-C effect.
+> **Two things this table does and does not support.** (1) The nicotinate/nicotinamide pathway **is** represented (driven by N1-methyl-2-pyridone-5-carboxamide, a niacin catabolite), the pathway-level echo of the manuscript's vitamin-B3/nicotinamide finding. (2) **No ascorbate/vitamin-C pathway row exists here.** Dehydroascorbate is a tracked, reliably supplement-matched feature (milk → infant blood), but the offline KEGG `metpa` library does not map dehydroascorbate or ascorbate to any pathway, so a vitamin-C pathway signal cannot be recovered from this analysis; this is a reference-library limitation, not evidence against a vitamin-C effect.
 
 The full query-compound list submitted to the pathway search (a superset of the tracked-feature list) is below.
 
@@ -266,12 +264,12 @@ cc_dt(read_cc("results/compartment_tracking/trenton_pathway_compound_list.csv"),
 
 ## Pathway-level signals across compartments {#cc-pathways}
 
-> **Exploratory — read as hypothesis, not confirmation.** Mummichog pathway enrichment is direction-agnostic and unstable on the short feature lists here (3–18 features per stratum); it is putative-annotation / hypothesis-generation only. The load-bearing cross-compartment results are the identity-anchored concordance (§10.2), the selenoprotein chain (§10.3), and the directional three-compartment increase in the *m/z* 286.202 acylcarnitine (§10.4) above — not the pathway enrichment below.
+> **Exploratory: read as hypothesis, not confirmation.** Mummichog pathway enrichment is direction-agnostic and unstable on the short feature lists here (3–18 features per stratum); it is putative-annotation / hypothesis-generation only. The load-bearing cross-compartment results are the identity-anchored concordance (§10.2), the selenoprotein chain (§10.3), and the directional three-compartment increase in the *m/z* 286.202 acylcarnitine (§10.4) above, not the pathway enrichment below.
 
-We ran three complementary analyses on the blood and milk feature lists: direction-agnostic **Mummichog** pathway enrichment, **signed sign-tests** of pathway direction, and — for the maternal-blood platforms — **chemical-class** over-representation. They must be read at different evidential weights:
+We ran three complementary analyses on the blood and milk feature lists: direction-agnostic **Mummichog** pathway enrichment, **signed sign-tests** of pathway direction, and, for the maternal-blood platforms, **chemical-class** over-representation. They carry different evidential weight:
 
-- **The blood Mummichog is nominal only — no pathway survives FDR.** In the adjusted models the lowest-FDR blood pathway is *androgen and estrogen biosynthesis and metabolism* (raw *p* ≈ 5 × 10⁻⁴, *Q* ≈ 0.06), and every other pathway sits above it; the direction-agnostic Mummichog enrichment simply does not clear multiple testing in blood. Treat the pathway grid below as directional corroboration, not as an FDR-significant finding.
-- **The FDR-significant maternal-blood result is at the chemical-class level.** Testing over-representation of curated compound classes among the BEP-responsive features, maternal plasma shows **oxylipins** (*Q* ≈ 0.005) and **free fatty acids and conjugates** (*Q* ≈ 0.005) enriched among *up*-regulated features and **acylcarnitines** enriched among *down*-regulated features (*Q* ≈ 0.03), while maternal postnatal VAMS shows **phosphoethanolamines** enriched *up* (*Q* ≈ 0.03) and **diglycerides** enriched *down* (*Q* ≈ 0.02) — all surviving FDR.
+- **The blood Mummichog is nominal only; no pathway survives FDR.** In the adjusted models the lowest-FDR blood pathway is *androgen and estrogen biosynthesis and metabolism* (raw *p* ≈ 5 × 10⁻⁴, *Q* ≈ 0.06), and every other pathway sits above it; the direction-agnostic Mummichog enrichment simply does not clear multiple testing in blood. Treat the pathway grid below as directional corroboration, not as an FDR-significant finding.
+- **The FDR-significant maternal-blood result is at the chemical-class level.** Testing over-representation of curated compound classes among the BEP-responsive features, maternal plasma shows **oxylipins** (*Q* ≈ 0.005) and **free fatty acids and conjugates** (*Q* ≈ 0.005) enriched among *up*-regulated features and **acylcarnitines** enriched among *down*-regulated features (*Q* ≈ 0.03), while maternal postnatal VAMS shows **phosphoethanolamines** enriched *up* (*Q* ≈ 0.03) and **diglycerides** enriched *down* (*Q* ≈ 0.02), all surviving FDR.
 - **The signed sign-tests tie the two together** into a coherent **fat-synthesis redistribution**: de novo fatty-acid biosynthesis and related lipid pathways are **down in milk** but **up in maternal blood**, consistent with mothers making less milk fat themselves and drawing more on circulating or dietary fat (raised oxylipins / free fatty acids), and it holds across the three milk timepoints. The Mummichog grid is directionally consistent with this but, on its own, does not reach FDR.
 
 ```{r cc-pathway-figs, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%", fig.show="hold"}
@@ -279,9 +277,9 @@ safe_img("figures/cross_compartment/pathway_milk_vs_blood_adjusted.png", "pathwa
 safe_img("figures/cross_compartment/fig_G_signed_pathway_heatmap.png", "signed pathway heatmap")
 ```
 
-***Figure.** Left: pathway enrichment, milk vs. maternal blood (adjusted). Right: signed-direction heatmap — milk lipid pathways down (negative), maternal-blood lipid pathways up (positive).*
+***Figure.** Left: pathway enrichment, milk vs. maternal blood (adjusted). Right: signed-direction heatmap, with milk lipid pathways down (negative) and maternal-blood lipid pathways up (positive).*
 
-**Chemical-class enrichment (the FDR-significant maternal-blood result).** The tables below give the compound-class over-representation among BEP-responsive maternal-blood features — the non-directional test (is a class enriched among responsive features at all?) and its directional split (up- vs down-regulated). The FDR-significant classes are named in the section intro above; this is the pathway-level result in blood that actually survives multiple-testing correction, unlike the Mummichog grid.
+**Chemical-class enrichment (the FDR-significant maternal-blood result).** The tables below give the compound-class over-representation among BEP-responsive maternal-blood features: the non-directional test (is a class enriched among responsive features at all?) and its directional split (up- vs down-regulated). The FDR-significant classes are named in the section intro above; this is the pathway-level result in blood that actually survives multiple-testing correction, unlike the Mummichog grid.
 
 ```{r cc-class-fig, echo=FALSE, message=FALSE, warning=FALSE, out.width="70%", fig.align="center"}
 safe_img("figures/cross_compartment/blood_class_enrichment_figure.png", "blood chemical-class enrichment")
@@ -303,7 +301,7 @@ ced <- read_cc("results/blood_chemical_class_enrichment_directional.csv")
 if (!is.null(ced) && nrow(ced)) {
   ced <- ced %>% dplyr::arrange(.data[["fdr"]])
   cc_dt(ced, page_length = 15, sci = c("p", "fdr"),
-        caption = "Chemical-class over-representation split by direction of effect. FDR-significant (Q<0.05): maternal plasma — oxylipins up, free fatty acids up, acylcarnitines down; maternal postnatal VAMS — phosphoethanolamines up, diglycerides down.")
+        caption = "Chemical-class over-representation split by direction of effect. FDR-significant (Q<0.05): maternal plasma: oxylipins up, free fatty acids up, acylcarnitines down; maternal postnatal VAMS: phosphoethanolamines up, diglycerides down.")
 }
 ```
 
@@ -317,7 +315,7 @@ if (!is.null(bm) && nrow(bm)) {
   n_sig  <- sum(bm[[fdrcol]] < 0.05, na.rm = TRUE)
   bm_top <- bm %>% dplyr::arrange(.data[[ordcol]]) %>% dplyr::slice_head(n = 40)
   top_path <- as.character(bm_top[[intersect(c("pathway","Pathway"), names(bm))[1]]][1])
-  cat(sprintf("\n*No blood-compartment Mummichog pathway reached FDR significance in the adjusted models (%d of %s strata at Q<0.05); the lowest-FDR pathway is %s (Q ≈ %.2f). The direction-agnostic enrichment is weak in blood — the FDR-significant blood result is the chemical-class enrichment above, and the directional signal is carried by the signed sign-tests below. The 40 lowest-p strata are shown.*\n\n",
+  cat(sprintf("\n*No blood-compartment Mummichog pathway reached FDR significance in the adjusted models (%d of %s strata at Q<0.05); the lowest-FDR pathway is %s (Q ≈ %.2f). The direction-agnostic enrichment is weak in blood; the FDR-significant blood result is the chemical-class enrichment above, and the directional signal is carried by the signed sign-tests below. The 40 lowest-p strata are shown.*\n\n",
               n_sig, format(nrow(bm), big.mark = ","), top_path, min(bm[[fdrcol]], na.rm = TRUE)))
 }
 ```
@@ -328,7 +326,7 @@ if (!is.null(bm) && nrow(bm)) {
 ## why this table silently failed to appear in earlier builds.
 if (exists("bm_top") && !is.null(bm_top) && nrow(bm_top))
   cc_dt(bm_top, page_length = 15,
-        caption = "Blood-compartment Mummichog pathway enrichment (adjusted), 40 lowest-p strata (nominal only — none survive FDR).")
+        caption = "Blood-compartment Mummichog pathway enrichment (adjusted), 40 lowest-p strata (nominal only; none survive FDR).")
 ```
 
 ```{r cc-signed-pathways, echo=FALSE, message=FALSE, warning=FALSE}
@@ -344,7 +342,7 @@ cc_dt(read_cc("results/cross_compartment_pathways_adjusted.csv"), page_length = 
 
 ## Putative annotation of FDR-significant features {#cc-annotation}
 
-Because the metabolomic platforms are untargeted, the FDR-significant features carry only **putative** annotations, assigned by accurate mass against reference libraries (MSI level ≈ 3), with most features returning several candidates or none. The tables below list the mass-based candidate annotations for the blood and milk FDR-significant features; the curated milk list includes ~48 named metabolites (e.g. pantothenate/B5, ascorbate, fumarate). Treat every name as provisional. The fuller, finalized milk-side annotation — all 1,034 FDR-significant untargeted milk features, with named-vs-unresolved counts by direction and ionisation mode — is in the [feature-level putative annotation](#path-mummichog-annotation) subsection of §9.
+Because the metabolomic platforms are untargeted, the FDR-significant features carry only **putative** annotations, assigned by accurate mass against reference libraries (MSI level ≈ 3), with most features returning several candidates or none. The tables below list the mass-based candidate annotations for the blood and milk FDR-significant features; the curated milk list includes ~48 named metabolites (e.g. pantothenate/B5, ascorbate, fumarate). Treat every name as provisional. The fuller, finalized milk-side annotation, covering all 1,034 FDR-significant untargeted milk features with named-vs-unresolved counts by direction and ionisation mode, is in the [feature-level putative annotation](#path-mummichog-annotation) subsection of §9.
 
 The interactive **feature map** below plots each FDR-significant milk feature by its *m/z* against its standardized effect, coloured by direction. Brush a mass region (Plotly *Box Select*) to filter the annotation table to those features, or use the dropdowns; this is the quickest way to see which masses carry the up- vs down-regulated signal and read their putative names.
 
@@ -352,7 +350,7 @@ The interactive **feature map** below plots each FDR-significant milk feature by
 milk_ann <- read_cc("results/milk_fdr_sig_putative_annotation.csv")
 linked_scatter_table(milk_ann, x_col = "mz", y_col = "est",
                      color_col = "direction", key_col = "feature",
-                     title = "Milk FDR-significant features — m/z vs. effect (brush to filter the table)",
+                     title = "Milk FDR-significant features: m/z vs. effect (brush to filter the table)",
                      x_lab = "m/z", y_lab = "Effect (SD units)",
                      filter_cols = c("visit", "contrast", "direction", "mode"),
                      show_cols = c("visit","contrast","direction","curated_name",
@@ -419,5 +417,5 @@ The manuscript's consolidated cross-compartment table, reproduced here in full a
 
 ```{r cc-table-s8, echo=FALSE, message=FALSE, warning=FALSE}
 nice_dt(read_cc("results/table_s8_cross_compartment.csv"),
-        caption = "Manuscript Table S8 — cross-compartment BEP-responsive features (MISAME-III): panels A (features up in both maternal and infant blood), B (the m/z 286.202 medium-chain acylcarnitine across compartments), and C (selenoproteins, milk vs. maternal blood). Values are ΔSD (q).")
+        caption = "Manuscript Table S8: cross-compartment BEP-responsive features (MISAME-III): panels A (features up in both maternal and infant blood), B (the m/z 286.202 medium-chain acylcarnitine across compartments), and C (selenoproteins, milk vs. maternal blood). Values are ΔSD (q).")
 ```

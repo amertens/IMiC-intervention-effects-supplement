@@ -17,7 +17,7 @@ source(here::here("functions.R"))
 
 ## Render the forest plot and the searchable estimates table for one CSV.
 ## Returns an htmltools tagList so that htmlwidgets (plotly and DT) are picked
-## up by knit_print at the chunk top level — print() of widgets from inside
+## up by knit_print at the chunk top level, since print() of widgets from inside
 ## a function does not trigger the htmlwidget rendering path.
 show_forest_and_table <- function(csv_path, arm_strat = FALSE, title = NULL,
                                   fig_legend = NULL, tab_caption = NULL) {
@@ -35,7 +35,7 @@ show_forest_and_table <- function(csv_path, arm_strat = FALSE, title = NULL,
   htmltools::tagList(
     forest_plot(df, arm_strat = arm_strat, title = ttl),
     htmltools::tags$p(htmltools::tags$strong("Figure legend. "), htmltools::tags$em(legend)),
-    clean_tab(df, caption = tab_caption %||% paste0("Adjusted ATEs, 95% CIs, and FDR-adjusted q-values — ", ttl, "."))
+    clean_tab(df, caption = tab_caption %||% paste0("Adjusted ATEs, 95% CIs, and FDR-adjusted q-values: ", ttl, "."))
   )
 }
 ```
@@ -79,7 +79,7 @@ if (isTRUE(metadata_loaded) && exists("all_milk_components")) {
 
 ## Interactive effect explorer {#effect-explorer-app}
 
-The app below brings every primary, secondary, and tertiary intervention effect into one place. Choose an outcome group, switch between **standardised (SD) and native assay units**, filter by study, visit, and combined-vs-arm-stratified contrasts, and move between volcano, forest, and table views. It runs entirely in your browser through a WebAssembly build of R — no server — so the first load fetches the R runtime and takes a moment, after which it responds instantly. If the frame is cramped, [open the explorer full-screen in a new tab](apps/effect-explorer/).
+The app below brings every primary, secondary, and tertiary intervention effect into one place. Choose an outcome group, switch between **standardised (SD) and native assay units**, filter by study, visit, and combined-vs-arm-stratified contrasts, and move between volcano, forest, and table views. It runs entirely in your browser through a WebAssembly build of R, with no server, so the first load fetches the R runtime and takes a moment; after that it responds instantly. If the frame is cramped, [open the explorer full-screen in a new tab](apps/effect-explorer/).
 
 ```{r effect-explorer-embed, echo=FALSE, results='asis'}
 if (knitr::is_html_output()) {
@@ -99,7 +99,7 @@ if (knitr::is_html_output()) {
 
 ```{r effects-macro-combined, echo=FALSE, message=FALSE, warning=FALSE, fig.height=8}
 show_forest_and_table("results/subsetted results/primary_macro.csv",
-                      title = "Macronutrients — pooled intervention vs. control")
+                      title = "Macronutrients: pooled intervention vs. control")
 ```
 
 ### Stratified by randomized arm
@@ -107,7 +107,7 @@ show_forest_and_table("results/subsetted results/primary_macro.csv",
 ```{r effects-macro-strat, echo=FALSE, message=FALSE, warning=FALSE, fig.height=8}
 show_forest_and_table("results/subsetted results/primary_macro_arm_strat.csv",
                       arm_strat = TRUE,
-                      title = "Macronutrients — per-arm contrasts vs. control")
+                      title = "Macronutrients: per-arm contrasts vs. control")
 ```
 
 ## Micronutrients (including fat-soluble vitamins)
@@ -116,7 +116,7 @@ show_forest_and_table("results/subsetted results/primary_macro_arm_strat.csv",
 
 ```{r effects-micro-combined, echo=FALSE, message=FALSE, warning=FALSE, fig.height=12}
 show_forest_and_table("results/subsetted results/primary_micro.csv",
-                      title = "Micronutrients — pooled intervention vs. control")
+                      title = "Micronutrients: pooled intervention vs. control")
 ```
 
 ### Stratified by randomized arm
@@ -124,7 +124,7 @@ show_forest_and_table("results/subsetted results/primary_micro.csv",
 ```{r effects-micro-strat, echo=FALSE, message=FALSE, warning=FALSE, fig.height=12}
 show_forest_and_table("results/subsetted results/primary_micro_arm_strat.csv",
                       arm_strat = TRUE,
-                      title = "Micronutrients — per-arm contrasts vs. control")
+                      title = "Micronutrients: per-arm contrasts vs. control")
 ```
 
 ## B-vitamins
@@ -133,7 +133,7 @@ show_forest_and_table("results/subsetted results/primary_micro_arm_strat.csv",
 
 ```{r effects-bvit-combined, echo=FALSE, message=FALSE, warning=FALSE, fig.height=12}
 show_forest_and_table("results/subsetted results/primary_bvit.csv",
-                      title = "B-vitamins — pooled intervention vs. control")
+                      title = "B-vitamins: pooled intervention vs. control")
 ```
 
 ### Stratified by randomized arm
@@ -141,7 +141,7 @@ show_forest_and_table("results/subsetted results/primary_bvit.csv",
 ```{r effects-bvit-strat, echo=FALSE, message=FALSE, warning=FALSE, fig.height=12}
 show_forest_and_table("results/subsetted results/primary_bvit_arm_strat.csv",
                       arm_strat = TRUE,
-                      title = "B-vitamins — per-arm contrasts vs. control")
+                      title = "B-vitamins: per-arm contrasts vs. control")
 ```
 
 ## Human milk oligosaccharides (HMOs)
@@ -150,7 +150,7 @@ show_forest_and_table("results/subsetted results/primary_bvit_arm_strat.csv",
 
 ```{r effects-hmo-combined, echo=FALSE, message=FALSE, warning=FALSE, fig.height=12}
 show_forest_and_table("results/subsetted results/secondary_hmo.csv",
-                      title = "HMOs — pooled intervention vs. control")
+                      title = "HMOs: pooled intervention vs. control")
 ```
 
 ### Stratified by randomized arm
@@ -158,7 +158,7 @@ show_forest_and_table("results/subsetted results/secondary_hmo.csv",
 ```{r effects-hmo-strat, echo=FALSE, message=FALSE, warning=FALSE, fig.height=12}
 show_forest_and_table("results/subsetted results/secondary_hmo_arm_strat.csv",
                       arm_strat = TRUE,
-                      title = "HMOs — per-arm contrasts vs. control")
+                      title = "HMOs: per-arm contrasts vs. control")
 ```
 
 ## Bioactive proteins
@@ -167,7 +167,7 @@ show_forest_and_table("results/subsetted results/secondary_hmo_arm_strat.csv",
 
 ```{r effects-bio-combined, echo=FALSE, message=FALSE, warning=FALSE, fig.height=12}
 show_forest_and_table("results/subsetted results/secondary_bioactives.csv",
-                      title = "Bioactive proteins — pooled intervention vs. control")
+                      title = "Bioactive proteins: pooled intervention vs. control")
 ```
 
 ### Stratified by randomized arm
@@ -175,7 +175,7 @@ show_forest_and_table("results/subsetted results/secondary_bioactives.csv",
 ```{r effects-bio-strat, echo=FALSE, message=FALSE, warning=FALSE, fig.height=12}
 show_forest_and_table("results/subsetted results/secondary_bioactives_arm_strat.csv",
                       arm_strat = TRUE,
-                      title = "Bioactive proteins — per-arm contrasts vs. control")
+                      title = "Bioactive proteins: per-arm contrasts vs. control")
 ```
 
 ## Targeted metabolites (tertiary outcomes)
@@ -189,14 +189,14 @@ Because the targeted panel has thousands of metabolite estimates, the linked vie
 ```{r effects-tertiary-linked, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7}
 df_ter <- safe_read_csv(here::here("results/subsetted results/tertiary_targeted_metabolomics.csv"))
 linked_volcano_table(df_ter,
-                     title = "Targeted metabolites — pooled intervention vs. control (brush to filter the table)")
+                     title = "Targeted metabolites: pooled intervention vs. control (brush to filter the table)")
 ```
 
 ### Combined intervention arms
 
 ```{r effects-tertiary-combined, echo=FALSE, message=FALSE, warning=FALSE, fig.height=14}
 show_forest_and_table("results/subsetted results/tertiary_targeted_metabolomics.csv",
-                      title = "Targeted metabolites — pooled intervention vs. control")
+                      title = "Targeted metabolites: pooled intervention vs. control")
 ```
 
 ### Stratified by randomized arm
@@ -204,5 +204,5 @@ show_forest_and_table("results/subsetted results/tertiary_targeted_metabolomics.
 ```{r effects-tertiary-strat, echo=FALSE, message=FALSE, warning=FALSE, fig.height=14}
 show_forest_and_table("results/subsetted results/tertiary_targeted_metabolomics_arm_strat.csv",
                       arm_strat = TRUE,
-                      title = "Targeted metabolites — per-arm contrasts vs. control")
+                      title = "Targeted metabolites: per-arm contrasts vs. control")
 ```

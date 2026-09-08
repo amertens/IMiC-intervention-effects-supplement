@@ -49,7 +49,7 @@ if (isTRUE(metadata_loaded) && exists("all_milk_components") &&
 }
 ```
 
-## MILQ-deficiency reductions — headline findings
+## MILQ-deficiency reductions: headline findings
 
 ```{r milq-headline-data, include=FALSE}
 suppressPackageStartupMessages({ library(dplyr); library(here) })
@@ -76,9 +76,9 @@ milq_se_range <- if (is.null(milq_df) || !is.data.frame(milq_df)) "[data unavail
 }
 ```
 
-- **ELICIT — high-dose nicotinamide** reduced HM vitamin B3 deficiency at both timepoints (1-month `r milq_rr("ELICIT", "Vitamin B3", 1)`; 5-month `r milq_rr("ELICIT", "Vitamin B3", 5)`), with the FDR-significant signal at the second timepoint.
-- **Mumta-LW — postnatal BEP** reduced pantothenic acid, B2, and B3 deficiencies, although only at the first visit.
-- **MISAME-III — postnatal BEP** reduced pantothenic acid, B2, and B3 deficiencies at 14–21 days; pantothenic acid and B3 at 1–2 months; B3 at 4–5 months. Selenium deficiency was significantly reduced at all three timepoints (RR range `r milq_se_range`).
+- **ELICIT (high-dose nicotinamide)** reduced HM vitamin B3 deficiency at both timepoints (1-month `r milq_rr("ELICIT", "Vitamin B3", 1)`; 5-month `r milq_rr("ELICIT", "Vitamin B3", 5)`), with the FDR-significant signal at the second timepoint.
+- **Mumta-LW (postnatal BEP)** reduced pantothenic acid, B2, and B3 deficiencies, although only at the first visit.
+- **MISAME-III (postnatal BEP)** reduced pantothenic acid, B2, and B3 deficiencies at 14–21 days; pantothenic acid and B3 at 1–2 months; B3 at 4–5 months. Selenium deficiency was significantly reduced at all three timepoints (RR range `r milq_se_range`).
 
 ```{r milq-setup, include=FALSE}
 library(tidyverse)
@@ -112,7 +112,7 @@ if (!is.null(milq_df) && is.data.frame(milq_df)) {
                        "<br>q: ", signif(pval_adj, 3))
     )
 
-  d$panel <- factor(paste0(d$study, " — ", d$visit))
+  d$panel <- factor(paste0(d$study, ": ", d$visit))
   p <- ggplot2::ggplot(d,
                        ggplot2::aes(y = stats::reorder(label_f, RR), x = RR,
                                     color = sigFDR, shape = sigFDR, text = tooltip)) +
@@ -140,7 +140,7 @@ if (!is.null(milq_df) && is.data.frame(milq_df)) {
 }
 ```
 
-**Figure S2.** Relative risk (RR, log scale) of human-milk nutrient deficiency — defined as a concentration below the 10th percentile of the age-specific MILQ reference distribution — for pooled maternal nutritional intervention vs. control, by study and visit. RR < 1 indicates reduced deficiency risk under intervention. Filled symbols are significant after FDR correction (q < 0.05, applied within visit × outcome group); open symbols are non-significant. Components with fewer than five deficient samples within a study × visit stratum are omitted. Hover (HTML) for the exact RR, 95% CI, p, and q.
+**Figure S2.** Relative risk (RR, log scale) of human-milk nutrient deficiency, defined as a concentration below the 10th percentile of the age-specific MILQ reference distribution, for pooled maternal nutritional intervention vs. control, by study and visit. RR < 1 indicates reduced deficiency risk under intervention. Filled symbols are significant after FDR correction (q < 0.05, applied within visit × outcome group); open symbols are non-significant. Components with fewer than five deficient samples within a study × visit stratum are omitted. Hover (HTML) for the exact RR, 95% CI, p, and q.
 
 ## Searchable table of MILQ-deficiency effects
 
@@ -160,7 +160,7 @@ if (!is.null(milq_df) && is.data.frame(milq_df)) {
 
 ## Interpretation
 
-The MILQ-anchored analysis differs from the continuous-scale TMLE in two important ways. By binarizing at a clinically anchored threshold rather than estimating mean shifts in SD units, it asks whether supplementation moves the *tail* of the HM distribution most likely to be associated with inadequate infant supply. And because the reference is exogenous — an external population studied under harmonized conditions rather than a within-trial comparison — the effects measured here reflect movement *toward an external adequacy standard*.
+The MILQ-anchored analysis differs from the continuous-scale TMLE in two important ways. By binarizing at a clinically anchored threshold rather than estimating mean shifts in SD units, it asks whether supplementation moves the *tail* of the HM distribution most likely to be associated with inadequate infant supply. In addition, because the reference is exogenous (an external population studied under harmonized conditions rather than a within-trial comparison), the effects measured here reflect movement *toward an external adequacy standard*.
 
 The two views line up: the components for which the manuscript reports the largest mean-scale ATE (B-vitamins, particularly B3 in ELICIT; pantothenic acid and B3 in BEP trials; selenium in MISAME-III) are the same components whose deficiency prevalence is materially reduced here, which supports a consistent biological reading.
 

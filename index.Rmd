@@ -30,7 +30,7 @@ The appendix is organised into **ten numbered sections**, preceded by this unnum
 | **Fig. S4** | Milk triglycerides, with and without fat adjustment | §8.3 |
 | **Fig. S5** | Milk-microbiome α-diversity | §4 |
 
-Content in this appendix that has **no** printed-supplement figure — the direction-split pathway ORA panels in §9, and every figure in §10 — is labelled *online-only* where it appears. Main-text figures are cited as **Fig. 1–6** and match the article: machine-learning / PCA composites are **Fig. 1** (§8.4–§8.5), the primary-outcome forest plots **Fig. 2** (§5), the primary-outcome volcano and pathway panels **Fig. 3A–B** (§5, §9.1), the MILQ-referenced distributions **Fig. 4** (§2), the targeted-metabolite panels **Fig. 5A–C** (§5, §9.4–§9.5), and the untargeted metabolome/proteome panels **Fig. 6A–D** (§9.6–§9.8, §10.5).
+Content in this appendix that has **no** printed-supplement figure (the direction-split pathway ORA panels in §9, and every figure in §10) is labelled *online-only* where it appears. Main-text figures are cited as **Fig. 1–6** and match the article: machine-learning / PCA composites are **Fig. 1** (§8.4–§8.5), the primary-outcome forest plots **Fig. 2** (§5), the primary-outcome volcano and pathway panels **Fig. 3A–B** (§5, §9.1), the MILQ-referenced distributions **Fig. 4** (§2), the targeted-metabolite panels **Fig. 5A–C** (§5, §9.4–§9.5), and the untargeted metabolome/proteome panels **Fig. 6A–D** (§9.6–§9.8, §10.5).
 
 ## How this appendix maps to the manuscript
 
@@ -61,7 +61,7 @@ The full outcomes list (every milk component analysed in this supplement, groupe
 
 ## How to read interactive figures
 
-In the HTML build, forest and volcano plots are rendered as `plotly` widgets. Hover any point to reveal the component name, study, visit, ATE, 95% CI, and FDR-adjusted q-value. Plotly's mode bar (top-right of each plot) allows zoom, pan, lasso-select, and PNG export. Every plot is paired with a `DT::datatable` containing the same underlying data with column filters, free-text search, and sortable columns.
+In the HTML build, forest and volcano plots are rendered as `plotly` widgets. Hover any point to reveal the component name, study, visit, ATE, 95% CI, and FDR-adjusted q-value, and use the mode bar at the top right of each plot to zoom, pan, lasso-select, or export a PNG. Every plot is paired with a `DT::datatable` carrying the same underlying data, with column filters, free-text search, and sortable columns.
 
 Where a section relies on an upstream data artefact that is not present in the current build, the section prints an inline notice naming the missing file rather than failing. Re-run the upstream analysis pipeline (see *Reproducing the supplement* in the repository README) to regenerate those artefacts.
 
@@ -80,20 +80,20 @@ if (dir.exists(src)) {
 }
 files <- list(
   c("table_s2_tertiary_msea_full.csv",
-    "Table S2 — tertiary targeted-metabolome MSEA, every pathway x study x visit x contrast x direction row (see §9.4)"),
+    "Table S2: tertiary targeted-metabolome MSEA, every pathway x study x visit x contrast x direction row (see §9.4)"),
   c("table_s5_mummichog_full.csv",
-    "Table S5 — milk untargeted-metabolome Mummichog enrichment, pathways at raw P < 0.05 (see §9.7)"),
+    "Table S5: milk untargeted-metabolome Mummichog enrichment, pathways at raw P < 0.05 (see §9.7)"),
   c("table_s6_proteomics_go_full.csv",
-    "Table S6 — milk-proteome GO Biological Process enrichment, terms at nominal P < 0.05 and Storey q < 0.20 (see §9.8)"),
+    "Table S6: milk-proteome GO Biological Process enrichment, terms at nominal P < 0.05 and Storey q < 0.20 (see §9.8)"),
   c("table_s7_primary_secondary_native_units.csv",
-    "Table S7 — native-unit concentrations and intervention effects for all primary and secondary outcomes, long format (see §8.4)"),
+    "Table S7: native-unit concentrations and intervention effects for all primary and secondary outcomes, long format (see §8.4)"),
   c("table_s7_primary_secondary_native_units_wide.csv",
-    "Table S7 — the same data in wide format, one row per component x study x visit with the arms side by side")
+    "Table S7: the same data in wide format, one row per component x study x visit with the arms side by side")
 )
 for (f in files) {
   p <- file.path(src, f[1])
   n <- if (file.exists(p)) max(0, length(readLines(p, warn = FALSE)) - 1L) else NA_integer_
-  cat(sprintf("- [`%s`](appendix-data/%s) — %s%s\n", f[1], f[1], f[2],
+  cat(sprintf("- [`%s`](appendix-data/%s): %s%s\n", f[1], f[1], f[2],
               if (is.na(n)) " *(not present in this build)*" else ""))
 }
 ```

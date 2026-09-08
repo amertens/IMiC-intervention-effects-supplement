@@ -43,7 +43,7 @@ drop_empty_levels <- function(df) df %>% dplyr::mutate(dplyr::across(where(is.fa
 
 ## MISAME-III (Burkina Faso)
 
-**Baseline characteristics — MISAME-III (Burkina Faso).** Maternal, infant, and household characteristics by randomized arm, at the earliest postnatal milk-collection visit. No between-arm significance tests are reported (randomized trial).
+**Baseline characteristics: MISAME-III (Burkina Faso).** Maternal, infant, and household characteristics by randomized arm, at the earliest postnatal milk-collection visit. No between-arm significance tests are reported (randomized trial).
 
 ```{r baseline-misame, echo=FALSE}
 if (have_baseline) table1(~ sex + mage + meducyrs + mbmi + mmuaccm + parity + nperson + nrooms +
@@ -56,7 +56,7 @@ if (have_baseline) table1(~ sex + mage + meducyrs + mbmi + mmuaccm + parity + np
 
 ## Mumta-LW (Pakistan)
 
-**Baseline characteristics — Mumta-LW (Pakistan).** Maternal, infant, and household characteristics by randomized arm, at the earliest postnatal milk-collection visit. No between-arm significance tests are reported (randomized trial).
+**Baseline characteristics: Mumta-LW (Pakistan).** Maternal, infant, and household characteristics by randomized arm, at the earliest postnatal milk-collection visit. No between-arm significance tests are reported (randomized trial).
 
 ```{r baseline-mumta, echo=FALSE}
 if (have_baseline) table1(~ sex + mage + meducyrs + mbmi + mmuaccm + mhtcm + parity + nperson + nrooms +
@@ -69,7 +69,7 @@ if (have_baseline) table1(~ sex + mage + meducyrs + mbmi + mmuaccm + mhtcm + par
 
 ## ELICIT (Tanzania)
 
-**Baseline characteristics — ELICIT (Tanzania).** Maternal, infant, and household characteristics by randomized arm, at the earliest postnatal milk-collection visit. No between-arm significance tests are reported (randomized trial).
+**Baseline characteristics: ELICIT (Tanzania).** Maternal, infant, and household characteristics by randomized arm, at the earliest postnatal milk-collection visit. No between-arm significance tests are reported (randomized trial).
 
 ```{r baseline-elicit, echo=FALSE}
 if (have_baseline) table1(~ sex + mage + meducyrs + mbmi + mmuaccm + mhtcm + parity + nperson + nrooms +
