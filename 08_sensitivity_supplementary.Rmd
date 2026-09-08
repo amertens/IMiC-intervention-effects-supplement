@@ -4,11 +4,11 @@ The robustness analyses and supplementary outputs referenced from the manuscript
 
 - **8.1 Unadjusted intervention effects:** the same TMLE framework with covariate adjustment removed, which shows whether adjustment is doing meaningful work in the primary analyses.
 - **8.2 Unscaled (natural-unit) intervention effects:** adjusted TMLE ATEs in the native assay units (e.g. g/100 mL, µg/L, µM), letting readers interpret effect magnitudes clinically. Covers all three outcome groups (primary, secondary, and tertiary/targeted metabolomics); the primary and secondary estimates correspond to manuscript Table S7.
-- **8.3 Fat-adjusted triglyceride effects (Figure S4):** separating changes in triglyceride composition from transient changes in total milk fat.
+- **8.3 Fat-adjusted triglyceride effects (Figure S5):** separating changes in triglyceride composition from transient changes in total milk fat.
 - **8.4 SuperLearner CV-AUC treatment-arm prediction** (manuscript **Fig. 1A**): a multivariate test of whether the *joint* distribution of HM components carries intervention signal beyond per-component testing.
 - **8.5 PCA-based composite outcome scores** (manuscript **Fig. 1B**): ATEs on the first principal component of each modality, asking whether each modality moved as a whole.
 - **8.6 Pathway enrichment analyses:** now reported in full in [§9 *Reproducible pathway and enrichment analyses*](#reproducible-pathway-and-enrichment-analyses); only the network views and a pointer remain here.
-- **8.7 Infant growth analyses (Figure S1):** intervention effects on infant anthropometry within the IMiC subsamples, as a within-trial sanity check.
+- **8.7 Infant growth analyses (Figure S2):** intervention effects on infant anthropometry within the IMiC subsamples, as a within-trial sanity check.
 
 Primary inference about whether intervention effects are present and consistent rests on the adjusted analyses in §5. The analyses in this chapter contextualise those findings rather than replace them.
 
@@ -130,9 +130,9 @@ if (!is.null(s7)) {
 }
 ```
 
-## Fat-adjusted triglyceride effects (Figure S4)
+## Fat-adjusted triglyceride effects (Figure S5)
 
-The largest tertiary-outcome signal in the manuscript is on **triglycerides (TGs)**. In MISAME-III the same TGs were *increased* at 14–21 days and 3–4 months but *decreased* at the 1–2 month visit. This temporal inversion disappears once concentrations are expressed as a fraction of total fat content, which implies that the apparent 1–2 month decrease reflects the transient drop in total fat at that visit rather than a compositional change in the TG pool. The plot below reproduces Figure S4 (treatment-specific TG means with and without fat adjustment), and the forest plot beneath it shows the fat-adjusted ATEs behind that interpretation.
+The largest tertiary-outcome signal in the manuscript is on **triglycerides (TGs)**. In MISAME-III the same TGs were *increased* at 14–21 days and 3–4 months but *decreased* at the 1–2 month visit. This temporal inversion disappears once concentrations are expressed as a fraction of total fat content, which implies that the apparent 1–2 month decrease reflects the transient drop in total fat at that visit rather than a compositional change in the TG pool. The plot below reproduces Figure S5 (treatment-specific TG means with and without fat adjustment), and the forest plot beneath it shows the fat-adjusted ATEs behind that interpretation.
 
 > **Milk-volume caveat.** Total milk *output* was not measured in any of the three IMiC trials. The transient reduction in milk fat concentration seen at 1–2 months in MISAME-III may therefore reflect dilution from increased milk volume in the supplemented arm rather than a true reduction in fat synthesis or secretion. Concentration-based effects on macronutrients, and on any fat-dependent metabolite, should be read with this in mind: without a denominator on total daily output, a change in concentration cannot be translated cleanly into a change in infant nutrient delivery. The fat-adjusted analysis below removes one form of this confounding, proportional re-allocation across TGs, but it cannot recover the missing volume term.
 
@@ -148,7 +148,7 @@ p_s6 <- safe_readRDS(here::here("figure-data/figure_sX_forest_plot_fat_adjusted.
 show_any(p_s6)
 ```
 
-**Figure S4.** Treatment-specific means (and 95% CIs) of milk triglycerides (N = 235 TG species from the targeted-metabolomics panel) in MISAME-III, with and without adjustment for total milk fat. *Top:* treatment-specific mean TG-species concentrations; points are coloured by significance of the ATE estimate, and TGs are sorted by the mean Z-scored control-arm concentration at the first visit. The reductions seen at the second timepoint in the postnatal BEP arms (panels O and U) dissipate when concentrations are expressed as a percentage of total fat (panels P and V), revealing the same TG-species pattern as at the first and third timepoints. *Bottom:* fat-adjusted adjusted ATEs (SD units, 95% CI) for individual TG species, confirming a consistent direction of effect across visits once total milk fat is accounted for.
+**Figure S5.** Treatment-specific means (and 95% CIs) of milk triglycerides (N = 235 TG species from the targeted-metabolomics panel) in MISAME-III, with and without adjustment for total milk fat. *Top:* treatment-specific mean TG-species concentrations; points are coloured by significance of the ATE estimate, and TGs are sorted by the mean Z-scored control-arm concentration at the first visit. The reductions seen at the second timepoint in the postnatal BEP arms (panels O and U) dissipate when concentrations are expressed as a percentage of total fat (panels P and V), revealing the same TG-species pattern as at the first and third timepoints. *Bottom:* fat-adjusted adjusted ATEs (SD units, 95% CI) for individual TG species, confirming a consistent direction of effect across visits once total milk fat is accounted for.
 
 ## SuperLearner multi-class treatment-arm prediction
 
@@ -318,7 +318,7 @@ show_any(net_metab)
 
 **Network views.** Intervention-responsive pathway/feature networks for the primary outcomes (top) and the metabolome (bottom). Nodes are pathways or features; edges denote shared members or co-occurrence.
 
-## Infant growth analyses (Figure S1)
+## Infant growth analyses (Figure S2)
 
 Here we report the effects of maternal nutritional supplementation on infant anthropometric outcomes within the IMiC subsamples of each trial: length-for-age z-score (LAZ), weight-for-length z-score (WLZ), weight-for-age z-score (WAZ), head-circumference-for-age z-score (HCAZ), and mid-upper-arm-circumference-for-age z-score (MUACZ). Estimates use the same covariate-adjusted TMLE framework as the primary milk-component analyses. These growth analyses act as within-trial sanity checks. They document whether the IMiC subsample is a plausible, representative window onto the parent trial, and they set the manuscript's HM-composition findings against the corresponding infant phenotype.
 
@@ -367,7 +367,7 @@ if (!is.null(g) && is.data.frame(g)) {
 }
 ```
 
-**Figure S1.** Adjusted intervention effects (ATE on anthropometric z-score, with 95% CI) on infant length-for-age (LAZ), weight-for-length (WLZ), weight-for-age (WAZ), head-circumference-for-age (HCAZ), and MUAC-for-age (MUACZ), by study, randomized contrast, and infant age at measurement. Filled symbols are significant after FDR correction. In ELICIT, infant azithromycin and nicotinamide were administered after 6 months, so their effects at the 1- and 5-month visits are null by design and serve as a within-trial negative control.
+**Figure S2.** Adjusted intervention effects (ATE on anthropometric z-score, with 95% CI) on infant length-for-age (LAZ), weight-for-length (WLZ), weight-for-age (WAZ), head-circumference-for-age (HCAZ), and MUAC-for-age (MUACZ), by study, randomized contrast, and infant age at measurement. Filled symbols are significant after FDR correction. In ELICIT, infant azithromycin and nicotinamide were administered after 6 months, so their effects at the 1- and 5-month visits are null by design and serve as a within-trial negative control.
 
 ```{r growth-table, echo=FALSE, message=FALSE, warning=FALSE}
 if (!is.null(g) && is.data.frame(g)) {
@@ -376,6 +376,6 @@ if (!is.null(g) && is.data.frame(g)) {
                   chi_pval, chi_pval_adj, sig, sigFDR) %>%
     dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 3)))
   nice_dt(out,
-          caption = "Adjusted ATEs on infant anthropometric z-scores within the IMiC subsamples (Figure S1).")
+          caption = "Adjusted ATEs on infant anthropometric z-scores within the IMiC subsamples (Figure S2).")
 }
 ```

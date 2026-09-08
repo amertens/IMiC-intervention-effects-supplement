@@ -6,7 +6,7 @@ Every result here warrants caution. The estimates carry a heavy multiple-testing
 
 The forest and volcano plots in this chapter render as **interactive plotly figures** in the HTML build: hover any point to read the compound or taxon name, study, visit, ATE, and FDR-adjusted q-value. A searchable, filterable table accompanies each plot with the same underlying data. For the high-cardinality modalities (untargeted metabolomics: ~97,000 features across studies, visits, and ionization modes, giving 353,656 effect estimates), the interactive plot shows only the top hits by FDR-adjusted p-value so the page stays responsive. Each plot's sub-caption states exactly what the accompanying table contains: for the microbiome and proteomics it is every feature, and for untargeted metabolomics it is the features reaching q < 0.10.
 
-The microbiome individual-taxa analyses in the first half of this section are cited as **"Online Appendix 4"** in the main manuscript (Microbiome subsection). The section also includes the data underlying **Figure S5 (microbiome α-diversity)** of the printed Word supplement, plus exploratory volcano plots for untargeted proteomics and untargeted metabolomics referenced from later results paragraphs.
+The microbiome individual-taxa analyses in the first half of this section are cited as **"Online Appendix 4"** in the main manuscript (Microbiome subsection). The section also includes the data underlying **Figure S6 (microbiome α-diversity)** of the submitted supplement, plus exploratory volcano plots for untargeted proteomics and untargeted metabolomics referenced from later results paragraphs.
 
 ```{r explor-setup, include=FALSE}
 library(tidyverse)
@@ -41,7 +41,7 @@ prep_explor <- function(rds_path) {
 
 ## Microbiome
 
-### Intervention effects on microbiome α-diversity (Figure S5)
+### Intervention effects on microbiome α-diversity (Figure S6)
 
 Forest plots display ATEs on z-scored α-diversity metrics (observed richness and Shannon diversity), pooled across all intervention arms and then stratified by randomized arm. Across studies and visits, **no consistent intervention-related changes in microbiome diversity were observed**. The one exception was a transient increase in both indices at the first Mumta-LW visit; otherwise estimated effects varied in size and direction across timepoints and studies, and confidence intervals generally overlapped the null.
 
@@ -51,9 +51,9 @@ Forest plots display ATEs on z-scored α-diversity metrics (observed richness an
 df <- prep_explor("results/microbiome_diversity_intervention_effects_results.RDS")
 if (!is.null(df)) htmltools::tagList(
   forest_plot(df, title = "Microbiome α-diversity: pooled"),
-  htmltools::tags$p(htmltools::tags$strong("Figure S5. "),
+  htmltools::tags$p(htmltools::tags$strong("Figure S6. "),
     htmltools::tags$em("Maternal nutritional intervention effects on human-milk microbiota alpha diversity (observed richness and Shannon diversity), Z-scored for cross-study comparability of intervention effects, shown by study, visit, and intervention contrast (pooled intervention vs. control). Filled symbols are significant after FDR correction. Individual microbial taxa results are shown later in this chapter (cited from the manuscript as Online Appendix 4 / Section 4).")),
-  clean_tab(df, caption = "Adjusted ATEs on milk-microbiome α-diversity metrics, pooled intervention vs. control (manuscript Fig. S5)."))
+  clean_tab(df, caption = "Adjusted ATEs on milk-microbiome α-diversity metrics, pooled intervention vs. control (manuscript Fig. S6)."))
 ```
 
 #### Stratified by randomized arm

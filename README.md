@@ -39,7 +39,7 @@ The chapter Rmd files are numbered to match the manuscript's `Section N` / `Onli
 | 5 | Adjusted intervention effects on individual milk components | `05_intervention_effects.Rmd` |
 | 6 | Targeted-metabolite metadata and reductions in HM nutrient deficiency (Figure S3) | `06_milq_deficiency.Rmd` |
 | 7 | Trajectory analyses of HM component change across lactation | `07_trajectory_plots.Rmd` |
-| 8 | Sensitivity analyses and additional outputs (unadjusted, unscaled [Table S7], fat-adjusted TGs [Figure S4], SuperLearner [Fig. 1A], PCA [Fig. 1B], pathway-network views, infant growth [Figure S1]) | `08_sensitivity_supplementary.Rmd` |
+| 8 | Sensitivity analyses and additional outputs (unadjusted, unscaled [Table S7], fat-adjusted TGs [Figure S5], SuperLearner [Fig. 1A], PCA [Fig. 1B], pathway-network views, infant growth [Figure S2]) | `08_sensitivity_supplementary.Rmd` |
 | 9 | Reproducible pathway and enrichment analyses (MetaboAnalystR ORA / MSEA / Mummichog / GO; Tables S1–S6, Fig. 3B, 5B, 6B–C; direction-split ORA panels are online-only) | `09_pathway_enrichment.Rmd` |
 | 10 | Cross-compartment analyses in maternal and infant blood (MISAME-III; Tables S8–S11 and main-text Fig. 6D; no printed-supplement figure, all figures here are online-only) | `10_cross_compartment_blood.Rmd` |
 | – | Reproducibility / sessionInfo | `99_session_info.Rmd` |
