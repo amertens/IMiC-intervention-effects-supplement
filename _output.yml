@@ -4,7 +4,7 @@ bookdown::gitbook:
     toc:
       collapse: section
       before: |
-        <li><a href="./">IMiC Intervention Supplement</a></li>
+        <li><a href="./">IMiC intervention effects on human milk: online resource</a></li>
       after: |
         <li><a href="https://bookdown.org" target="_blank">Published with bookdown</a></li>
 

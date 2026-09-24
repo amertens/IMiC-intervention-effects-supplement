@@ -35,14 +35,16 @@ copy_data("effect-explorer",
 shinylive::export(file.path(apps_root, "effect-explorer"), dest, subdir = "effect-explorer")
 cat("[export] effect-explorer -> docs/apps/effect-explorer\n")
 
-## ---- Pathway Explorer: 9 enrichment CSVs (from results/metaboanalyst) ------
+## ---- Pathway Explorer: 11 enrichment CSVs (from results/metaboanalyst) -----
 pe_data <- file.path(apps_root, "pathway-explorer", "data")
 dir.create(pe_data, recursive = TRUE, showWarnings = FALSE)
-pe_src <- c("primary_combined/primary_combined_supplementary_table.csv",
+pe_src <- c("primary_pathway_local/primary_pathway_all_cells.csv",
+            "primary_combined/primary_combined_supplementary_table.csv",
             "primary_stratified/primary_stratified_supplementary_table.csv",
             "tertiary_msea/tertiary_msea_dual.csv",
             "tertiary_msea/tertiary_msea_combined.csv",
             "tertiary_msea/tertiary_msea_stratified.csv",
+            "triglyceride_fa/triglyceride_fa_composition_combined.csv",
             "triglyceride_fa/triglyceride_fa_composition_stratified.csv",
             "untargeted_msea/untargeted_msea_combined.csv",
             "mummichog_s5/milk_mummichog_tableS5.csv",

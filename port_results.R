@@ -1,14 +1,14 @@
 ## port_results.R
 ##
-## Copy the upstream analysis outputs the supplement bookdown consumes into
-## the supplement repo at the paths expected by each chapter. Run this once,
+## Copy the upstream analysis outputs the online resource (this bookdown)
+## consumes into this repo at the paths expected by each chapter. Run this once,
 ## or whenever the upstream analysis has been re-run.
 ##
 ## Usage (from the supplement repo root):
 ##   source("port_results.R")
 ##
 ## You can override the source/dest directories by setting
-##   options(imic.upstream = "C:/path/to/imic_intervention_effects")
+##   options(imic.upstream = "C:/path/to/upstream/analysis/repo")
 ##   options(imic.dest     = ".")
 ## before sourcing.
 
@@ -55,27 +55,30 @@ files <- list(
   list("results/subsetted results/tertiary_targeted_metabolomics_arm_strat.csv",
        "results/subsetted results/tertiary_targeted_metabolomics_arm_strat.csv"),
 
-  ## ---- Table S7: native-unit descriptive concentrations + ATEs (ch 8.2) ---
-  list("results/tables/table_s7_primary_secondary_native_units.csv",
-       "results/tables/table_s7_primary_secondary_native_units.csv"),
+  ## ---- Table S1: native-unit descriptive concentrations + ATEs (ch 8.2) ---
+  list("results/tables/table_s1_primary_secondary_native_units.csv",
+       "results/tables/table_s1_primary_secondary_native_units.csv"),
 
-  ## ---- Online-Appendix data files -----------------------------------------
-  ## The printed supplement externalises four oversized tables (S2, S5, S6, S7)
-  ## and names the CSV for each, telling readers to find it "in the Online
-  ## Appendix" -- i.e. here. They are published from appendix-data/ (see the
-  ## Machine-readable data files section of index.Rmd), so they must be ported
-  ## under that name, not just left in results/. Written upstream by
+  ## ---- machine-readable data files (published under data-files/) ---------
+  ## The supplementary materials externalise four oversized tables (S1, S3, S6,
+  ## S7) and name the CSV for each, telling readers to find it in the online
+  ## resource -- i.e. here -- plus a fifth file with the native-unit estimates
+  ## for every targeted metabolite. index.Rmd publishes data-files/ into docs/
+  ## (Machine-readable data files section), so they must be ported under that
+  ## folder, not just left in results/. Written upstream by
   ## src/pipeline/rebuild-submission-tables.R.
-  list("results/tables/table_s2_tertiary_msea_full.csv",
-       "appendix-data/table_s2_tertiary_msea_full.csv"),
-  list("results/tables/table_s5_mummichog_full.csv",
-       "appendix-data/table_s5_mummichog_full.csv"),
-  list("results/tables/table_s6_proteomics_go_full.csv",
-       "appendix-data/table_s6_proteomics_go_full.csv"),
-  list("results/tables/table_s7_primary_secondary_native_units.csv",
-       "appendix-data/table_s7_primary_secondary_native_units.csv"),
-  list("results/tables/table_s7_primary_secondary_native_units_wide.csv",
-       "appendix-data/table_s7_primary_secondary_native_units_wide.csv"),
+  list("results/tables/table_s1_primary_secondary_native_units.csv",
+       "data-files/table_s1_primary_secondary_native_units.csv"),
+  list("results/tables/table_s1_primary_secondary_native_units_wide.csv",
+       "data-files/table_s1_primary_secondary_native_units_wide.csv"),
+  list("results/tables/targeted_metabolites_native_units.csv",
+       "data-files/targeted_metabolites_native_units.csv"),
+  list("results/tables/table_s3_tertiary_msea_full.csv",
+       "data-files/table_s3_tertiary_msea_full.csv"),
+  list("results/tables/table_s6_mummichog_full.csv",
+       "data-files/table_s6_mummichog_full.csv"),
+  list("results/tables/table_s7_proteomics_go_full.csv",
+       "data-files/table_s7_proteomics_go_full.csv"),
 
   ## ---- trajectory (ch 10) --------------------------------------------------
   list("results/adjusted_intervention_effects_traj_results_clean.RDS",
@@ -126,8 +129,6 @@ files <- list(
        "figure-data/figure_s2_plots.RDS"),
   list("figure-data/figure_s4_trajectory_plots.RDS",
        "figure-data/figure_s4_trajectory_plots.RDS"),
-  list("figure-data/figure_s7_tri_pattern.RDS",
-       "figure-data/figure_s7_tri_pattern.RDS"),
   list("figure-data/figure_sX_forest_plot_fat_adjusted.RDS",
        "figure-data/figure_sX_forest_plot_fat_adjusted.RDS"),
   list("figure-data/figures8_network_plots_primary.RDS",
@@ -136,28 +137,36 @@ files <- list(
        "figure-data/figures8_network_plots_metabolomics.RDS"),
   list("figure-data/pca_intervention_effects_results.RDS",
        "figure-data/pca_intervention_effects_results.RDS"),
-  list("figure-data/primary_growth_plot.RDS",
-       "figure-data/primary_growth_plot.RDS"),
+  list("figure-data/figureS1_growth_plot_data.RDS",
+       "figure-data/figureS1_growth_plot_data.RDS"),
   list("figure-data/subgroup_results.RDS",
        "figure-data/subgroup_results.RDS")
 )
 
-## ---- NEW: reproducible enrichment pipeline outputs (ch 9) ----------------
-## primary volcano+enrichment composites embedded in the pathway chapter.
-files[[length(files) + 1]] <- list("figures/figure4_combined_arms.png",
-                                   "figures/figure4_combined_arms.png")
-files[[length(files) + 1]] <- list("figures/figure4_stratified_supplement.png",
-                                   "figures/figure4_stratified_supplement.png")
+## ---- manuscript figures regenerated upstream 2026-09-23 (colourblind-safe) ---
+## Fig. 3 (fig3-primary-volcano-composite.R): the combined-arm composite and its
+## arm-stratified counterpart are embedded in §9.2, and the printed Fig. S4 in
+## §8.3. The others are the current print versions of Figs. 4-6, S1 and S5, kept
+## alongside for reference.
+for (f in c("figures/figure3.png", "figures/figure3_stratified_supplement.png",
+            "figures/figure4.jpeg", "figures/figure5.png", "figures/figure6.png",
+            "figures/figureS4_triglyceride_means.png",
+            "figures/figureS1_growth_outcomes.png",
+            "figures/figureS5_microbiome_diversity.png"))
+  files[[length(files) + 1]] <- list(f, f)
 
-## Direction-split ORA composite figures (§9 primary/tertiary subsections).
-files[[length(files) + 1]] <- list("figures/figureS_primary_ora_by_direction.png",
+## Direction-split ORA composite figures (§9 primary/tertiary subsections). Named
+## appendix_* upstream; kept under their figureS_* names here so the published
+## site carries no "appendix" file names. NOT regenerated on 2026-09-23, so they
+## still use the pre-Okabe-Ito study colours.
+files[[length(files) + 1]] <- list("figures/appendix_primary_ora_by_direction.png",
                                    "figures/figureS_primary_ora_by_direction.png")
-files[[length(files) + 1]] <- list("figures/figureS_tertiary_ora_by_direction.png",
+files[[length(files) + 1]] <- list("figures/appendix_tertiary_ora_by_direction.png",
                                    "figures/figureS_tertiary_ora_by_direction.png")
 
 ## Finalized milk-Mummichog feature-level annotation (§9 mummichog subsection).
 ## These live at results/ top-level upstream; relocate under mummichog_s5/ here
-## so §9 loads them alongside the Table S5 pathway grid. (The direction-split
+## so §9.8 loads them alongside the Table S6 pathway grid. (The direction-split
 ## primary/tertiary ORA CSVs already live under results/metaboanalyst/ upstream
 ## and are picked up by the copy_tree("results/metaboanalyst") call below.)
 files[[length(files) + 1]] <- list("results/milk_mummichog_annotation_finalized.csv",
@@ -165,19 +174,19 @@ files[[length(files) + 1]] <- list("results/milk_mummichog_annotation_finalized.
 files[[length(files) + 1]] <- list("results/milk_mummichog_annotation_summary.csv",
                                    "results/metaboanalyst/mummichog_s5/milk_mummichog_annotation_summary.csv")
 
-## CORRECTED untargeted milk proteome GO enrichment (Table S6 / Fig 6C, §9.8).
+## CORRECTED untargeted milk proteome GO enrichment (Table S7 / Fig 6C, §9.9).
 ## These live at results/ TOP-LEVEL upstream (NOT under metaboanalyst/), so the
 ## copy_tree("results/metaboanalyst") call below does NOT pick them up. They are
 ## the UniProt-native over-representation results that SUPERSEDE the retracted
 ## gene-level proteomics_go_tableS6.csv. Relocate under proteomics_go/ here so
-## §9.8 reads the corrected, predominantly down-regulated GO-BP signature.
+## §9.9 reads the corrected, predominantly down-regulated GO-BP signature.
 files[[length(files) + 1]] <- list("results/proteomics_go_uniprot.csv",
                                    "results/metaboanalyst/proteomics_go/proteomics_go_uniprot.csv")
 files[[length(files) + 1]] <- list("results/proteomics_go_uniprot_fdrsig.csv",
                                    "results/metaboanalyst/proteomics_go/proteomics_go_uniprot_fdrsig.csv")
 
-## Chemical-class enrichment figure (§10.5) — lives at results/ top-level
-## upstream; relocate under figures/cross_compartment/ here so §10.5 loads it
+## Chemical-class enrichment figure (§10.6) -- lives at results/ top-level
+## upstream; relocate under figures/cross_compartment/ here so §10.6 loads it
 ## alongside the other cross-compartment figures.
 files[[length(files) + 1]] <- list("results/blood_class_enrichment_figure.png",
                                    "figures/cross_compartment/blood_class_enrichment_figure.png")
@@ -200,7 +209,7 @@ blood_csvs <- c(
   "results/cross_compartment_matching_sensitivity.csv",
   # selenoproteins / proteome overlap (§10.3, adjusted models)
   "results/cross_compartment_proteome_overlap_adjusted.csv",
-  # carnitine transfer (§10.4). The mediation outputs that used to be ported
+  # m/z 286.202 acylcarnitine (§10.4). The mediation outputs that used to be ported
   # here (tmle_mediation.csv, dyad_milk_infant_mediation.csv,
   # mediation_measurement_error_sensitivity.csv) were withdrawn 2026-08-27
   # along with their upstream scripts -- the analysis is not claimed by the
@@ -210,23 +219,23 @@ blood_csvs <- c(
   "results/targeted_acylcarnitine_class_summary.csv",
   "results/acylcarnitine_composition.csv",
   "results/carnitine_annotation_support.csv",
-  # pathway analyses (§10.5, adjusted / signed)
+  # pathway analyses (§10.6, adjusted / signed)
   "results/blood_mummichog_pathways.csv",
   "results/blood_mummichog_pathways_adjusted.csv",
   "results/cross_compartment_pathways_adjusted.csv",
   "results/signed_pathway_direction.csv",
   "results/signed_pathway_direction_milk.csv",
   "results/fat_synthesis_timepoint_table.csv",
-  # chemical-class enrichment (§10.5): the FDR-significant maternal-blood result
+  # chemical-class enrichment (§10.6): the FDR-significant maternal-blood result
   # (blood mummichog is nominal-only, 0 pathways survive FDR). Non-directional +
   # directional (up/down) class over-representation by compartment.
   "results/blood_chemical_class_enrichment.csv",
   "results/blood_chemical_class_enrichment_directional.csv",
-  # putative annotation (§10.6)
+  # putative annotation (§10.7)
   "results/fdr_sig_putative_annotation.csv",
   "results/milk_fdr_sig_putative_annotation.csv",
   "results/blood_consistent_annotated_features_consistent.csv",
-  # BEP-product provenance (§10.7)
+  # BEP-product provenance (§10.8)
   "results/bep_supplement_tracer.csv",
   "results/bep_supplement_composition_xref.csv",
   "results/four_compartment_bep_shortlist.csv",
@@ -234,16 +243,15 @@ blood_csvs <- c(
   # infant growth null control (§10.9)
   "results/infant_carnitine_growth_assoc.csv",
   "results/detectability_proxy_infant_carnitine.csv",
-  # consolidated cross-compartment table (§10.9)
+  # consolidated cross-compartment table (§10.10)
   "results/table_s8_cross_compartment.csv",
-  # compartment tracking (Trenton's name-based grouping rule — the SAME rule
-  # now behind manuscript Fig. 6D, Table S11, and Fig. S10 as of the 2026-08-25
-  # reconciliation; see Manuscript/SUPPLEMENT_HANDOFF_FIG6D_RESOLUTION.md
-  # upstream). Table S11 (§10.5) and its supporting counts/compound list; the
-  # paired figure PNGs (trenton_xcompartment_tracking / _volcanoes) ride the
-  # figures/cross_compartment copy_tree below and need no explicit entry.
+  # compartment tracking (Trenton's name-based grouping rule -- the SAME rule
+  # behind manuscript Fig. 6D and Table S11 as of the 2026-08-25 reconciliation;
+  # see Manuscript/SUPPLEMENT_HANDOFF_FIG6D_RESOLUTION.md upstream). Table S11
+  # (§10.5) and its supporting compound list; the paired figure PNGs are
+  # ported explicitly further down.
+  "results/tables/table_s10_temporal_persistence.csv",   # Table S10 (§10.1)
   "results/tables/table_s11_compartment_pathway.csv",
-  "results/tables/figS10_tracking_counts.csv",
   "results/compartment_tracking/trenton_linked_crosscompartment.csv",
   "results/compartment_tracking/trenton_pathway_compound_list.csv",
   "results/compartment_tracking/metabolite_pathways_trenton.csv"
@@ -293,9 +301,16 @@ cat(sprintf("\nCopied %d of %d files.\n", sum(res), length(res)))
 ## ---- recursive trees: enrichment CSV outputs + upstream figure PNGs -------
 ## (ch 9) the scripted MetaboAnalystR ORA/MSEA/Mummichog/GO result tables:
 copy_tree("results/metaboanalyst", "results/metaboanalyst", pattern = "\\.csv$")
-## (ch 10) pre-rendered cross-compartment + blood-volcano figures:
+## (ch 10) pre-rendered cross-compartment figures. The blood-volcano PNGs
+## (figures/blood_volcano/) are no longer ported: they predate the 2026-07-13
+## blood re-run, so §10.1 reports the FDR-significant counts as tables instead.
 copy_tree("figures/cross_compartment", "figures/cross_compartment", pattern = "\\.png$")
-copy_tree("figures/blood_volcano",     "figures/blood_volcano",     pattern = "\\.png$")
+## The §10.5 figures are named appendix_* upstream; publish them under their
+## existing local names so the site carries no "appendix" file names.
+copy_one("figures/cross_compartment/appendix_crosscompartment_volcanoes.png",
+         "figures/cross_compartment/figureS11_crosscompartment_volcanoes.png")
+copy_one("figures/cross_compartment/appendix_compartment_tracking.png",
+         "figures/cross_compartment/figureS10_compartment_tracking.png")
 
 ## ---- attach pval_adj_global (sensitivity) to the subsetted CSVs --------------
 ## Upstream clean_results.R writes the per-visit pval_adj into the subsetted CSVs

@@ -1,6 +1,6 @@
 `r if (knitr::is_html_output()) '# Reproducibility {-}'`
 
-This page records the R session that produced the current build of the supplement, so the exact package versions and platform are part of the public artefact.
+This page records the R session that produced this version of the online resource, including package versions and platform.
 
 ```{r session-info, echo=FALSE}
 sessionInfo()

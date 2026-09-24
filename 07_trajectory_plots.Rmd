@@ -1,12 +1,12 @@
 # Trajectory analyses of human milk component change across lactation
 
-Did maternal nutritional interventions alter **within-individual changes** in human milk composition across successive postpartum visits? The trajectory analyses in this chapter address that question. Where the cross-sectional analyses elsewhere in the supplement compare arms at a given visit, these track visit-to-visit change within the same mother–infant dyad.
+The trajectory analyses in this section ask whether maternal nutritional interventions altered within-individual changes in human milk composition across successive postpartum visits. The cross-sectional analyses elsewhere in this online resource compare arms at a given visit; these track visit-to-visit change within the same mother–infant dyad.
 
-For each milk component, we transformed the raw concentration measurements into **visit-to-visit differences** (current visit minus the immediately preceding visit within each mother). Baseline visits without a prior observation were dropped. We estimated trajectory-specific intervention effects with TMLE, adjusting for the same prespecified baseline prognostic covariates used in the primary adjusted analyses, and standardized outcomes before estimation. Analyses ran separately by study and visit interval, and arms were pooled where appropriate to improve precision.
+For each milk component, we converted the raw concentration measurements into visit-to-visit differences (current visit minus the immediately preceding visit within each mother). First visits, which have no earlier measurement, were dropped. We standardized the outcomes and estimated trajectory-specific intervention effects with TMLE, adjusting for the same prespecified baseline prognostic covariates as the primary adjusted analyses. Analyses were run separately by study and visit interval, with arms pooled as in the main analysis.
 
-Results appear as **volcano plots** for primary, secondary, and tertiary outcomes, and as **trajectory line plots** showing mean milk component concentrations across visits by intervention arm. In the HTML build the volcano plots render as interactive plotly figures; hover any point to read the component name, study, visit interval, ATE, and FDR-adjusted q-value.
+Results are shown as volcano plots for primary, secondary, and tertiary outcomes and as trajectory line plots of mean milk component concentrations across visits by intervention arm. The volcano plots are interactive plotly figures; hovering over a point shows the component name, study, visit interval, ATE, and FDR-adjusted *Q*-value.
 
-> **Interpretation note.** Trajectory analyses are exploratory. The number of repeated measurements per participant and the per-stratum sample size both limit power to detect trajectory-specific effects. Primary inference about intervention effects rests on the cross-sectional adjusted analyses. The trajectory results add context, letting readers ask whether supplementation produces changes that are consistent, delayed, or cumulative across early lactation.
+> **Interpretation note.** Trajectory analyses are exploratory. The number of repeated measurements per participant and the per-stratum sample size both limit power to detect trajectory-specific effects. Primary inference about intervention effects rests on the cross-sectional adjusted analyses; the trajectory results add context on whether supplementation effects are consistent, delayed, or cumulative across early lactation.
 
 ```{r traj-setup, include=FALSE}
 library(tidyverse)
@@ -60,7 +60,7 @@ make_traj_volcano(traj_combined,
                   title = "Trajectory effects: tertiary outcomes (targeted metabolites)")
 ```
 
-**Trajectory volcano plots.** Each point is the adjusted intervention effect on the visit-to-visit *change* in one milk component (primary, secondary, and tertiary outcomes shown separately), pooled intervention vs. control. The x-axis is the ATE (SD units) and the y-axis is −log~10~(*p*), with the dotted line marking *p* = 0.05. Points are coloured by significance tier. In the high-cardinality tertiary panel, the interactive plot shows the top features by raw *p*-value, and the full set is in the searchable table below. Trajectory analyses are exploratory.
+**Trajectory volcano plots.** Each point is the adjusted intervention effect on the visit-to-visit *change* in one milk component (primary, secondary, and tertiary outcomes shown separately), pooled intervention vs. control. The x-axis is the ATE (SD units) and the y-axis is −log~10~(*P*), with the dotted line marking *P* = 0.05. Points are colored by significance. In the tertiary panel, which has thousands of features, the interactive plot shows the 1,500 features with the smallest raw *P*-values (of 6,182), and the full set is in the searchable table below.
 
 ## Searchable tables of trajectory effects
 
@@ -84,7 +84,7 @@ if (!is.null(traj_combined) && is.data.frame(traj_combined)) {
 
 ## Trajectory line plots by intervention arm
 
-The figures below trace human milk components over successive visits by intervention arm within each study. Line plots display mean milk component levels across visits, aggregated within biologically defined component categories (e.g. macronutrients, B-vitamins, HMOs, amino acids, other metabolite classes) and stratified by randomized intervention arm. To build the category-level summaries, we averaged component values across all available biomarkers within a category in each study. Plots appear on two scales: a standardized scale (z-scored within study × visit) for cross-category comparison, and the original measurement scale, which keeps absolute concentrations interpretable.
+The line plots below trace mean human milk component levels over successive visits by randomized intervention arm within each study. For the category-level summaries, we averaged component values across all available biomarkers within a category in each study.
 
 ```{r traj-lineplots, echo=FALSE, message=FALSE, warning=FALSE, fig.height=8, results='asis'}
 p_s5 <- safe_readRDS(here::here("figure-data/figure_s4_trajectory_plots.RDS"),
@@ -92,4 +92,4 @@ p_s5 <- safe_readRDS(here::here("figure-data/figure_s4_trajectory_plots.RDS"),
 show_any(p_s5)
 ```
 
-**Trajectory line plots.** Mean human-milk component levels across successive milk-collection visits by randomized intervention arm within each study, averaged within biologically defined component categories (e.g. macronutrients, B-vitamins, HMOs, amino acids, other metabolite classes). Shown on a standardized (z-scored within study × visit) scale for cross-category comparison and on the original measurement scale, which preserves absolute concentrations.
+**Trajectory line plots.** Mean human milk component levels across successive milk collection visits by randomized intervention arm within each study, averaged within biologically defined component categories (e.g. macronutrients, B-vitamins, HMOs, amino acids, other metabolite classes). Levels are shown on a standardized scale (Z-scored within study × visit) for cross-category comparison and on the original measurement scale, which preserves absolute concentrations.

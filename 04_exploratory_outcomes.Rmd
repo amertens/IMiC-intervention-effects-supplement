@@ -1,12 +1,12 @@
 # Exploratory high-dimensional outcomes: microbiome, untargeted proteomics, untargeted metabolomics
 
-The analyses collected here cover human milk components that were not designated as primary or secondary outcomes: the milk microbiome (α-diversity and individual taxa), untargeted proteomics, and untargeted metabolomics. They are meant to survey where intervention-related signals might exist across these high-dimensional modalities and to generate hypotheses for follow-up.
+This section covers human milk components that were not designated as primary or secondary outcomes: the milk microbiome (α-diversity and individual taxa), untargeted proteomics, and untargeted metabolomics. These analyses survey where intervention-related signals might exist in high-dimensional data and generate hypotheses for follow-up.
 
-Every result here warrants caution. The estimates carry a heavy multiple-testing burden and variable measurement error, and in some cases rest on limited sample sizes or incomplete intervention contrasts. Formal inference and primary conclusions come from the prespecified primary and secondary outcomes in the *Adjusted intervention effects* chapter. Pathway-level interpretation of the metabolomic and proteomic signals, which gives a far more readable view of the biology, appears in the *Pathway enrichment* chapter.
+All of these results call for caution. They carry a heavy multiple-testing burden and variable measurement error, and some rest on small samples or incomplete intervention contrasts. Formal inference and the primary conclusions come from the prespecified primary and secondary outcomes in the *Adjusted intervention effects* section. Pathway-level interpretation of the metabolomic and proteomic signals, which is easier to read biologically, is in the *Pathway enrichment* section.
 
-The forest and volcano plots in this chapter render as **interactive plotly figures** in the HTML build: hover any point to read the compound or taxon name, study, visit, ATE, and FDR-adjusted q-value. A searchable, filterable table accompanies each plot with the same underlying data. For the high-cardinality modalities (untargeted metabolomics: ~97,000 features across studies, visits, and ionization modes, giving 353,656 effect estimates), the interactive plot shows only the top hits by FDR-adjusted p-value so the page stays responsive. Each plot's sub-caption states exactly what the accompanying table contains: for the microbiome and proteomics it is every feature, and for untargeted metabolomics it is the features reaching q < 0.10.
+The forest and volcano plots in this section are interactive plotly figures; hovering over a point shows the compound or taxon name, study, visit, ATE, and FDR-adjusted *Q*-value. Each plot has a searchable, filterable table of the same data. For untargeted proteomics (3,001 estimates) and untargeted metabolomics (~97,000 features across studies, visits, and ionization modes, giving 353,656 estimates), the interactive plot shows only the 2,000 and 5,000 estimates with the smallest raw *P*-values, so that the page stays responsive. The sub-caption of each plot states what its table contains: every feature for the microbiome and proteomics, and the features with *Q* < 0.10 for untargeted metabolomics.
 
-The microbiome individual-taxa analyses in the first half of this section are cited as **"Online Appendix 4"** in the main manuscript (Microbiome subsection). The section also includes the data underlying **Figure S5 (microbiome α-diversity)** of the printed Word supplement, plus exploratory volcano plots for untargeted proteomics and untargeted metabolomics referenced from later results paragraphs.
+The manuscript's microbiome results cite the individual-taxa analyses in the first half of this section as "Section 4 of the online resource". This section also contains the data underlying Figure S5 (microbiome α-diversity) of the supplementary materials and exploratory volcano plots for untargeted proteomics and untargeted metabolomics.
 
 ```{r explor-setup, include=FALSE}
 library(tidyverse)
@@ -43,7 +43,7 @@ prep_explor <- function(rds_path) {
 
 ### Intervention effects on microbiome α-diversity (Figure S5)
 
-Forest plots display ATEs on z-scored α-diversity metrics (observed richness and Shannon diversity), pooled across all intervention arms and then stratified by randomized arm. Across studies and visits, **no consistent intervention-related changes in microbiome diversity were observed**. The one exception was a transient increase in both indices at the first Mumta-LW visit; otherwise estimated effects varied in size and direction across timepoints and studies, and confidence intervals generally overlapped the null.
+The forest plots show ATEs on Z-scored α-diversity metrics (observed richness and Shannon diversity), first with all intervention arms pooled and then stratified by randomized arm. Microbiome diversity showed no consistent intervention-related change across studies and visits. The one exception was an increase in observed richness, but not Shannon diversity, at the first Mumta-LW visit; otherwise, estimated effects varied in size and direction across timepoints and studies, and confidence intervals generally overlapped the null.
 
 #### Combined intervention arms
 
@@ -52,7 +52,7 @@ df <- prep_explor("results/microbiome_diversity_intervention_effects_results.RDS
 if (!is.null(df)) htmltools::tagList(
   forest_plot(df, title = "Microbiome α-diversity: pooled"),
   htmltools::tags$p(htmltools::tags$strong("Figure S5. "),
-    htmltools::tags$em("Maternal nutritional intervention effects on human-milk microbiota alpha diversity (observed richness and Shannon diversity), Z-scored for cross-study comparability of intervention effects, shown by study, visit, and intervention contrast (pooled intervention vs. control). Filled symbols are significant after FDR correction. Individual microbial taxa results are shown later in this chapter (cited from the manuscript as Online Appendix 4 / Section 4).")),
+    htmltools::tags$em("Maternal nutritional intervention effects on human milk microbiota alpha diversity (observed richness and Shannon diversity), Z-scored for cross-study comparability of intervention effects, by study, visit, and intervention contrast (pooled intervention vs. control). Orange triangles are significant after FDR correction, filled gray circles nominally significant (P < 0.05), and open circles non-significant. Results for individual microbial taxa appear later in this section (cited in the manuscript as Section 4 of the online resource).")),
   clean_tab(df, caption = "Adjusted ATEs on milk-microbiome α-diversity metrics, pooled intervention vs. control (manuscript Fig. S5)."))
 ```
 
@@ -67,7 +67,7 @@ if (!is.null(df)) htmltools::tagList(forest_plot(df, arm_strat = TRUE,
 
 ### Intervention effects on individual microbial features
 
-The volcano plots below summarize per-taxon (or per-ASV) intervention effects. In every analysis, the distribution of effect estimates and p-values is consistent with a global null hypothesis: no taxa show reproducible intervention-associated shifts across studies or visits.
+The volcano plots below show per-taxon (or per-ASV) intervention effects. No individual taxon reached FDR significance in any study or visit.
 
 #### Combined intervention arms
 
@@ -93,7 +93,7 @@ if (!is.null(df)) {
 
 ## Untargeted proteomics
 
-Untargeted proteomic analyses were run in a subset of mother–infant dyads and carried important design constraints. Data were available for a limited number of samples, and in the ELICIT trial they were collected only in the control arm, which ruled out formal estimation of randomized intervention effects for ELICIT. The volcano plot below is descriptive: the share of nominally significant protein-level associations matches the false-positive rate expected under a global null distribution. **GO Biological Process enrichment** of the directional protein lists appears in the *Pathway enrichment* chapter.
+Untargeted proteomics was measured in a subset of mother–infant dyads, so data were available for a limited number of samples. ELICIT proteome samples came only from the control and azithromycin arms, so no nicotinamide effect could be estimated for that trial. The volcano plot below is descriptive; few proteins reach FDR significance (see the table). Gene Ontology (GO) Biological Process enrichment of the directional protein lists is in the *Pathway enrichment* section.
 
 ```{r prot-vol, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7, results='asis'}
 df <- prep_explor("results/adjusted_combined_arms_intervention_effects_proteomics_results_clean.RDS")
@@ -104,40 +104,40 @@ if (!is.null(df)) {
     nice_dt(df %>% dplyr::select(dplyr::any_of(c("study","visit","contrast","label_f","biomarker",
                                                   "est","cil","ciu","pval","pval_adj","sig","sigFDR"))) %>%
               dplyr::mutate(dplyr::across(where(is.numeric), ~ signif(.x, 3))),
-            caption = "Per-protein adjusted intervention effects on the untargeted milk proteome, pooled BEP vs. control (descriptive; ELICIT proteomics were control-arm only).")
+            caption = "Per-protein adjusted intervention effects on the untargeted milk proteome, pooled BEP vs. control (descriptive; ELICIT excluded: no nicotinamide-arm samples).")
   ))
 }
 ```
 
 ## Untargeted metabolomics
 
-The volcano below displays effect estimates and significance for the full untargeted metabolomics feature set (≈97,000 features across studies, visits, and ionization modes). Relative to the microbiome and proteomics analyses, untargeted metabolomics shows a higher density of features with nominal evidence of intervention association. Only a small fraction survives FDR correction. The pattern reads more clearly at the **pathway level**, in the MetaboAnalyst ORA and Mummichog results of the *Pathway enrichment* chapter, and it is summarized in the manuscript's Figure 6 (panels A–B).
+The volcano plot below shows effect estimates and significance for the full untargeted metabolomics feature set (≈97,000 features across studies, visits, and ionization modes). More features show nominal evidence of an intervention effect than in the microbiome and proteomics analyses, but only a small fraction survive FDR correction. The pattern is clearer at the pathway level, in the MSEA and Mummichog results of the *Pathway enrichment* section, and is summarized in the manuscript's Figure 6 (panels A–B).
 
 ```{r met-vol, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7, results='asis'}
 df <- prep_explor("results/adjusted_combined_arms_intervention_effects_untargeted_results_clean.RDS")
 if (!is.null(df)) {
   p <- volcano_capped(df, n_show = 5000,
-                      table_note = "the table below is restricted to the features with q < 0.10, not the full feature set",
+                      table_note = "the table below is restricted to the features with Q < 0.10, not the full feature set",
                       title = "Untargeted metabolomics: pooled intervention vs. control")
   ## The full ~1M-row table is far too large to render as DT; expose the
   ## FDR-significant subset only.
   df_sig <- df %>% dplyr::filter(!is.na(pval_adj), pval_adj < 0.1) %>%
     dplyr::mutate(dplyr::across(where(is.numeric), ~ signif(.x, 3)))
-  cat(sprintf("\n\n*Table below shows the %s metabolite-feature **ATE estimates** with q < 0.10 across all study × visit strata; %s ATE estimates total (after filtering the upstream RDS to `measure==\"ATE\"`). Counts and percentages are computed on ATE rows only; the RDS file also stores `MN` (mean) rows for the control and intervention arms, which are excluded here so the denominator matches per-arm intervention-effect estimates.*\n\n",
+  cat(sprintf("\n\n*The table below shows the %s metabolite-feature ATE estimates with Q < 0.10 across all study × visit strata, out of %s ATE estimates in total (results file filtered to `measure==\"ATE\"`). Counts and percentages use ATE rows only; the RDS file also stores `MN` (mean) rows for the control and intervention arms, which are excluded here so the denominator matches per-arm intervention-effect estimates.*\n\n",
               format(nrow(df_sig), big.mark = ","), format(nrow(df), big.mark = ",")))
   print(htmltools::tagList(
     p,
     nice_dt(df_sig %>% dplyr::select(dplyr::any_of(c(
       "study","visit","contrast","label_f","biomarker","est","cil","ciu",
       "pval","pval_adj","sig","sigFDR"))), page_length = 25,
-      caption = "Untargeted-metabolomics features with q < 0.10 (adjusted intervention effects, pooled BEP vs. control). The complete feature set is too large to embed here; it is regenerated by the upstream analysis pipeline into results/adjusted_combined_arms_intervention_effects_untargeted_results_clean.RDS.")
+      caption = "Untargeted-metabolomics features with Q < 0.10 (adjusted intervention effects, pooled BEP vs. control). The complete feature set is too large to embed here; the analysis code writes it to results/adjusted_combined_arms_intervention_effects_untargeted_results_clean.RDS.")
   ))
 }
 ```
 
 ## Pre-rendered volcano plot objects (manuscript figure panels)
 
-For reference, we also include the volcano plot objects used to assemble the manuscript figures. These are saved ggplot objects from the upstream figure-prep pipeline; they render here as static images when plotly cannot convert their internal structure.
+These are the volcano plots used to build the manuscript figure panels, shown as static images.
 
 ```{r explor-prerendered, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7, results='asis'}
 v_combined <- safe_readRDS(here::here("figures/figure-data/volcano_plots_pooled_arms.RDS"),

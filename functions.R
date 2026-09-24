@@ -1,8 +1,76 @@
 ## Shared helpers for the IMiC intervention-effects supplement.
 ## Loaded by individual chapter Rmds via source("functions.R") (or here()).
 
-tableau10 <- c("#1F77B4","#FF7F0E","#2CA02C","#D62728",
-               "#9467BD","#8C564B","#E377C2","#7F7F7F","#BCBD22","#17BECF")
+## ---- Colourblind-safe palettes ----------------------------------------------
+## Science editor, round 2: every figure must be colourblind-accessible, avoiding
+## red-green coding or backing colour with a second cue such as symbol shape. So
+## every categorical colour below is Okabe-Ito, and every plot that encodes a
+## category by colour also encodes it by shape or line type.
+okabe_ito <- c(black = "#000000", orange = "#E69F00", skyblue = "#56B4E9",
+               green = "#009E73", yellow = "#F0E442", blue = "#0072B2",
+               vermillion = "#D55E00", purple = "#CC79A7")
+
+## The five objects below are copied verbatim from the upstream analysis repo,
+## figure-scripts/manuscript_figures/study_colors.R (2026-09-23), so studies and
+## milk-component categories look the same here as in the manuscript figures.
+## Index the maps by name (imic_study_cols[studies]), never by position.
+imic_study_cols <- c(
+  "ELICIT"     = "#0072B2",  # Okabe-Ito blue
+  "MISAME-III" = "#E69F00",  # Okabe-Ito orange
+  "Mumta-LW"   = "#009E73"   # Okabe-Ito bluish green
+)
+imic_study_shapes <- c(
+  "ELICIT"     = 16,         # filled circle
+  "MISAME-III" = 17,         # filled triangle
+  "Mumta-LW"   = 15          # filled square
+)
+imic_cat_cols   <- c("#0072B2", "#E69F00", "#009E73", "#D55E00", "#CC79A7", "#56B4E9", "#8C6D31")
+imic_cat_shapes <- c(17, 18, 25, 8, 4, 3, 10)   # triangle, diamond, down-triangle, asterisk, x, plus, circle-plus
+imic_shapes_for <- function(keys) {
+  s <- unname(imic_study_shapes[keys])
+  s[is.na(s)] <- 16
+  stats::setNames(s, keys)
+}
+
+## Randomised contrasts vs. control, fixed by name so a contrast keeps its colour
+## and line type in every plot. Only one trial's contrasts share a facet, so the
+## colours are chosen to separate within a trial; line types do the same job
+## without colour.
+imic_contrast_cols <- c(
+  "Nico" = "#0072B2", "Az." = "#8C6D31", "Nico+Az." = "#CC79A7",          # ELICIT
+  "IFA/BEP" = "#E69F00", "BEP/BEP" = "#D55E00", "BEP/IFA" = "#56B4E9",    # MISAME-III
+  "BEP+ExBf" = "#009E73", "BEP+ExBf+AZT" = "#000000"                      # Mumta-LW
+)
+imic_contrast_linetypes <- c(
+  "Nico" = "solid", "Az." = "dashed", "Nico+Az." = "dotted",
+  "IFA/BEP" = "solid", "BEP/BEP" = "dashed", "BEP/IFA" = "dotted",
+  "BEP+ExBf" = "solid", "BEP+ExBf+AZT" = "dashed"
+)
+
+## Colour and line-type scales for a categorical variable (typically `contrast`).
+## Known contrast names get their fixed colour/line type; anything else (e.g. the
+## growth-plot contrast labels) is filled in from the remaining Okabe-Ito colours
+## and a cycle of line types. Use both scales with the same `name` so ggplot
+## merges them into one legend.
+imic_contrast_scales <- function(keys, name = "Contrast") {
+  keys <- sort(unique(as.character(keys[!is.na(keys)])))
+  cols <- unname(imic_contrast_cols[keys])
+  spare <- setdiff(c(imic_cat_cols, okabe_ito[["black"]]), cols)
+  cols[is.na(cols)] <- rep_len(spare, sum(is.na(cols)))
+  lts <- unname(imic_contrast_linetypes[keys])
+  spare_lt <- setdiff(c("solid", "dashed", "dotted", "dotdash", "longdash", "twodash"), lts)
+  if (!length(spare_lt)) spare_lt <- c("dotdash", "longdash", "twodash")
+  lts[is.na(lts)] <- rep_len(spare_lt, sum(is.na(lts)))
+  list(ggplot2::scale_colour_manual(name = name, values = stats::setNames(cols, keys)),
+       ggplot2::scale_linetype_manual(name = name, values = stats::setNames(lts, keys)))
+}
+
+## Significance tiers shared by the volcano helpers: grey circle (not
+## significant), blue square (nominal p < 0.05), orange triangle (FDR q below
+## threshold). Colour and shape both carry the tier.
+sig_tier_cols   <- c("grey70", okabe_ito[["blue"]], okabe_ito[["orange"]])
+sig_tier_shapes <- c(16, 15, 17)
+sig_tier_symbols <- c("circle", "square", "triangle-up")   # plotly equivalents
 
 ## Standard study/visit factor levels used across chapters.
 .harmonize_factors <- function(tab) {
@@ -65,32 +133,36 @@ forest_plot <- function(tab, arm_strat = FALSE, interactive = TRUE,
   ## x=est directly and skip coord_flip(). geom_errorbarh() supplies the
   ## horizontal error bars.
   if (arm_strat) {
+    ## Contrast is carried by colour AND by the line type of its CI bar;
+    ## significance tier by symbol shape (open circle / filled circle / triangle).
     p <- ggplot2::ggplot(tab, ggplot2::aes(y = stats::reorder(label_f, est), x = est,
                                            color = contrast, shape = sigcat,
                                            group = contrast, text = tooltip)) +
       ggplot2::geom_point(position = ggplot2::position_dodge(width = 0.5), size = 2) +
-      ggplot2::geom_errorbar(ggplot2::aes(xmin = cil, xmax = ciu),
+      ggplot2::geom_errorbar(ggplot2::aes(xmin = cil, xmax = ciu, linetype = contrast),
                              width = 0.2, orientation = "y",
                              position = ggplot2::position_dodge(width = 0.5)) +
       ggplot2::geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
-      ggplot2::scale_shape_manual(values = c(1, 19, 17)) +
-      ggplot2::scale_color_manual(values = tableau10) +
+      ggplot2::scale_shape_manual(values = c(1, 19, 17), name = NULL, drop = FALSE) +
+      imic_contrast_scales(tab$contrast) +
       ggplot2::facet_wrap(~ panel) +
       ggplot2::labs(title = title, y = "Outcome", x = "Estimate (SD units)") +
       ggplot2::theme_minimal() +
       ggplot2::theme(legend.position = "right")
   } else {
+    ## Three tiers, each with its own colour AND shape: open grey circle (not
+    ## significant), filled grey circle (p < 0.05 before FDR), filled orange
+    ## triangle (FDR-significant).
     p <- ggplot2::ggplot(tab, ggplot2::aes(y = stats::reorder(label_f, est), x = est,
-                                           color = sigFDR, shape = sig, text = tooltip)) +
+                                           color = sigcat, shape = sigcat, text = tooltip)) +
       ggplot2::geom_point(position = ggplot2::position_dodge(width = 0.5), size = 2) +
       ggplot2::geom_errorbar(ggplot2::aes(xmin = cil, xmax = ciu),
                              width = 0.2, orientation = "y",
                              position = ggplot2::position_dodge(width = 0.5)) +
       ggplot2::geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
-      ggplot2::scale_shape_manual(values = c(1, 19),
-                                  labels = c("Not Significant","Significant")) +
-      ggplot2::scale_color_manual(values = c("grey60", tableau10[2]),
-                                  labels = c("Not Significant","Significant (FDR)")) +
+      ggplot2::scale_shape_manual(values = c(1, 19, 17), drop = FALSE) +
+      ggplot2::scale_color_manual(values = c("grey60", "grey35", okabe_ito[["orange"]]),
+                                  drop = FALSE) +
       ggplot2::facet_wrap(~ panel) +
       ggplot2::labs(title = title, y = "Outcome", x = "Estimate (SD units)") +
       ggplot2::theme_minimal() +
@@ -136,13 +208,14 @@ volcano_plot <- function(tab, fdr_thresh = 0.05, interactive = TRUE,
   }
 
   p <- ggplot2::ggplot(tab, ggplot2::aes(x = est, y = neglog10p,
-                                         color = sig_label, text = tooltip)) +
+                                         color = sig_label, shape = sig_label, text = tooltip)) +
     ggplot2::geom_point(alpha = 0.6, size = 1.4) +
     ggplot2::geom_hline(yintercept = -log10(0.05), linetype = "dotted", color = "grey50") +
     ggplot2::geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
-    ggplot2::scale_color_manual(values = c("grey70", tableau10[1], tableau10[2]), drop = FALSE) +
+    ggplot2::scale_color_manual(values = sig_tier_cols, drop = FALSE) +
+    ggplot2::scale_shape_manual(values = sig_tier_shapes, drop = FALSE) +
     facet_layer +
-    ggplot2::labs(title = title, x = x_lab, y = "-log10(p)", color = NULL) +
+    ggplot2::labs(title = title, x = x_lab, y = "-log10(p)", color = NULL, shape = NULL) +
     ggplot2::theme_minimal()
 
   if (interactive && requireNamespace("plotly", quietly = TRUE) &&
@@ -303,7 +376,7 @@ show_any <- function(x, label = NULL) {
     ## also the only reliable option here: ggplotly() returns an htmlwidget, and
     ## print()-ing a widget from INSIDE a function does not trigger knitr's
     ## htmlwidget path, so the plot is silently dropped from the page (the same
-    ## trap that hid the Table S5 and blood-Mummichog tables). A widget has to be
+    ## trap that hid the Table S6 and blood-Mummichog tables). A widget has to be
     ## the chunk's own last auto-printed value to survive, which a side-effect
     ## helper like this one cannot arrange. print() of a ggplot, by contrast,
     ## draws to the graphics device and is captured wherever it is called.
@@ -391,8 +464,9 @@ linked_volcano_table <- function(df, fdr_thresh = 0.05,
 
   p <- plotly::plot_ly(sd, x = ~est, y = ~neglog10p, type = "scatter", mode = "markers",
                        color = ~Significance,
-                       colors = stats::setNames(c("grey70", tableau10[1], tableau10[2]),
-                                                levels(df$Significance)),
+                       colors = stats::setNames(sig_tier_cols, levels(df$Significance)),
+                       symbol = ~Significance,
+                       symbols = stats::setNames(sig_tier_symbols, levels(df$Significance)),
                        text = ~tooltip, hoverinfo = "text",
                        marker = list(size = 6, opacity = 0.6)) %>%
     plotly::layout(title = list(text = title), xaxis = list(title = x_lab),
@@ -445,8 +519,22 @@ linked_scatter_table <- function(df, x_col, y_col, color_col = NULL, key_col,
                type = "scatter", mode = "markers", text = ~tooltip, hoverinfo = "text",
                marker = list(size = 6, opacity = 0.6))
   if (!is.null(color_col) && color_col %in% names(df)) {
-    args$color  <- stats::as.formula(paste0("~`", color_col, "`"))
-    args$colors <- tableau10
+    ## Colour and symbol both encode the category. An up/down direction gets
+    ## pointing triangles; any other category cycles through distinct symbols.
+    lv   <- sort(unique(as.character(df[[color_col]][!is.na(df[[color_col]])])))
+    dirn <- ifelse(grepl("^up", lv, ignore.case = TRUE), "up",
+            ifelse(grepl("^down", lv, ignore.case = TRUE), "down", NA))
+    if (!anyNA(dirn)) {
+      cols <- ifelse(dirn == "up", okabe_ito[["vermillion"]], okabe_ito[["blue"]])
+      syms <- ifelse(dirn == "up", "triangle-up", "triangle-down")
+    } else {
+      cols <- rep_len(imic_cat_cols, length(lv))
+      syms <- rep_len(c("circle", "triangle-up", "square", "diamond", "x", "cross", "star"), length(lv))
+    }
+    args$color   <- stats::as.formula(paste0("~`", color_col, "`"))
+    args$colors  <- stats::setNames(cols, lv)
+    args$symbol  <- stats::as.formula(paste0("~`", color_col, "`"))
+    args$symbols <- stats::setNames(syms, lv)
   }
   p <- do.call(plotly::plot_ly, args) %>%
     plotly::layout(title = list(text = title), xaxis = list(title = x_lab),

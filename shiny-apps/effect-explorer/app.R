@@ -1,11 +1,11 @@
 # Intervention-Effect Explorer  ---------------------------------------------
-# Standalone Shiny app, deployed to the online supplement via shinylive
+# Standalone Shiny app, deployed to the online resource via shinylive
 # (WebAssembly / webR) so it runs entirely in the browser on GitHub Pages —
 # no server. It only *displays* the precomputed TMLE estimates; nothing is
 # re-fitted here. Data live in ./data (the 12 subsetted result CSVs), bundled
 # with the app at export time.
 #
-# Build (from the supplement repo root):
+# Build (from the online-resource repo root):
 #   source("build_apps.R")            # copies data in + shinylive::export()
 
 library(shiny)
@@ -101,12 +101,16 @@ server <- function(input, output, session) {
     d
   })
 
-  pal <- c("ns" = "grey70", "p < 0.05" = "#1F77B4", "q < 0.05" = "#FF7F0E")
+  # Okabe-Ito colours plus a symbol per tier, so significance never rests on
+  # colour alone (colourblind-accessible).
+  pal  <- c("ns" = "grey70", "p < 0.05" = "#0072B2", "q < 0.05" = "#E69F00")
+  syms <- c("ns" = "circle", "p < 0.05" = "square", "q < 0.05" = "triangle-up")
 
   output$volcano <- renderPlotly({
     d <- dat(); validate(need(nrow(d) > 0, "No rows match the current filters."))
     plot_ly(d, x = ~.est, y = ~neglog10p, type = "scatter", mode = "markers",
             color = ~factor(Significance, names(pal)), colors = pal,
+            symbol = ~factor(Significance, names(syms)), symbols = unname(syms),
             text = ~paste0(label_f, "<br>", study, " | ", visit, " | ", contrast,
                            "<br>effect ", signif(.est, 3), " | q ", signif(.q, 3)),
             hoverinfo = "text", marker = list(size = 7, opacity = 0.6)) |>
@@ -121,6 +125,7 @@ server <- function(input, output, session) {
     d <- d[order(d$.est), ]; d$label_f <- factor(d$label_f, levels = unique(d$label_f))
     plot_ly(d, x = ~.est, y = ~label_f, type = "scatter", mode = "markers",
             color = ~factor(Significance, names(pal)), colors = pal,
+            symbol = ~factor(Significance, names(syms)), symbols = unname(syms),
             error_x = list(type = "data", symmetric = FALSE,
                            array = ~(.ciu - .est), arrayminus = ~(.est - .cil)),
             text = ~paste0(study, " | ", visit, " | ", contrast,

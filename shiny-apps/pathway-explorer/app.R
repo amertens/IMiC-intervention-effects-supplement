@@ -1,7 +1,7 @@
 # Pathway-Enrichment Explorer  ----------------------------------------------
 # Standalone Shiny app deployed via shinylive (webR) — runs in the browser on
 # GitHub Pages, no server. Displays the scripted MetaboAnalystR enrichment
-# outputs (manuscript Tables S1–S6) from ./data; nothing is recomputed.
+# outputs (manuscript Tables S2–S7) from ./data; nothing is recomputed.
 #
 # The six enrichment result files have different schemas, so each is mapped to
 # a common frame: pathway | study | timepoint | contrast | direction | p | fdr | enrichment.
@@ -13,31 +13,39 @@ library(DT)
 # ---- analysis catalogue ----------------------------------------------------
 # type drives the column harmonisation in harmonize().
 ANALYSES <- list(
-  "Primary ORA (Table S1)" = list(
+  # Table S2 is the KEGG pathway analysis with topological impact (the same run
+  # as Fig. 3B): one non-directional cell per study x timepoint. The SMPDB ORA
+  # below is a different library/foreground/background and is offered as a
+  # separate supplementary view. See section 9.2.
+  "Primary KEGG pathway analysis (Table S2)" = list(
+    type = "kegg",
+    files = c(Combined = "primary_pathway_all_cells.csv")),
+  "Primary SMPDB ORA - supplementary view (not Table S2)" = list(
     type = "ora_primary",
     files = c(Combined = "primary_combined_supplementary_table.csv",
               `Arm-stratified` = "primary_stratified_supplementary_table.csv")),
-  # Table S2 is the DUAL-LIBRARY run (SMPDB small-molecule + lipid sets), which is
+  # Table S3 is the DUAL-LIBRARY run (SMPDB small-molecule + lipid sets), which is
   # also what Fig. 5B is built from. The single-library combined/stratified runs
   # below use a different background and do NOT reproduce the printed table --
-  # they are offered separately so the two are not confused. See section 9.4.
-  "Tertiary MSEA (Table S2)" = list(
+  # they are offered separately so the two are not confused. See section 9.5.
+  "Tertiary MSEA (Table S3)" = list(
     type = "msea",
     files = c(`All contrasts` = "tertiary_msea_dual.csv")),
-  "Tertiary MSEA - single-library view (not Table S2)" = list(
+  "Tertiary MSEA - single-library view (not Table S3)" = list(
     type = "msea",
     files = c(Combined = "tertiary_msea_combined.csv",
               `Arm-stratified` = "tertiary_msea_stratified.csv")),
-  "Triglyceride fatty-acids (Table S3)" = list(
+  "Triglyceride fatty-acids (Table S4)" = list(
     type = "tgfa",
-    files = c(`Arm-stratified` = "triglyceride_fa_composition_stratified.csv")),
-  "Untargeted MSEA (Table S4)" = list(
+    files = c(Combined = "triglyceride_fa_composition_combined.csv",
+              `Arm-stratified` = "triglyceride_fa_composition_stratified.csv")),
+  "Untargeted MSEA (Table S5)" = list(
     type = "msea",
     files = c(Combined = "untargeted_msea_combined.csv")),
-  "Milk Mummichog (Table S5)" = list(
+  "Milk Mummichog (Table S6)" = list(
     type = "mummichog",
     files = c(Combined = "milk_mummichog_tableS5.csv")),
-  "Milk proteome GO (Table S6)" = list(
+  "Milk proteome GO (Table S7)" = list(
     type = "go",
     files = c(Combined = "proteomics_go_tableS6.csv"))
 )
@@ -53,6 +61,10 @@ read_csv0 <- function(f) {
 harmonize <- function(d, type) {
   g <- function(nm) if (nm %in% names(d)) d[[nm]] else NA
   out <- switch(type,
+    kegg = data.frame(pathway = g("pathway"), study = g("study"),
+                      timepoint = g("tp"), contrast = "combined",
+                      direction = "non-directional", p = g("raw_p"), fdr = g("fdr"),
+                      enrichment = NA_real_, stringsAsFactors = FALSE),
     ora_primary = data.frame(pathway = g("pathway"), study = g("study"),
                              timepoint = g("studytime"), contrast = g("contrast"),
                              direction = g("direction"), p = g("raw_p"), fdr = g("fdr_native"),
@@ -74,16 +86,32 @@ harmonize <- function(d, type) {
                     direction = g("regulation"), p = g("p_value"), fdr = g("fdr"),
                     enrichment = g("fold_enrichment"), stringsAsFactors = FALSE)
   )
-  out[!is.na(out$pathway) & out$pathway != "", , drop = FALSE]
+  out <- out[!is.na(out$pathway) & out$pathway != "", , drop = FALSE]
+  # Direction of effect in one vocabulary (the source tables use up/down,
+  # Upregulated/Downregulated, ...), so the plot can give it a symbol as well
+  # as a colour.
+  d <- tolower(as.character(out$direction))
+  out$dir <- ifelse(grepl("^up", d), "up-regulated",
+             ifelse(grepl("^down", d), "down-regulated", "non-directional"))
+  out
 }
+
+# Okabe-Ito colours and a matching symbol per direction, so direction never
+# rests on colour alone (colourblind-accessible).
+DIR_COLS <- c("up-regulated" = "#D55E00", "down-regulated" = "#0072B2",
+              "non-directional" = "#000000")
+DIR_SYMS <- c("up-regulated" = "triangle-up", "down-regulated" = "triangle-down",
+              "non-directional" = "circle")
 
 # ---- UI --------------------------------------------------------------------
 ui <- fluidPage(
   titlePanel("IMiC — Pathway-Enrichment Explorer"),
   tags$p(style = "color:#555;",
          "Scripted MetaboAnalystR enrichment across studies, timepoints, and contrasts ",
-         "(manuscript Tables S1–S6). Pick an analysis, filter, and read the enriched ",
-         "pathways. Runs in your browser; the first load fetches the R runtime."),
+         "(manuscript Tables S2–S7). Pick an analysis, filter, and read the enriched ",
+         "pathways. Up- and down-regulated pathways are told apart by symbol ",
+         "(triangle up / down) as well as colour. Runs in your browser; the first load ",
+         "fetches the R runtime."),
   sidebarLayout(
     sidebarPanel(
       width = 3,
@@ -156,8 +184,11 @@ server <- function(input, output, session) {
     keep_paths <- unique(d$pathway)[seq_len(min(input$topn, length(unique(d$pathway))))]
     d <- d[d$pathway %in% keep_paths, , drop = FALSE]
     d$pathway <- factor(d$pathway, levels = rev(unique(d$pathway[order(d$neglogfdr)])))
+    lv <- intersect(names(DIR_COLS), unique(d$dir))
+    d$dir <- factor(d$dir, levels = lv)
     plot_ly(d, x = ~neglogfdr, y = ~pathway, type = "scatter", mode = "markers",
-            color = ~as.character(direction),
+            color = ~dir, colors = DIR_COLS[lv],
+            symbol = ~dir, symbols = unname(DIR_SYMS[lv]),
             size = ~pmax(neglogfdr, 0.1), sizes = c(30, 300),
             text = ~paste0(pathway, "<br>", stratum, "<br>direction ", direction,
                            "<br>q ", signif(fdr, 3), " | p ", signif(p, 3),
@@ -167,7 +198,10 @@ server <- function(input, output, session) {
              legend = list(orientation = "h", title = list(text = "direction")),
              shapes = list(list(type = "line", x0 = -log10(0.05), x1 = -log10(0.05),
                                 yref = "paper", y0 = 0, y1 = 1,
-                                line = list(dash = "dot", color = "grey50"))))
+                                line = list(dash = "dot", color = "grey50"))),
+             annotations = list(list(x = -log10(0.05), y = 1, yref = "paper",
+                                     text = "q = 0.05", showarrow = FALSE,
+                                     xanchor = "left", font = list(color = "grey40"))))
   })
 
   output$table <- DT::renderDataTable({

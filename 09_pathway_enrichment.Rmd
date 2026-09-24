@@ -1,12 +1,12 @@
 # Reproducible pathway and enrichment analyses
 
-This chapter reports the **pathway- and enrichment-level interpretation** of the per-component milk signals shown in §4 and §5, converting large tables of individual features into a smaller set of biologically interpretable pathways. It replaces the earlier manual `metaboanalyst.ca` point-and-click workflow with a fully scripted **MetaboAnalystR** pipeline (`src/metaboanalyst/` in the upstream analysis repository), so every table below can be regenerated deterministically from the intervention-effect estimates.
+This section summarizes the per-component milk effects of §4 and §5 at the level of pathways. Every table was produced by scripts run offline and can be regenerated from the intervention-effect estimates: MetaboAnalystR for the KEGG, SMPDB, and MSEA analyses, a Wilcoxon rank-sum test for triglyceride fatty-acid composition, the mummichog software for Mummichog, and clusterProfiler for the proteome GO analysis.
 
-Each analysis is reported twice: for the **combined-arm** contrast (all maternal nutritional-intervention arms pooled vs. control, the framing used in the printed manuscript figures) and for the **arm-stratified** contrasts (each randomised arm vs. control, the supplement view). Enrichment tests use a permissive foreground (features at unadjusted *p* < 0.05, split by direction of effect) evaluated against the assay-specific background, then Benjamini–Hochberg FDR correction of the pathway *p*-values within each study × timepoint × contrast × direction stratum (and, for Mummichog, ionisation mode). A pathway is flagged **significant** at *Q* < 0.05 (`fdr_native` / `fdr` / `FDR` column, depending on the table).
+Most analyses are reported twice: for the combined-arm contrast (all maternal nutritional-intervention arms pooled vs. control, as in the manuscript figures) and for the arm-stratified contrasts (each randomized arm vs. control). Unless stated otherwise, the foreground is the set of features with unadjusted *P* < 0.05, split by direction of effect, tested against the background stated for each analysis; pathway *P*-values are then Benjamini–Hochberg-corrected within each study × time point × contrast × direction stratum (and, for Mummichog, ionization mode). A pathway is significant at *Q* < 0.05 (the `fdr_native`, `fdr`, or `FDR` column, as named in each table). Some tables use the trials' internal labels: Elicit = ELICIT, Misame or MISAME = MISAME-III, and Vital = Mumta-LW.
 
-> **Interpretation note.** These enrichment results summarise and contextualise the prespecified per-component analyses; they are not themselves a separate confirmatory test. Over-representation depends on the choice of background metabolite set (see §9.2), and pathway membership in reference databases is incomplete, so absence of a pathway is not evidence of absence of biology. Read the results as a hypothesis-generating map of where the intervention signal concentrates.
+> **Interpretation note.** These enrichment results summarize the prespecified per-component analyses and are not a separate confirmatory test. Over-representation depends on the background metabolite set (§\@ref(path-ora-vs-pathway)), and pathway membership in reference databases is incomplete, so a missing pathway is not evidence that the biology is absent. The results are hypothesis-generating and indicate where the intervention effects concentrate.
 
-> **Coverage: all six manuscript enrichment tables (S1–S6) are reproduced here** as searchable tables, in manuscript order: primary ORA (**Table S1**, §9.1), the ORA-vs-impact comparison (§9.2), the empty secondary result (§9.3), tertiary MSEA (**Table S2**, §9.4), triglyceride fatty-acid composition (**Table S3**, §9.5), untargeted-metabolome MSEA (**Table S4**, §9.6), milk untargeted Mummichog (**Table S5**, §9.7), and milk-proteome GO (**Table S6**, §9.8).
+> **Coverage.** All six manuscript enrichment tables (Tables S2–S7) are reproduced here as searchable tables, in manuscript order: primary KEGG pathway analysis (Table S2, §\@ref(path-primary)), the ORA-vs-impact comparison (§\@ref(path-ora-vs-pathway)), the empty secondary result (§\@ref(path-secondary)), tertiary MSEA (Table S3, §\@ref(path-tertiary)), triglyceride fatty-acid composition (Table S4, §\@ref(path-tg-fa)), untargeted-metabolome MSEA (Table S5, §\@ref(path-untargeted-msea)), untargeted milk-metabolome Mummichog (Table S6, §\@ref(path-mummichog)), and milk-proteome GO (Table S7, §\@ref(path-go)).
 
 ```{r path-setup, include=FALSE}
 library(tidyverse)
@@ -19,11 +19,11 @@ knitr::opts_chunk$set(fig.width = 12, fig.height = 8, dpi = 110)
 
 ## Read an enrichment CSV, degrading gracefully. Unlike safe_read_csv this also
 ## survives an empty (0-byte / header-only) file, since some cells of the enrichment
-## grid legitimately return no pathways (e.g. HMOs/bioactives, §9.3).
+## grid legitimately return no pathways (e.g. HMOs/bioactives, §9.4).
 read_enrich <- function(path) {
   full <- here::here(path)
   if (!file.exists(full)) {
-    cat(sprintf("*Results file not found at `%s`. Run `port_results.R` to copy it from the upstream analysis repo.*", path))
+    cat(sprintf("*Results file not found at `%s`. Run `port_results.R` to copy it from the analysis repository.*", path))
     return(invisible(NULL))
   }
   df <- tryCatch(utils::read.csv(full, check.names = FALSE), error = function(e) NULL)
@@ -47,7 +47,7 @@ enrich_dt <- function(df, caption = NULL, page_length = 15) {
 
 ## Interactive pathway explorer {#pathway-explorer-app}
 
-The app below spans all six enrichment analyses in this chapter (manuscript Tables S1–S6). Pick an analysis, restrict to FDR-significant pathways or show everything, and filter by study and timepoint; the dot plot ranks pathways by −log10(FDR) and the table gives the full numbers. Like the effect explorer in §5, it runs entirely in your browser (WebAssembly R), so the first load fetches the runtime and is then instant. [Open it full-screen in a new tab](apps/pathway-explorer/).
+The app below covers all six enrichment analyses in this section (manuscript Tables S2–S7). Choose an analysis, show all pathways or only the FDR-significant ones, and filter by study and time point; the dot plot ranks pathways by −log10(FDR) and the table gives the full statistics. Like the effect explorer in §5, it runs entirely in the browser (WebAssembly R), so the first load downloads the runtime and later loads are fast. [Open it full-screen in a new tab](apps/pathway-explorer/).
 
 ```{r pathway-explorer-embed, echo=FALSE, results='asis'}
 if (knitr::is_html_output()) {
@@ -55,49 +55,66 @@ if (knitr::is_html_output()) {
       'width="100%" height="820" loading="lazy" ',
       'style="border:1px solid #ddd; border-radius:4px;"></iframe>\n', sep = "")
 } else {
-  cat("*The interactive pathway explorer is available in the HTML build of this appendix.*\n")
+  cat("*The interactive pathway explorer is available in the web version of this online resource.*\n")
 }
 ```
 
-## Primary outcomes: MetaboAnalyst enrichment of micronutrient / B-vitamin features {#path-primary}
+## Primary outcomes: KEGG pathway analysis of micronutrient / B-vitamin features {#path-primary}
 
-These are the pathway summaries of the **primary-outcome** signals (macronutrients, micronutrients, B-vitamins). They correspond to manuscript **Table S1** and the enrichment panels of manuscript **Fig. 3B**. Over-representation analysis (ORA) is run per study × timepoint × contrast × direction against the targeted-panel background; the `significant` column flags pathways with `fdr_native` < 0.05.
+These analyses summarize the primary-outcome effects (macronutrients, micronutrients, B vitamins) at the pathway level. The main analysis corresponds to manuscript Table S2 and Fig. 3B. For each study × time point, the primary components that were FDR-significant under the combined-arm contrast were tested for over-representation in KEGG metabolic pathways (hypergeometric test against the KEGG pathway library, one test per study–time point combination, not split by direction), and each pathway was also scored by its topological impact (relative-betweenness centrality of the hit metabolites). Pathway *P*-values were Benjamini–Hochberg-corrected within each study–time point combination.
 
-The clearest result is **nicotinate and nicotinamide metabolism**, driven by the ELICIT nicotinamide-during-lactation arm (up-regulated at both the 1-month and 5-month visits; 5/15 pathway metabolites hit, hypergeometric *p* ≈ 3.7 × 10⁻¹¹, *Q* ≈ 3.0 × 10⁻⁹), and also FDR-significant in the BEP trials (Mumta-LW, MISAME-III). Riboflavin, vitamin B~6~, and thiamine metabolism appear as secondary FDR-significant pathways across BEP trials and timepoints.
+The strongest result is nicotinate and nicotinamide metabolism, driven by the ELICIT nicotinamide-during-lactation arm at the 1-month and 5-month visits (5 of 15 pathway metabolites hit, *P* = 3.5 × 10⁻¹¹, *Q* = 2.8 × 10⁻⁹, impact 0.62); this pathway is also FDR-significant at every Mumta-LW and MISAME-III visit. The other FDR-significant pathways are riboflavin metabolism (all MISAME-III and Mumta-LW visits), vitamin B~6~ metabolism (all three MISAME-III visits), and thiamine metabolism (MISAME-III, 14–21 days). In all, 16 of the 31 study × time point × pathway rows have *Q* < 0.05, and these 16 rows make up Table S2.
 
 ```{r path-primary-fig-combined, echo=FALSE, message=FALSE, warning=FALSE}
-safe_img("figures/figure4_combined_arms.png", label = "figure4_combined_arms.png")
+safe_img("figures/figure3.png", label = "figure3.png")
 ```
 
-***Figure (manuscript Fig. 3B, combined arms).** Volcano and pathway-enrichment composite for the primary micronutrient / B-vitamin outcomes, all maternal-intervention arms pooled vs. control. Points are individual components; enriched pathways are annotated. Nicotinate/nicotinamide metabolism (ELICIT) and riboflavin / vitamin B~6~ metabolism (BEP trials) are the leading FDR-significant pathways.*
+***Figure (manuscript Fig. 3, combined arms).** (A) Volcano plots of intervention effects on the primary HM components by study and visit, all maternal-intervention arms pooled vs. control. The dashed gray line is the nominal cutoff (*P* < 0.05) and the dotted green line the FDR cutoff. FDR-significant components are colored and shaped by component category (other points black), the top five are labeled, and the inset bars show, per category, the share of all components (light) and of FDR-significant components (dark). (B) KEGG pathway analysis (Table S2). Each point is one pathway in one study–time point combination, plotting topological impact (*x*) against −log~10~(*P*) (*y*), colored and shaped by study (ELICIT circles, MISAME-III triangles, Mumta-LW squares); non-significant results are gray. The labeled gray line marks *P* < 0.05 and the labeled green line the FDR threshold (*Q* < 0.05). Ellipses group repeated measurements of the same pathway, and pathways nominally enriched in at least two study–time point combinations are labeled.*
+
+```{r path-primary-tab-kegg, echo=FALSE, message=FALSE, warning=FALSE}
+enrich_dt(read_enrich("results/metaboanalyst/primary_pathway_local/primary_pathway_all_cells.csv"),
+          caption = "Primary-outcome KEGG pathway analysis (over-representation with topological impact), combined intervention arms vs. control: all 31 study × time point × pathway rows. The 16 rows with fdr < 0.05 are manuscript Table S2. tp = time point; impact = pathway topology score; fdr = BH-adjusted pathway P-value.")
+```
+
+```{r path-primary-tab-kegg-hits, echo=FALSE, message=FALSE, warning=FALSE}
+enrich_dt(read_enrich("results/metaboanalyst/primary_pathway_local/primary_pathway_hits_all_cells.csv"),
+          caption = "Hit metabolites for each KEGG pathway row above (one row per study × time point × pathway × metabolite); Table S2 lists them in its Metabolites column.")
+```
+
+The next table is a separate analysis of the same primary effects and is not Table S2. It is a MetaboAnalyst over-representation analysis against the SMPDB metabolite sets, run per study × time point × contrast × direction on the *P* < 0.05 foreground with the targeted-panel background. Nicotinate and nicotinamide metabolism, up-regulated in ELICIT at 1 and 5 months (5 of 7 set members hit), is the only pathway that clears FDR here, in agreement with Table S2, where it is also the strongest pathway. Riboflavin, vitamin B~6~, and thiamine metabolism do not, because the library, foreground, and background all differ from those of Table S2.
 
 ```{r path-primary-tab-combined, echo=FALSE, message=FALSE, warning=FALSE}
 enrich_dt(read_enrich("results/metaboanalyst/primary_combined/primary_combined_supplementary_table.csv"),
-          caption = "Primary-outcome MetaboAnalyst ORA, combined intervention arms vs. control (manuscript Table S1). significant = fdr_native < 0.05.")
+          caption = "Primary-outcome MetaboAnalyst ORA against SMPDB metabolite sets, combined intervention arms vs. control (separate analysis; not manuscript Table S2). significant = fdr_native < 0.05.")
 ```
 
 ### Arm-stratified
 
 ```{r path-primary-fig-strat, echo=FALSE, message=FALSE, warning=FALSE}
-safe_img("figures/figure4_stratified_supplement.png", label = "figure4_stratified_supplement.png")
+safe_img("figures/figure3_stratified_supplement.png", label = "figure3_stratified_supplement.png")
 ```
 
-***Figure (manuscript Fig. 3B, arm-stratified supplement).** As above, with each randomised arm contrasted separately against its trial control.*
+***Figure (arm-stratified counterpart of manuscript Fig. 3; online-only).** As above, but with each randomized arm compared separately with its trial control. (A) Volcano plots per study × visit × contrast. (B) Pathway impact vs. −log~10~(*P*) for the arm-stratified pathway analysis (table below), colored and shaped by study as in Fig. 3B.*
+
+```{r path-primary-tab-strat-pathway, echo=FALSE, message=FALSE, warning=FALSE}
+enrich_dt(read_enrich("results/metaboanalyst/primary_stratified_pathway/primary_stratified_pathway_all_cells.csv"),
+          caption = "Primary-outcome pathway analysis with topological impact, arm-stratified contrasts vs. control (data for panel B of the figure above). impact = pathway topology score; fdr = BH-adjusted pathway P-value.")
+```
 
 ```{r path-primary-tab-strat, echo=FALSE, message=FALSE, warning=FALSE}
 enrich_dt(read_enrich("results/metaboanalyst/primary_stratified/primary_stratified_supplementary_table.csv"),
-          caption = "Primary-outcome MetaboAnalyst ORA, arm-stratified contrasts vs. control.")
+          caption = "Primary-outcome MetaboAnalyst ORA against SMPDB metabolite sets, arm-stratified contrasts vs. control (separate analysis; not manuscript Table S2).")
 ```
 
-### Direction-split ORA (up- vs down-regulated; online-only)
+### Direction-split ORA (up- vs down-regulated; online-only) {#path-primary-dirsplit}
 
-These standalone tables run the over-representation separately on the up- and down-regulated primary feature lists (combined arms). The §9.1 ORA already splits the *foreground* by direction internally; here that split is reported directly, recovering **nicotinate and nicotinamide metabolism** among the up-regulated features (ELICIT) and **lactose synthesis and superoxide degradation** among the down-regulated features (MISAME-III).
+These tables report the SMPDB over-representation analysis separately for the up- and down-regulated primary feature lists (combined arms). The SMPDB ORA above already splits the foreground by direction; here each direction is reported on its own. Nicotinate and nicotinamide metabolism is enriched among the up-regulated features (ELICIT, FDR-significant), and lactose synthesis and superoxide degradation among the down-regulated features (MISAME-III), at nominal *P* < 0.05 only.
 
 ```{r path-primary-dirsplit-fig, echo=FALSE, message=FALSE, warning=FALSE}
 safe_img("figures/figureS_primary_ora_by_direction.png", label = "figureS_primary_ora_by_direction.png")
 ```
 
-***Figure (online-only; primary-outcome ORA split by direction of effect, combined arms).** Enriched pathways among up- vs. down-regulated primary features. Nicotinate/nicotinamide metabolism (ELICIT) dominates the up-regulated side; lactose synthesis and superoxide degradation (MISAME-III) appear among the down-regulated side. Points are coloured by study, non-significant pathways are grey, and enrichment was tested per study, time point, and direction with Benjamini–Hochberg correction of the pathway-level p-values. (Dropped from the print manuscript/supplement entirely on 2026-08-26 per author decision, as there was not enough content to justify a numbered figure; the searchable tables below are the primary record.)*
+***Figure (online-only; primary-outcome ORA split by direction of effect, combined arms).** Enriched pathways among up- vs. down-regulated primary features. Nicotinate/nicotinamide metabolism (ELICIT) dominates the up-regulated side, and lactose synthesis and superoxide degradation (MISAME-III) appear on the down-regulated side. Points are colored by study and non-significant pathways are gray; enrichment was tested per study, time point, and direction, with Benjamini–Hochberg correction of the pathway-level *P*-values. The searchable tables below give the full results.*
 
 ```{r path-primary-ora-up, echo=FALSE, message=FALSE, warning=FALSE}
 enrich_dt(read_enrich("results/metaboanalyst/primary_combined/primary_ora_upregulated.csv"),
@@ -111,21 +128,21 @@ enrich_dt(read_enrich("results/metaboanalyst/primary_combined/primary_ora_downre
 
 ## Primary outcomes: over-representation vs. quantitative pathway/impact analysis {#path-ora-vs-pathway}
 
-MetaboAnalyst supports two related enrichment styles, and comparing them makes the **background dependence** of enrichment explicit:
+MetaboAnalyst offers two related enrichment methods on the SMPDB metabolite sets, and comparing them shows how enrichment depends on the background:
 
-- **Over-representation analysis (ORA)**, the §9.1 tables, tests whether the significant features are unexpectedly concentrated in a pathway, using the **restricted targeted-panel** as the background universe.
-- **Pathway / impact analysis**, the table below, additionally weights each pathway by the topological position of the hit metabolites and evaluates it against the **full SMPDB** background.
+- Over-representation analysis (ORA; the separate SMPDB analysis in §\@ref(path-primary)) tests whether the significant features are concentrated in a pathway more than expected, with the restricted targeted panel as the background universe.
+- Pathway/impact analysis (the table below) also weights each pathway by the topological position of the hit metabolites and uses the full SMPDB background.
 
-Both recover **nicotinate and nicotinamide metabolism** as the leading primary-outcome pathway. The impact analysis additionally flags **vitamin B~6~ metabolism**; because that difference tracks the larger background set rather than a distinct data signal, we show the two side by side so the dependence stays visible.
+Both identify nicotinate and nicotinamide metabolism as the leading primary-outcome pathway. The impact analysis also flags vitamin B~6~ metabolism; this difference reflects the larger background set rather than a distinct signal in the data, so we show both analyses to keep the dependence visible. The KEGG pathway analysis behind Table S2 and Fig. 3B (§\@ref(path-primary)) uses the same impact-weighted design on the KEGG library.
 
 ```{r path-ora-pathway-tab, echo=FALSE, message=FALSE, warning=FALSE}
 enrich_dt(read_enrich("results/metaboanalyst/primary_combined_pathway/primary_combined_pathway_all_cells.csv"),
-          caption = "Primary-outcome quantitative pathway/impact analysis (full SMPDB background), combined arms. impact = pathway topology score; fdr = BH-adjusted pathway p-value.")
+          caption = "Primary-outcome quantitative pathway/impact analysis (full SMPDB background), combined arms. impact = pathway topology score; fdr = BH-adjusted pathway P-value.")
 ```
 
 ## Secondary outcomes: HMOs and bioactive proteins {#path-secondary}
 
-Enrichment was also attempted for the secondary outcomes (human milk oligosaccharides and bioactive proteins). These returned **no enriched metabolite-set pathways**: HMOs and milk bioactive proteins are largely absent from the SMPDB metabolite-set libraries, so the mapping step leaves too few annotated features to test. We report the empty result here for completeness; it is not a null biological finding.
+We also ran enrichment for the secondary outcomes (human milk oligosaccharides and bioactive proteins). No metabolite-set pathways were enriched, because HMOs and milk bioactive proteins are largely absent from the SMPDB metabolite-set libraries and too few features map to them to test. The empty result is reported for completeness and is not a null biological finding.
 
 ```{r path-secondary-tab, echo=FALSE, message=FALSE, warning=FALSE}
 enrich_dt(read_enrich("results/metaboanalyst/secondary_combined/secondary_combined_all_cells.csv"),
@@ -136,45 +153,47 @@ enrich_dt(read_enrich("results/metaboanalyst/secondary_stratified/secondary_stra
 
 ## Tertiary outcomes: targeted-metabolome MSEA {#path-tertiary}
 
-Metabolite-set enrichment analysis (MSEA) of the tertiary **Biocrates MxP Quant 500** targeted panel summarises the per-metabolite effects from §5 at the pathway level. It corresponds to manuscript **Table S2** and **Fig. 5B**.
+Metabolite set enrichment analysis (MSEA) of the tertiary Biocrates MxP Quant 500 targeted panel summarizes the per-metabolite effects from §5 at the pathway level (manuscript Table S3 and Fig. 5B).
 
-Under BEP supplementation, breastmilk metabolism undergoes **time-dependent reprogramming**. In the early postpartum period the enrichment is dominated by broad **down-regulation of amino-acid and nitrogen-handling pathways** (arginine–proline, glycine–serine, methionine, and glutamate metabolism, and ammonia recycling) together with **mitochondrial energy metabolism** (fatty-acid β-oxidation, the citric-acid cycle, the electron-transport chain, ketone-body metabolism, and carnitine synthesis). By 3–4 months several of these pathways reverse, showing enrichment of mitochondrial respiration, lipid oxidation, and ketone metabolism. (The distinct down-regulation of *de novo fatty-acid biosynthesis* is an **untargeted**-metabolome finding reported in §9.6, not a targeted-panel MSEA result.)
+The milk metabolome responded to supplementation differently across lactation. In early lactation (≤2 months), the FDR-significant pathways were dominated by down-regulated amino-acid and nitrogen metabolism (glutamate, arginine–proline, methionine, and glycine–serine metabolism, ammonia recycling, and glutathione metabolism), together with fatty-acid and bile-acid biosynthesis and carnitine synthesis (*Q* = 6.0 × 10⁻⁶ to 3.5 × 10⁻² for these pathways; the lowest, methionine metabolism, is from ELICIT at 1 month in the nicotinamide + azithromycin arm). In the BEP trials, these pathways come from MISAME-III at 14–21 days and 1–2 months and Mumta-LW at 1.5 and 2 months. By 3–4 months, mitochondrial oxidative pathways (the electron-transport chain, ketone-body metabolism, and phytanic-acid peroxisomal oxidation) were up-regulated in MISAME-III (*Q* = 4.9 × 10⁻²), while glycine–serine metabolism remained down-regulated (*Q* = 4.2 × 10⁻³).
 
-### MSEA: manuscript Table S2 (dual-library run)
+Up- and down-regulated pathways are reported separately. Enrichment was tested within each direction of effect, so each row of the Table S3 MSEA (§\@ref(path-tertiary-msea)) has a `direction` column, and §\@ref(path-tertiary-dirsplit) runs the over-representation analysis on the up- and down-regulated feature lists separately.
 
-The table below **is** manuscript Table S2: the dual-library MSEA that combines the SMPDB
-small-molecule and lipid metabolite-set libraries, reported for every pathway × study × visit ×
-contrast × direction cell, unfiltered and sorted by raw *p*. All 463 rows, 52 of them FDR-significant.
-The print supplement externalises the same 463 rows as a machine-readable file; both it and the
-table below are written from `results/metaboanalyst/tertiary_msea/tertiary_msea_dual.csv`, so they
-carry identical numbers. **Download:** [`table_s2_tertiary_msea_full.csv`](appendix-data/table_s2_tertiary_msea_full.csv).
+Amino-acid and central-carbon pathways recur across the targeted and untargeted metabolome, although directions vary by study and platform. Glutamate metabolism, ammonia recycling, and the urea cycle are FDR-significant both in this targeted MSEA and in the untargeted MSEA (§\@ref(path-untargeted-msea)); the Warburg effect and the glucose–alanine cycle are FDR-significant there and nominally significant here (*P* = 4.0 × 10⁻³ to 2.2 × 10⁻², *Q* > 0.05). Directions agree in some strata but not others: glutamate metabolism is down-regulated in ELICIT at 1 month on both platforms, whereas the urea cycle in Mumta-LW at 1.5 months is up-regulated here and down-regulated in the untargeted data, and ammonia recycling is down-regulated here (MISAME-III, 14–21 days) but up-regulated in the untargeted data (MISAME-III, 3–4 months; Mumta-LW, 2 months).
+
+### MSEA: manuscript Table S3 (dual-library run) {#path-tertiary-msea}
+
+The table below is manuscript Table S3, the dual-library MSEA combining the SMPDB small-molecule
+and lipid metabolite-set libraries. It reports every pathway × study × visit × contrast × direction
+combination, unfiltered and sorted by raw *P*: 463 rows, 52 of them FDR-significant. The same 463
+rows form the machine-readable file cited in the supplementary materials; that file and the table below hold the same numbers. **Download:** [`table_s3_tertiary_msea_full.csv`](data-files/table_s3_tertiary_msea_full.csv).
 
 ```{r path-tertiary-msea-dual, echo=FALSE, message=FALSE, warning=FALSE}
 enrich_dt(read_enrich("results/metaboanalyst/tertiary_msea/tertiary_msea_dual.csv"),
-          caption = "Tertiary targeted-metabolome MSEA, dual-library run across all arm contrasts: manuscript Table S2 (463 rows, 52 FDR-significant). klass = which metabolite-set library the pathway comes from; fdr_native = BH-adjusted enrichment p-value.")
+          caption = "Tertiary targeted-metabolome MSEA, dual-library run across all arm contrasts: manuscript Table S3 (463 rows, 52 FDR-significant). klass = metabolite-set library of the pathway; fdr_native = BH-adjusted enrichment P-value.")
 ```
 
 ### MSEA: single-library pooled-arm and per-arm views
 
-These two tables are **separate, single-library runs** of the same targeted panel, kept here as the
-pooled-arm and per-arm views. They are *not* alternative renderings of Table S2 and their numbers do
-not match it: they use a different metabolite-set background (the `total` column differs row for row),
-so pathway *p*- and *q*-values differ throughout. Cite Table S2 above, not these, when reconciling
-against the printed manuscript or Fig. 5B.
+These two tables are separate single-library runs on the same targeted panel, one for the pooled
+arms and one per arm. They are not versions of Table S3, and their numbers do not match it: they use
+a different metabolite-set background (the `total` column differs row by row), so pathway *P*- and
+*Q*-values differ throughout. Table S3 above, not these tables, is the one that corresponds to the
+manuscript and Fig. 5B.
 
 ```{r path-tertiary-msea-combined, echo=FALSE, message=FALSE, warning=FALSE}
 enrich_dt(read_enrich("results/metaboanalyst/tertiary_msea/tertiary_msea_combined.csv"),
-          caption = "Tertiary targeted-metabolome MSEA, single-library run, combined intervention arms vs. control (supplementary view, NOT manuscript Table S2). fdr_native = BH-adjusted enrichment p-value.")
+          caption = "Tertiary targeted-metabolome MSEA, single-library run, combined intervention arms vs. control (separate run; not manuscript Table S3). fdr_native = BH-adjusted enrichment P-value.")
 ```
 
 ```{r path-tertiary-msea-strat, echo=FALSE, message=FALSE, warning=FALSE}
 enrich_dt(read_enrich("results/metaboanalyst/tertiary_msea/tertiary_msea_stratified.csv"),
-          caption = "Tertiary targeted-metabolome MSEA, single-library run, arm-stratified contrasts vs. control (supplementary view, NOT manuscript Table S2).")
+          caption = "Tertiary targeted-metabolome MSEA, single-library run, arm-stratified contrasts vs. control (separate run; not manuscript Table S3).")
 ```
 
 ### ORA counterpart
 
-The over-representation view of the same tertiary features, with the same column structure as §9.1:
+Over-representation analysis of the same tertiary features, with the same columns as the SMPDB ORA in §\@ref(path-primary).
 
 ```{r path-tertiary-ora-combined, echo=FALSE, message=FALSE, warning=FALSE}
 enrich_dt(read_enrich("results/metaboanalyst/tertiary_combined/tertiary_combined_supplementary_table.csv"),
@@ -186,15 +205,15 @@ enrich_dt(read_enrich("results/metaboanalyst/tertiary_stratified/tertiary_strati
           caption = "Tertiary targeted-metabolome over-representation analysis, arm-stratified contrasts.")
 ```
 
-### Direction-split ORA (up- vs down-regulated; online-only)
+### Direction-split ORA (up- vs down-regulated; online-only) {#path-tertiary-dirsplit}
 
-As for the primary outcomes, these tables run the over-representation separately on the up- and down-regulated tertiary (targeted-metabolite) feature lists (combined arms): the per-direction companion to the MSEA and ORA views above.
+As for the primary outcomes, these tables report the over-representation analysis separately for the up- and down-regulated tertiary (targeted-metabolite) feature lists (combined arms).
 
 ```{r path-tertiary-dirsplit-fig, echo=FALSE, message=FALSE, warning=FALSE}
 safe_img("figures/figureS_tertiary_ora_by_direction.png", label = "figureS_tertiary_ora_by_direction.png")
 ```
 
-***Figure (online-only; tertiary targeted-metabolome ORA split by direction of effect, combined arms).** Enriched pathways among up- vs. down-regulated tertiary features, with the same study colouring, grey non-significant points, and per-study/time-point/direction BH correction as the primary-outcome panel above. (Dropped from the print manuscript/supplement entirely on 2026-08-26 per author decision; see the note on that panel.)*
+***Figure (online-only; tertiary targeted-metabolome ORA split by direction of effect, combined arms).** Enriched pathways among up- vs. down-regulated tertiary features, with the same study colors, gray non-significant points, and per-study/time-point/direction BH correction as the primary-outcome figure above.*
 
 ```{r path-tertiary-ora-up, echo=FALSE, message=FALSE, warning=FALSE}
 enrich_dt(read_enrich("results/metaboanalyst/tertiary_combined/tertiary_ora_upregulated.csv"),
@@ -208,41 +227,50 @@ enrich_dt(read_enrich("results/metaboanalyst/tertiary_combined/tertiary_ora_down
 
 ## Triglyceride fatty-acid composition {#path-tg-fa}
 
-The compositional companion to the fat-adjusted triglyceride analysis in §8.3, corresponding to manuscript **Table S3** and **Fig. 5C**. For each study × timepoint × contrast × direction stratum, the fatty-acyl moieties carried by the intervention-responsive triglycerides are compared against the background TG pool (a Wilcoxon test on within-TG proportional representation across the sn-1/sn-2/sn-3 positions). This identifies fatty acids **compositionally enriched or depleted** among the BEP-responsive triglycerides, *not* absolute fatty-acid concentrations. The consistent signal is enrichment of **polyunsaturated fatty acids**, including α-linolenic (18:3n-3), γ-linolenic, and related PUFAs, among the triglycerides increased under BEP across MISAME-III contrasts and timepoints. The signal resolves in the **arm-stratified** analysis (the combined-arm table is empty).
+This compositional analysis complements the fat-adjusted triglyceride analysis in §8.3 and corresponds to manuscript Table S4 and Fig. 5C. For each study × time point × contrast × direction stratum, we compared the fatty-acyl moieties of the intervention-responsive triglycerides with the background TG pool (Wilcoxon test on within-TG proportional representation across the sn-1/sn-2/sn-3 positions). The test identifies fatty acids that are compositionally enriched or depleted among the intervention-responsive triglycerides; it does not measure absolute fatty-acid concentrations. In MISAME-III, BEP was consistently associated with triglycerides rich in polyunsaturated fatty acids, particularly α-linolenic and γ-linolenic acid (18:3n-3/18:3n-6), at all three visits (combined-arm contrast, *P* = 5.4 × 10⁻⁸ to 6.0 × 10⁻³), with stearidonic acid (18:4n-3) also over-represented at 14–21 days (*P* = 3.4 × 10⁻³). Among saturated and monounsaturated fatty acids, myristic acid (14:0; Mumta-LW and ELICIT) and 9Z-nonadecenoic acid (19:1(9Z); ELICIT) were under-represented among the triglycerides that increased. The first table below gives the combined-arm analysis and the second the arm-stratified breakdown; Table S4 lists the rows with raw *P* < 0.05 from both.
+
+```{r path-tg-fa-tab-combined, echo=FALSE, message=FALSE, warning=FALSE}
+enrich_dt(read_enrich("results/metaboanalyst/triglyceride_fa/triglyceride_fa_composition_combined.csv"),
+          caption = "Compositional fatty-acid enrichment of intervention-responsive triglycerides, combined intervention arms vs. control (manuscript Table S4 / Fig. 5C). direction = direction of the triglyceride effect; positive enrichment_ratio = fatty acid over-represented among the responsive TGs; fdr_native = BH-adjusted P.")
+```
 
 ```{r path-tg-fa-tab, echo=FALSE, message=FALSE, warning=FALSE}
 enrich_dt(read_enrich("results/metaboanalyst/triglyceride_fa/triglyceride_fa_composition_stratified.csv"),
-          caption = "Compositional fatty-acid enrichment of intervention-responsive triglycerides, arm-stratified contrasts (manuscript Table S3 / Fig. 5C). fdr_native = BH-adjusted p; positive enrichment_ratio = fatty acid over-represented among up-regulated TGs.")
+          caption = "Compositional fatty-acid enrichment of intervention-responsive triglycerides, arm-stratified contrasts (manuscript Table S4, arm-stratified rows). direction = direction of the triglyceride effect; positive enrichment_ratio = fatty acid over-represented among the responsive TGs; fdr_native = BH-adjusted P.")
 ```
 
 ## Untargeted-metabolome MSEA {#path-untargeted-msea}
 
-Metabolite-set enrichment of the **untargeted** milk-metabolome feature lists, corresponding to manuscript **Table S4** and **Fig. 6A**. This is the named-metabolite-set counterpart to the Mummichog view in §9.7; both operate on the same untargeted features, but this enrichment tests curated metabolite sets on name-mapped compounds whereas Mummichog infers pathways directly from *m/z*. The table is read **verbatim from the 14 MetaboAnalyst enrichment exports** (one per study × timepoint × direction cell) downloaded for the manuscript, rather than regenerated by a script, and reproduces the **submitted signature**: the recurring pathways are **Fatty Acid Biosynthesis, Warburg Effect, Urea Cycle, Citric Acid Cycle, and Mitochondrial Electron Transport Chain**, with points from **both MISAME-III and Mumta-LW** (not MISAME-III alone). Backgrounds are **per-study name-mapped reference metabolomes** (246 compounds for MISAME-III, 234 for the ELICIT/Mumta-LW–Vital platform). Labels and thresholds are on the **raw p-value** (grey at *P* < 0.05, green at *P* < 0.01); **no pathway clears FDR** under this reproduction (the smallest `fdr_native` is ≈ 0.15). The strongest raw-p signals are a co-ordinated *up*-regulation of Warburg Effect / Citric Acid Cycle / Urea Cycle / mitochondrial ETC in Mumta-LW at 1.5 mo. and a *down*-regulation of Fatty Acid Biosynthesis in MISAME-III.
+This analysis tests the untargeted milk-metabolome feature lists for metabolite set enrichment (manuscript Table S5 and Fig. 6A). It uses the same untargeted features as the Mummichog analysis in §\@ref(path-mummichog), but it tests curated metabolite sets on name-mapped compounds, whereas Mummichog infers pathways directly from *m/z*. Over-representation was computed offline in MetaboAnalystR for each study × time point × direction, against the reference metabolome described in the manuscript Methods, excluding pathways with fewer than three annotated members.
 
-> **Reproducibility note.** This enrichment is **compound-name-matching- and background-dependent** and is *not* scriptably reproducible from the raw features (it reads MetaboAnalyst web-tool exports, and the mapped-name set and reference background are fixed at export time). The identification-robust untargeted view is the Mummichog analysis in §9.7, which works directly from *m/z*.
+The table below holds all 330 pathway × study × time point × direction rows across the three trials. Of these, 68 are FDR-significant (*Q* < 0.05); these 68 rows make up Table S5 and the highlighted points of Fig. 6A. Enrichment centers on central-carbon and nitrogen metabolism. The Warburg effect is down-regulated in ELICIT at 1 month (*Q* = 3.2 × 10⁻⁴) and in Mumta-LW at 1.5 months (*Q* = 1.9 × 10⁻⁴). In MISAME-III at 1–2 months, bile acid biosynthesis is down-regulated (*Q* = 1.2 × 10⁻⁴) and the glucose–alanine cycle up-regulated (*Q* = 7.3 × 10⁻⁴). In Mumta-LW at 2 months, purine metabolism, ammonia recycling, the urea cycle, and glutamate metabolism are up-regulated (*Q* = 2.5 × 10⁻⁴ to 3.7 × 10⁻⁴). Fatty-acid biosynthesis is also FDR-significant and down-regulated in MISAME-III at 1–2 months (*Q* = 4.6 × 10⁻³), matching the direction of the targeted MSEA (§\@ref(path-tertiary)) and the Mummichog analysis (§\@ref(path-mummichog)).
+
+In Fig. 6A, the lower, gray dashed line marks *P* < 0.05 and the upper, green dashed line the FDR threshold (*Q* < 0.05). FDR-significant pathways are drawn as filled symbols colored and shaped by study (ELICIT circles, MISAME-III triangles, Mumta-LW squares), pathways significant only before FDR correction as open circles, and non-significant pathways as gray dots.
+
+> **Reproducibility note.** This enrichment depends on matching compound names to the reference metabolome, so both the mapped names and the background affect the result; the pathway themes and directions are more dependable than the exact *P*-values. The Mummichog analysis (§\@ref(path-mummichog)) works directly from *m/z* and does not require prior compound identification.
 
 ```{r path-untargeted-msea-tab, echo=FALSE, message=FALSE, warning=FALSE}
 enrich_dt(read_enrich("results/metaboanalyst/untargeted_msea/untargeted_msea_combined.csv"),
-          caption = "Untargeted-metabolome enrichment across the 14 MetaboAnalyst export cells (manuscript Table S4 / Fig. 6A). study/timepoint/direction identify the cell; raw_p is the reported p-value (label/threshold basis); fdr_native = BH-adjusted p (none < 0.05); enrichment_ratio = hits / expected.")
+          caption = "Untargeted-metabolome MSEA across all study × time point × direction combinations (330 rows; the 68 with fdr_native < 0.05 are manuscript Table S5 / Fig. 6A). raw_p = hypergeometric P-value; fdr_native = BH-adjusted P; enrichment_ratio = hits / expected, signed negative for down-regulated pathways.")
 ```
 
 ## Exploratory untargeted milk metabolome: Mummichog functional enrichment {#path-mummichog}
 
-Mummichog infers enriched pathways directly from mass-spectral features, without prior compound identification, by matching *m/z* to putative compounds within each ionisation mode. Annotation uses a **10 ppm** database tolerance against the `human_mfn` reference network, and pathways are tested at *p* < 0.05. This is the exploratory **untargeted-metabolome** enrichment. It corresponds to manuscript **Table S5** and **Fig. 6B**, and is reported by study × timepoint × contrast × direction × ionisation mode.
+Mummichog infers enriched pathways directly from mass-spectral features, without prior compound identification, by matching *m/z* values to putative compounds within each ionization mode. Annotation used a 10 ppm database tolerance against the `human_mfn` reference network, and features with *P* < 0.05 formed the input list for each test. This exploratory untargeted-metabolome enrichment corresponds to manuscript Table S6 and Fig. 6B and is reported by study × time point × contrast × direction × ionization mode.
 
-> **Two tolerances, one number apart.** The **10 ppm** here is a *compound-annotation* tolerance (matching a feature's *m/z* to a database compound). It is a different quantity from the **±25 ppm** *cross-platform feature-matching* tolerance used in §10.2 (matching a feature in one dataset to a feature in another). A reviewer comparing the two chapters should not read the difference as an inconsistency.
+> **Two mass tolerances.** The 10 ppm tolerance here is for compound annotation (matching a feature's *m/z* to a database compound). The ±25 ppm tolerance in §10.2 is for cross-platform feature matching (matching a feature in one dataset to a feature in another). The two values apply to different steps and are not inconsistent.
 
-The dominant signature is **down-regulation of polyunsaturated-fatty-acid and lipid pathways** (de novo fatty-acid biosynthesis, fatty-acid activation and metabolism, arachidonic-acid and linoleate metabolism, and leukotriene / prostaglandin formation), concentrated in the MISAME-III BEP contrasts. The full grid is large (9,520 pathway × stratum rows), so the table below is filtered exactly as manuscript **Table S5** is: to the strata significant at **raw *P* < 0.05**, sorted by *P* ascending, giving 505 rows, the set underlying Fig. 6B. The `FDR` column is retained so the more stringent *Q* < 0.05 frontier (20 strata) can be read off directly. **Download:** [`table_s5_mummichog_full.csv`](appendix-data/table_s5_mummichog_full.csv).
+The main FDR-significant pattern is down-regulation of fatty-acid and inflammatory-lipid pathways (de novo fatty-acid biosynthesis, fatty-acid activation and metabolism, and arachidonic-acid, linoleate, and leukotriene metabolism), concentrated in the MISAME-III BEP contrasts. Prostaglandin formation from arachidonate is the exception: it is FDR-significant in the up-regulated direction (MISAME-III, 1–2 months, *Q* = 0.050). The full results contain 9,520 pathway × stratum rows, so the table below is filtered in the same way as Table S6, to the strata with raw *P* < 0.05, sorted by ascending *P*. This gives 505 rows, the set underlying Fig. 6B. The `FDR` column shows which of these strata also have *Q* < 0.05 (20 strata). **Download:** [`table_s6_mummichog_full.csv`](data-files/table_s6_mummichog_full.csv).
 
 ```{r path-mummichog-note, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 mum <- read_enrich("results/metaboanalyst/mummichog_s5/milk_mummichog_tableS5.csv")
-## Match the printed Table S5 exactly: raw P < 0.05, sorted by P ascending.
+## Match the printed Table S6 exactly: raw P < 0.05, sorted by P ascending.
 ## (Filtering to FDR < 0.05 instead would show only 20 of these 505 rows and
 ## would not correspond to any table in the manuscript.)
 mum_sig <- if (!is.null(mum) && nrow(mum))
   mum %>% dplyr::filter(.data[["P-value"]] < 0.05) %>% dplyr::arrange(.data[["P-value"]]) else NULL
 if (!is.null(mum_sig) && nrow(mum_sig))
-  cat(sprintf("\n*Showing %s pathway strata significant at raw P < 0.05, of %s total; manuscript Table S5. Of these, %s also clear FDR Q < 0.05.*\n\n",
+  cat(sprintf("\n*Showing the %s pathway strata with raw P < 0.05 (of %s in total), as in manuscript Table S6; %s of these also have FDR Q < 0.05.*\n\n",
               format(nrow(mum_sig), big.mark = ","), format(nrow(mum), big.mark = ","),
               format(sum(mum_sig[["FDR"]] < 0.05), big.mark = ",")))
 ```
@@ -253,12 +281,12 @@ if (!is.null(mum_sig) && nrow(mum_sig))
 ## is why this table silently failed to appear in earlier builds.
 if (!is.null(mum_sig) && nrow(mum_sig))
   enrich_dt(mum_sig,
-            caption = "Milk untargeted-metabolome Mummichog enrichment, strata significant at raw P < 0.05 (manuscript Table S5 / Fig. 6B; 505 rows). FDR = BH-adjusted enrichment p-value.")
+            caption = "Milk untargeted-metabolome Mummichog enrichment, strata significant at raw P < 0.05 (manuscript Table S6 / Fig. 6B; 505 rows). FDR = BH-adjusted enrichment P-value.")
 ```
 
 ### Feature-level putative annotation {#path-mummichog-annotation}
 
-The finalized per-feature annotation of the same untargeted milk features complements the pathway view above. Across **1,034 FDR-significant** features, organised by direction × ionisation mode, **243 carry a name** (48 curated + 195 Mummichog-putative) and the remainder are unresolved; the strongest named up-regulated signal is a vitamin/cofactor cluster (pantothenate/B5, nicotinamide, ascorbate). Every name is **putative**, mass-based at MSI level ~3, not a confirmed identification.
+The tables below give the finalized per-feature annotation of the same untargeted milk features. Of the 1,034 FDR-significant features, grouped by direction × ionization mode, 243 have a name (48 curated + 195 Mummichog-putative) and the rest are unresolved. The strongest named up-regulated signal is a vitamin/cofactor cluster (pantothenate/B5, nicotinamide, ascorbate). All names are putative mass-based annotations (MSI level ~3), not confirmed identifications.
 
 ```{r path-mummichog-annot-summary, echo=FALSE, message=FALSE, warning=FALSE}
 enrich_dt(read_enrich("results/metaboanalyst/mummichog_s5/milk_mummichog_annotation_summary.csv"),
@@ -276,46 +304,42 @@ if (!is.null(annot) && nrow(annot)) {
 
 ## Exploratory untargeted milk proteome: GO functional enrichment {#path-go}
 
-Gene Ontology (Biological Process) over-representation of the intervention-associated **untargeted milk proteomic** features corresponds to manuscript **Table S6** and **Fig. 6C**. Enrichment uses a **UniProt-native** over-representation test: `clusterProfiler::enricher` run against a custom UniProt→GO-BP annotation map, with each measured protein counted **once** and a **per-cell measured-proteome background** (the set of proteins actually quantified in that study × timepoint × contrast). This supersedes the earlier UniProt→Entrez→`enrichGO` gene-level workflow, whose identifier-mapping step distorted the background and produced a now-retracted "three-domain" result.
+Gene Ontology (GO) Biological Process over-representation analysis of the intervention-associated untargeted milk proteomic features corresponds to manuscript Table S7 and Fig. 6C. The test is UniProt-native: `clusterProfiler::enricher` was run against a custom UniProt→GO-BP annotation map, with each measured protein counted once and with the measured proteome as the background (the proteins quantified in that study × time point × contrast).
 
-The corrected signature is a **predominantly down-regulated shift**; no GO-BP term is FDR-significantly *up*-regulated in the primary BEP contrasts:
+In MISAME-III (1–2 months, BEP), 27 GO-BP terms are FDR-significant and down-regulated, dominated by proteostasis, translation, protein folding, and intracellular trafficking. The telomere-maintenance and DNA-biosynthetic terms at the top of the list are driven by molecular chaperones (the CCT/TCP1 chaperonin subunits, HSP90AA1/AB1, and the co-chaperone PTGES3), which appear under those GO labels because chaperones are annotated to telomerase assembly and activity. The signal therefore reflects chaperones and proteostasis rather than a telomere-specific effect.
 
-- **MISAME-III (1–2 mo., BEP):** **27 FDR-significant down-regulated** GO-BP terms, dominated by proteostasis, translation, protein folding, and intracellular trafficking. The telomere-maintenance and DNA-templated terms that head the list are **driven by molecular chaperones**, the CCT/TCP1 chaperonin subunits together with HSP90AA1/AB1 and the co-chaperone PTGES3, appearing under those GO labels because chaperones annotate to telomere/DNA-repair complexes; this is a **chaperone/proteostasis** signal, **not** a telomere-specific effect.
-- **Mumta-LW (2 mo., BEP+ExBf):** **58 FDR-significant down-regulated** terms centred on **energy metabolism**: glycolysis, pyruvate metabolism, cellular respiration, ATP generation, and nucleotide / NAD (pyridine-nucleotide) metabolism, driven by glycolytic and redox enzymes (PKM, GAPDH, ALDOA/ALDOC, PGAM1, GPI, LDHA, G6PD, IDH2, NAMPT).
+In Mumta-LW (2 months, BEP+ExBf), 58 terms are FDR-significant and down-regulated, centered on energy metabolism (glycolysis, pyruvate metabolism, cellular respiration, ATP generation, and nucleotide and NAD [pyridine-nucleotide] metabolism) and driven by glycolytic and redox enzymes (PKM, GAPDH, ALDOA/ALDOC, PGAM1, GPI, LDHA, G6PD, IDH2, NAMPT).
 
-> **Provenance of the 27/58 counts.** An earlier frozen spreadsheet (`Manuscript/Table_S6_proteomics_GO.xlsx`, approved run of 2026-08-10) reported **31** and **65** FDR-significant terms. That file is superseded: the underlying proteomic effect estimates were regenerated on 2026-08-12, growing the measured-proteome background from ~1,196/1,555 to **1,320/1,681 quantified proteins**, the counts used for the individual-protein analyses elsewhere in the manuscript. The manuscript's own Table S6 and Fig. 6C now report **27** and **58**, which is what the current pipeline produces and what the tables below show. There is no live discrepancy to reconcile; the 31/65 figures should not be cited.
+> **Proteomic-interpretation caveat (GO BP).** Milk proteins come from a mixture of cellular debris (mammary epithelial cells, leukocytes, exosomes) and secreted proteins. Enrichment of terms such as "telomere maintenance" or "glycolytic process" is therefore consistent with changes in the cellular composition or intracellular protein content of milk; it does not show that the named process is active in secreting cells. These results are hypothesis-generating, and mechanistic claims would require functional assays, which were not part of the IMiC protocol.
 
-> **Proteomic-interpretation caveat (GO BP).** Milk proteomic features draw from a heterogeneous mixture of cellular debris (mammary epithelial cells, leukocytes, exosomes) and secreted proteins. Enrichment of terms such as "telomere maintenance" or "glycolytic process" therefore indicates a signature **consistent with** changes in cellular composition or intracellular protein content in milk, not that the named process is being executed within secreting cells. Read these as hypothesis-generating; mechanistic claims require functional assays that were not part of the IMiC protocol.
+The first table below is manuscript Table S7: the 182 terms enriched at nominal *P* < 0.05 and
+Storey *q* < 0.20, the inclusion threshold of that table. Its `fdr` column identifies the terms
+with *Q* < 0.05 shown in Fig. 6C (27 MISAME-III + 58 Mumta-LW = 85 terms, all down-regulated; no
+up-regulated term survives FDR correction). The same 182 rows form the machine-readable file cited
+in the supplementary materials; that file and the table below hold the same numbers. **Download:** [`table_s7_proteomics_go_full.csv`](data-files/table_s7_proteomics_go_full.csv).
 
-The first table below **is** manuscript Table S6: the terms enriched at nominal *P* < 0.05 **and**
-Storey *q* < 0.20, the inclusion threshold of the originally submitted table, giving 182 rows. Its `fdr`
-column marks the *Q* < 0.05 frontier shown in Fig. 6C (27 MISAME-III + 58 Mumta-LW = 85 terms, all
-down-regulated; no up-regulated term survives FDR correction). The print supplement externalises the same 182 rows as a machine-readable file; both it and the
-table below come from `results/metaboanalyst/proteomics_go/proteomics_go_tableS6.csv`, so the
-numbers are identical. **Download:** [`table_s6_proteomics_go_full.csv`](appendix-data/table_s6_proteomics_go_full.csv).
-
-```{r path-go-tableS6-note, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
-s6 <- read_enrich("results/metaboanalyst/proteomics_go/proteomics_go_tableS6.csv")
-if (!is.null(s6) && nrow(s6)) {
-  cat(sprintf("\n*Showing all %d terms at nominal P < 0.05 and Storey q < 0.20; manuscript Table S6. Of these, %d clear FDR Q < 0.05 (%d MISAME-III, %d Mumta-LW), all down-regulated.*\n\n",
-              nrow(s6), sum(s6$fdr < 0.05, na.rm = TRUE),
-              sum(s6$study == "MISAME-III" & s6$fdr < 0.05, na.rm = TRUE),
-              sum(s6$study == "Mumta-LW"   & s6$fdr < 0.05, na.rm = TRUE)))
+```{r path-go-table-s7-note, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
+tab_s7 <- read_enrich("results/metaboanalyst/proteomics_go/proteomics_go_tableS6.csv")
+if (!is.null(tab_s7) && nrow(tab_s7)) {
+  cat(sprintf("\n*Showing all %d terms at nominal P < 0.05 and Storey q < 0.20; manuscript Table S7. Of these, %d clear FDR Q < 0.05 (%d MISAME-III, %d Mumta-LW), all down-regulated.*\n\n",
+              nrow(tab_s7), sum(tab_s7$fdr < 0.05, na.rm = TRUE),
+              sum(tab_s7$study == "MISAME-III" & tab_s7$fdr < 0.05, na.rm = TRUE),
+              sum(tab_s7$study == "Mumta-LW"   & tab_s7$fdr < 0.05, na.rm = TRUE)))
   ## Format only after the counts above are taken; formatC turns these numeric.
-  for (cc in intersect(c("p_value", "fdr"), names(s6)))
-    s6[[cc]] <- formatC(s6[[cc]], format = "e", digits = 2)
+  for (cc in intersect(c("p_value", "fdr"), names(tab_s7)))
+    tab_s7[[cc]] <- formatC(tab_s7[[cc]], format = "e", digits = 2)
 }
 ```
 
-```{r path-go-tableS6, echo=FALSE, message=FALSE, warning=FALSE}
-if (!is.null(s6) && nrow(s6))
-  nice_dt(s6, caption = "Untargeted milk-proteome GO Biological Process enrichment: manuscript Table S6 (182 rows, nominal P < 0.05 and Storey q < 0.20). UniProt-native over-representation (clusterProfiler::enricher, per-cell measured-proteome background); regulation = direction of effect; fdr = BH-adjusted enrichment p-value.")
+```{r path-go-table-s7, echo=FALSE, message=FALSE, warning=FALSE}
+if (!is.null(tab_s7) && nrow(tab_s7))
+  nice_dt(tab_s7, caption = "Untargeted milk-proteome GO Biological Process enrichment: manuscript Table S7 (182 rows, nominal P < 0.05 and Storey q < 0.20). UniProt-native over-representation (clusterProfiler::enricher; background = proteins measured in each study × time point × contrast); regulation = direction of effect; fdr = BH-adjusted enrichment P-value.")
 ```
 
-The second table is the **FDR-significant subset only** (the 85 rows with *Q* < 0.05), carrying the
-fuller per-term detail (gene ratio, background ratio, rich factor, z-score, Storey *q*, and the
-contributing UniProt accessions) that the printed table has no room for. Its 85 terms are exactly
-the *Q* < 0.05 rows of Table S6 above; the two are the same run, one filtered further.
+The second table is the FDR-significant subset (the 85 rows with *Q* < 0.05), with per-term detail
+that Table S7 omits: gene ratio, background ratio, rich factor, z-score, Storey *q*, and the
+contributing UniProt accessions. Its 85 terms are exactly the *Q* < 0.05 rows of Table S7 above,
+from the same run.
 
 ```{r path-go-tab-note, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 go <- read_enrich("results/metaboanalyst/proteomics_go/proteomics_go_uniprot_fdrsig.csv")
@@ -332,6 +356,6 @@ if (!is.null(go) && nrow(go)) {
 
 ```{r path-go-tab, echo=FALSE, message=FALSE, warning=FALSE}
 if (!is.null(go) && nrow(go)) {
-  nice_dt(go, caption = "Untargeted milk-proteome GO Biological Process enrichment, FDR-significant subset of Table S6 with extended per-term detail (the Q < 0.05 frontier shown in Fig. 6C). UniProt-native over-representation (clusterProfiler::enricher, per-cell measured-proteome background); direction = sign of effect; p.adjust = BH-adjusted enrichment p-value; qvalue = Storey q.")
+  nice_dt(go, caption = "Untargeted milk-proteome GO Biological Process enrichment, FDR-significant subset of Table S7 with extended per-term detail (the Q < 0.05 terms shown in Fig. 6C). UniProt-native over-representation (clusterProfiler::enricher; background = proteins measured in each study × time point × contrast); direction = sign of effect; p.adjust = BH-adjusted enrichment P-value; qvalue = Storey q.")
 }
 ```

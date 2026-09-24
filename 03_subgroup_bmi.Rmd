@@ -1,10 +1,10 @@
 # Subgroup analyses stratified by maternal BMI
 
-Did the intervention effects on human milk components depend on maternal nutritional status at baseline? We addressed this using **maternal body mass index (BMI)** as a marker of that status, dichotomized a priori into *underweight* (BMI ≤ 18.5 kg/m²) and *normal or overweight* (BMI > 18.5 kg/m²) strata. Stratum-specific ATEs were estimated with the same TMLE framework used in the primary adjusted analyses. **Interaction p-values** come from a Wald-type test comparing the two stratum-specific estimates, taking the difference in estimates scaled by the pooled standard error.
+This section examines whether intervention effects on human milk components depended on maternal nutritional status at baseline, using maternal body mass index (BMI) as a marker of that status, dichotomized into *underweight* (BMI ≤ 18.5 kg/m²) and *normal or overweight* (BMI > 18.5 kg/m²) strata. We estimated stratum-specific ATEs with the same TMLE framework used in the primary adjusted analyses. Interaction *P*-values come from a Wald-type test of the difference between the two stratum-specific estimates, divided by the standard error of the difference. The results shown here are the component × study × visit combinations with a nominally significant interaction (all interaction *P* < 0.01): 129 in Mumta-LW (1.5 and 2 months) and one in MISAME-III (3–4 months); six, all in Mumta-LW, remain significant after FDR correction.
 
-The main manuscript cites this section as **"Online Appendix 3"** in the Results paragraphs on macronutrient and micronutrient effects, where it reports **no consistent evidence of effect modification by maternal BMI** across primary, secondary, and tertiary outcomes. The plots and tables below let a reader check that conclusion component by component.
+The manuscript cites this section as "Section 3 of the online resource" in the Results paragraph on macronutrient and micronutrient effects, where it reports that maternal BMI did not consistently modify macronutrient or micronutrient effects.
 
-> **Interpretation note.** These subgroup analyses are exploratory and not powered to detect modest interactions, particularly within studies where the underweight stratum is small. Where per-component point estimates differ in magnitude or direction across BMI strata, read them cautiously, especially when the corresponding 95% CIs are wide.
+> These subgroup analyses are exploratory and not powered to detect modest interactions, particularly in studies with a small underweight stratum. Differences in the size or direction of per-component estimates between BMI strata should be interpreted cautiously, especially when the 95% CIs are wide.
 
 ```{r bmi-setup, include=FALSE}
 library(tidyverse)
@@ -22,21 +22,28 @@ stratified_forest <- function(tab, title = "BMI-stratified intervention effects"
                         if ("contrast" %in% names(tab)) paste0("<br>Contrast: ", tab$contrast) else "",
                         "<br>ATE: ", round(tab$est, 3),
                         " (", round(tab$cil, 3), ", ", round(tab$ciu, 3), ")",
-                        if ("chi_pval_adj" %in% names(tab)) paste0("<br>q: ", signif(tab$chi_pval_adj, 3)) else "",
-                        if ("interaction_pvalue" %in% names(tab)) paste0("<br>p_interaction: ", signif(tab$interaction_pvalue, 3)) else "")
+                        if ("chi_pval_adj" %in% names(tab)) paste0("<br>Q: ", signif(tab$chi_pval_adj, 3)) else "",
+                        if ("interaction_pvalue" %in% names(tab)) paste0("<br>Interaction P: ", signif(tab$interaction_pvalue, 3)) else "")
   tab$panel <- factor(paste0(tab$study, ": ", tab$visit))
+  ## BMI stratum is carried by colour, symbol shape, and CI line type.
+  strata <- sort(unique(as.character(tab$subgroup)))
   p <- ggplot2::ggplot(tab,
                        ggplot2::aes(y = stats::reorder(label_f, est), x = est,
-                                    color = subgroup, text = tooltip)) +
+                                    color = subgroup, shape = subgroup, text = tooltip)) +
     ggplot2::geom_point(position = ggplot2::position_dodge(width = 0.6), size = 2) +
-    ggplot2::geom_errorbar(ggplot2::aes(xmin = cil, xmax = ciu),
+    ggplot2::geom_errorbar(ggplot2::aes(xmin = cil, xmax = ciu, linetype = subgroup),
                           width = 0.2, orientation = "y",
                           position = ggplot2::position_dodge(width = 0.6)) +
     ggplot2::geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
-    ggplot2::scale_color_manual(values = tableau10[c(1, 2, 3, 4)]) +
+    ggplot2::scale_color_manual(values = stats::setNames(
+      rep_len(unname(okabe_ito[c("blue", "vermillion", "green", "purple")]), length(strata)), strata)) +
+    ggplot2::scale_shape_manual(values = stats::setNames(rep_len(c(16, 17, 15, 18), length(strata)), strata)) +
+    ggplot2::scale_linetype_manual(values = stats::setNames(
+      rep_len(c("solid", "dashed", "dotted", "dotdash"), length(strata)), strata)) +
     ggplot2::facet_wrap(~ panel) +
     ggplot2::labs(title = title, y = "Outcome", x = "Estimate (SD units)",
-                  color = "Maternal BMI stratum") +
+                  color = "Maternal BMI stratum", shape = "Maternal BMI stratum",
+                  linetype = "Maternal BMI stratum") +
     ggplot2::theme_minimal() + ggplot2::theme(legend.position = "bottom")
   if (knitr::is_html_output() && requireNamespace("plotly", quietly = TRUE)) {
     conv <- try(plotly::ggplotly(p, tooltip = "text"), silent = TRUE)
@@ -51,7 +58,7 @@ bmi_df <- safe_readRDS(here::here("figure-data/subgroup_results.RDS"),
 
 ## Per-component stratified forest plots
 
-**Figure (Online Appendix 3).** Adjusted ATEs (SD units, with 95% CI) within maternal-BMI strata (underweight, BMI ≤ 18.5 kg/m²; normal/overweight, BMI > 18.5 kg/m²), by study and milk-collection visit, shown separately for primary, secondary, and tertiary outcomes. Points are coloured by BMI stratum; hover (HTML) for the stratum-specific estimate, q-value, and the Wald-type interaction *p*-value. As noted above, these analyses are exploratory and not powered to detect modest interactions.
+**Figure (online-only).** Adjusted ATEs (SD units, with 95% CI), for component × study × visit combinations with a nominally significant interaction, within maternal-BMI strata (underweight, BMI ≤ 18.5 kg/m²; normal/overweight, BMI > 18.5 kg/m²), by study and milk-collection visit, shown separately for primary, secondary, and tertiary outcomes. BMI strata differ in color, symbol shape, and CI line type (normal/overweight: blue circles, solid lines; underweight: vermillion triangles, dashed lines). In the web version, hovering over a point shows the stratum-specific estimate, *Q*-value, and Wald-type interaction *P*-value.
 
 ```{r bmi-primary, echo=FALSE, message=FALSE, warning=FALSE, fig.height=14}
 if (!is.null(bmi_df) && is.data.frame(bmi_df)) {
@@ -92,6 +99,6 @@ if (!is.null(bmi_df) && is.data.frame(bmi_df)) {
     ))) %>%
     dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 3)))
   nice_dt(tbl,
-          caption = "BMI-stratified ATEs and Wald-type interaction p-values for every analyzed milk component.")
+          caption = "BMI-stratified ATEs and Wald-type interaction P-values for the component × study × visit combinations with a nominally significant interaction.")
 }
 ```

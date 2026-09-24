@@ -1,12 +1,12 @@
 # Adjusted intervention effects on individual milk components
 
-Here we report the **primary, covariate-adjusted estimates** of how maternal nutritional interventions affect individual human milk components. Each component appears as an interactive forest plot alongside a searchable table, stratified by study and milk collection visit. We estimate average treatment effects (ATEs) using targeted maximum likelihood estimation (TMLE), adjusting for prespecified baseline prognostic factors, and apply the Benjamini–Hochberg false-discovery rate (FDR) correction within each outcome group × study × visit. Every result table also carries `pval_adj_global`, a more conservative correction pooled across all studies and visits within an outcome group (the pre-revision scheme), which we retain for sensitivity; significance flags (`sigFDR`) rest on the per-visit `pval_adj`.
+This section reports the primary covariate-adjusted estimates of maternal nutritional intervention effects on individual human milk components. Each component appears in an interactive forest plot and a searchable table, stratified by study and milk collection visit. We estimated average treatment effects (ATEs) with targeted maximum likelihood estimation (TMLE), adjusting for prespecified baseline prognostic factors, and applied Benjamini–Hochberg false discovery rate (FDR) correction within each outcome group × study × visit. Every results table also includes `pval_adj_global`, a more conservative correction pooled across all studies and visits within an outcome group, which we retain as a sensitivity analysis; the significance flag (`sigFDR`) is based on the per-visit `pval_adj`.
 
-Each modality appears twice. The first view **pools** the intervention arms (all maternal nutritional intervention arms combined vs. the corresponding control) to maximize precision. The second **stratifies by randomized arm**, contrasting each post-randomization nutritional arm against its trial's control. Within the forest plots, solid filled symbols mark effects that survive FDR correction and open symbols do not, while intermediate ("Sig before FDR") symbols flag nominal *p* < 0.05 that fell short of the multiplicity threshold. In the HTML version, hovering over a point reveals the exact estimate, 95% CI, and q-value, and the column filters in each table let you drill into specific components, studies, or visits.
+Each outcome group appears twice. The first view pools the intervention arms (all maternal nutritional intervention arms combined vs. the corresponding control) to maximize precision. The second stratifies by randomized arm, comparing each randomized nutritional arm with its trial's control. In the forest plots, filled triangles mark effects that survive FDR correction, filled circles ("Sig before FDR") mark nominal *P* < 0.05 that did not survive correction, and open circles mark neither; in the arm-stratified plots, each contrast also has its own color and CI line type. Hovering over a point shows the exact estimate, 95% CI, and *Q*-value, and the column filters in each table narrow the view to specific components, studies, or visits.
 
-These outputs map to **Figure 2** (primary-outcome forest plots) and **Figure S3** (secondary outcomes) in the manuscript, and they supply the per-component estimates behind the **Figure 5A** targeted-metabolite volcano. For the multivariate treatment-arm prediction and PCA composites of manuscript Figure 1, see §8.
+These estimates correspond to Figure 2 (primary outcomes) of the manuscript and Figure S3 (secondary outcomes) of the supplementary materials, and supply the per-component estimates behind the Figure 5A targeted-metabolite volcano plot. The machine-learning prediction of treatment arm and the PCA composites of manuscript Figure 1 are in §8.
 
-> **Looking for absolute concentrations?** The estimates below sit on the **standardised (SD) scale** so that components can be compared directly. To read the same intervention effects in their **native assay units** (g/100 mL for macronutrients; µg/L or mg/L for micronutrients; relative abundance for HMOs), see **§8.2 "Unscaled (natural-unit) intervention effects"** in the *Sensitivity analyses and additional outputs* chapter. Each result table below carries an `ATE_unscaled` column giving the per-component natural-unit estimate next to the standardised one. Unadjusted estimates appear in **§8.1** for sensitivity.
+> **Native assay units.** The estimates below are on the standardized (SD) scale so that components can be compared directly. The same intervention effects in native assay units (g/100 mL for macronutrients; µg/L or mg/L for micronutrients; nmol/mL for HMOs) are in §8.2 "Unscaled (natural-unit) intervention effects" of the *Sensitivity analyses and additional outputs* section, and each results table below includes an `ATE_unscaled` column with the natural-unit estimate next to the standardized one. Unadjusted estimates, for sensitivity, are in §8.1.
 
 ```{r effects-setup, include=FALSE}
 library(tidyverse)
@@ -28,23 +28,23 @@ show_forest_and_table <- function(csv_path, arm_strat = FALSE, title = NULL,
     "Each point is the adjusted average treatment effect (ATE, SD units) with 95% CI for one milk component, ",
     "faceted by study and milk-collection visit. ",
     if (arm_strat)
-      "Symbols are coloured by randomised contrast; solid filled symbols mark effects significant after FDR correction (q<0.05), intermediate symbols nominal p<0.05, and open symbols non-significant. "
+      "Each randomized contrast has its own color and CI line type (solid, dashed, dotted); filled triangles mark effects significant after FDR correction (Q < 0.05), filled circles nominal P < 0.05, and open circles non-significant. "
     else
-      "Solid orange symbols mark effects significant after FDR correction (q<0.05); grey filled symbols are nominally significant (p<0.05); open symbols are non-significant. ",
-    "FDR correction is applied within outcome group, study, and visit. Hover (HTML) for the exact estimate, 95% CI, and q-value.")
+      "Orange filled triangles mark effects significant after FDR correction (Q < 0.05); gray filled circles are nominally significant (P < 0.05); open circles are non-significant. ",
+    "FDR correction is applied within outcome group, study, and visit. Hover over a point for the exact estimate, 95% CI, and Q-value.")
   htmltools::tagList(
     forest_plot(df, arm_strat = arm_strat, title = ttl),
     htmltools::tags$p(htmltools::tags$strong("Figure legend. "), htmltools::tags$em(legend)),
-    clean_tab(df, caption = tab_caption %||% paste0("Adjusted ATEs, 95% CIs, and FDR-adjusted q-values: ", ttl, "."))
+    clean_tab(df, caption = tab_caption %||% paste0("Adjusted ATEs, 95% CIs, and FDR-adjusted Q-values: ", ttl, "."))
   )
 }
 ```
 
-## Primary and secondary component metadata (Online Appendix 5) {#primary-component-metadata}
+## Primary and secondary component metadata {#primary-component-metadata}
 
-Primary outcomes are the macronutrients, micronutrients, and B-vitamins; secondary outcomes are the human milk oligosaccharides and bioactive proteins. The table below lists every one of them, grouped by prespecified outcome class, with indicators for whether the component was measured in each of the three IMiC trials.
+Primary outcomes are the macronutrients, micronutrients, and B-vitamins; secondary outcomes are the human milk oligosaccharides and bioactive proteins. The table below lists each component, grouped by prespecified outcome class, with indicators of whether it was measured in each of the three IMiC trials.
 
-This inventory is the resource cited from **Fig. 3A** of the manuscript. It is the primary/secondary counterpart to the targeted-metabolite metadata cited from Fig. 5A, which lives in [§6](#targeted-metabolite-metadata-and-reductions-in-hm-nutrient-deficiency); the complete inventory across all outcome classes, including tertiary, is in [§2 *Outcomes and human milk component distributions*](#outcomes-and-human-milk-component-distributions). The intervention-effect estimates for these components follow in the rest of this section.
+The manuscript's Fig. 3A legend cites this inventory as Section 5 of the online resource. The corresponding targeted-metabolite metadata, cited from Fig. 5A, are in [§6.1](#targeted-metabolite-metadata), and the complete inventory across all outcome classes, including tertiary, is in [§2 *Outcomes and human milk component distributions*](#outcomes-and-human-milk-component-distributions). The intervention-effect estimates for these components follow in the rest of this section.
 
 ```{r primary-component-metadata, echo=FALSE, message=FALSE, warning=FALSE}
 metadata_loaded <- safe_load(here::here("metadata/milk_component.Rdata"))
@@ -79,7 +79,7 @@ if (isTRUE(metadata_loaded) && exists("all_milk_components")) {
 
 ## Interactive effect explorer {#effect-explorer-app}
 
-The app below brings every primary, secondary, and tertiary intervention effect into one place. Choose an outcome group, switch between **standardised (SD) and native assay units**, filter by study, visit, and combined-vs-arm-stratified contrasts, and move between volcano, forest, and table views. It runs entirely in your browser through a WebAssembly build of R, with no server, so the first load fetches the R runtime and takes a moment; after that it responds instantly. If the frame is cramped, [open the explorer full-screen in a new tab](apps/effect-explorer/).
+The app below collects every primary, secondary, and tertiary intervention effect. You can choose an outcome group, switch between standardized (SD) and native assay units, filter by study, visit, and pooled or arm-stratified contrasts, and move between volcano, forest, and table views. It runs in the browser on a WebAssembly build of R, with no server, so the first load takes a moment while the R runtime downloads. If the frame is cramped, [open the explorer full-screen in a new tab](apps/effect-explorer/).
 
 ```{r effect-explorer-embed, echo=FALSE, results='asis'}
 if (knitr::is_html_output()) {
@@ -87,13 +87,13 @@ if (knitr::is_html_output()) {
       'width="100%" height="900" loading="lazy" ',
       'style="border:1px solid #ddd; border-radius:4px;"></iframe>\n', sep = "")
 } else {
-  cat("*The interactive effect explorer is available in the HTML build of this appendix.*\n")
+  cat("*The interactive effect explorer is available in the web version of this online resource.*\n")
 }
 ```
 
 ## Macronutrients
 
-> Total protein, fat, and digestible carbohydrate (primarily lactose), measured in g/100 mL.
+> Total protein, fat, and digestible carbohydrate (primarily lactose), measured in g/100 mL, and total energy (kcal/L).
 
 ### Combined intervention arms
 
@@ -180,16 +180,16 @@ show_forest_and_table("results/subsetted results/secondary_bioactives_arm_strat.
 
 ## Targeted metabolites (tertiary outcomes)
 
-The targeted-metabolomics panel (Biocrates MxP Quant 500) is large, so higher-level summaries live elsewhere: pathway-level views in the *Pathway enrichment* chapter and volcano plots in the *Trajectory analyses* chapter. The forest plots below lay out the same metabolites as a long, hover-searchable forest, most useful when you filter the table to a specific compound class.
+Summaries of the large targeted metabolomics panel (Biocrates MxP Quant 500) are elsewhere: pathway-level views in the *Pathway enrichment* section, and the corresponding volcano plot in manuscript Fig. 5A. The forest plots below show the same metabolites individually in one long plot (hover to identify points) and are most useful alongside a table filtered to a single compound class.
 
 ### Interactive explorer (linked volcano + table)
 
-Because the targeted panel has thousands of metabolite estimates, the linked view below is often the quickest way in. Drag a box (Plotly's *Box Select* / *Lasso*) around points in the volcano to filter the table to just those metabolites; conversely, the dropdowns and the table's own column filters narrow the plotted points. Every point is one metabolite (pooled intervention vs. control), positioned by effect size and −log10(p); orange marks FDR-significant hits.
+With thousands of metabolite estimates in the targeted panel, the linked view below is often the quickest place to start. Drawing a box or lasso (Plotly's *Box Select* / *Lasso*) around points in the volcano plot filters the table to those metabolites, and the dropdowns and the table's column filters in turn narrow the plotted points. Each point is one metabolite (pooled intervention vs. control), placed by effect size and −log10(*P*); FDR-significant metabolites are orange triangles, nominal (*P* < 0.05) ones blue squares, and the rest gray circles.
 
 ```{r effects-tertiary-linked, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7}
 df_ter <- safe_read_csv(here::here("results/subsetted results/tertiary_targeted_metabolomics.csv"))
 linked_volcano_table(df_ter,
-                     title = "Targeted metabolites: pooled intervention vs. control (brush to filter the table)")
+                     title = "Targeted metabolites: pooled intervention vs. control (select points to filter the table)")
 ```
 
 ### Combined intervention arms
