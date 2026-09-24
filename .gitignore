@@ -28,5 +28,9 @@ TODO.local.md
 # Stray device output from batch rendering
 Rplots.pdf
 
+# bookdown's intermediate figure folder (book_filename + "_files"); the render
+# copies its images into docs/imic_online_resource_files/, which is published.
+/imic_online_resource_files/
+
 # One-off investigation prompts (working notes, not part of the supplement)
 MANUSCRIPT_*_PROMPT.md
