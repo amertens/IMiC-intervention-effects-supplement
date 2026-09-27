@@ -1,8 +1,8 @@
 # Cross-compartment analyses in maternal and infant blood
 
-This section reports the cross-compartment analyses in the MISAME-III subset with paired maternal plasma, maternal and infant dried-blood microsample (VAMS) metabolomics, and maternal blood proteomics, set alongside the milk measurements analyzed elsewhere in this online resource. It supports the manuscript Results subsection *"BEP-associated changes are concordant across maternal blood, milk, and infant blood (MISAME-III)"* and corresponds to Tables S8, S9, S10, and S11 of the supplementary materials. Table S11 covers the features increased in two or more compartments and their pathway enrichment (§10.5), the basis for Fig. 6D. The supplementary materials have no figure for this section, so every figure here is online-only.
+This section reports the cross-compartment analyses in the MISAME-III subset with paired maternal plasma, maternal and infant dried-blood microsample (VAMS) metabolomics, and maternal blood proteomics, set alongside the milk measurements analyzed elsewhere in this online resource. It supports the manuscript Results subsection *"BEP-associated changes in maternal blood, milk, and infant blood (MISAME-III)"* and corresponds to Tables S8, S9, S10, and S11 of the supplementary materials. Table S11 covers the features increased in two or more compartments and their pathway enrichment (§10.5), the basis for Fig. 6D. The supplementary materials have no figure for this section, so every figure here is online-only.
 
-The milk analyses in the rest of this online resource (§1–§9) pool all three trials (MISAME-III, Mumta-LW, ELICIT). The blood and cross-compartment analyses here use MISAME-III only, the one trial in which maternal plasma, dried-blood VAMS metabolomics, and blood proteomics were collected. MISAME-III randomized prenatal and postnatal balanced energy-protein (BEP) supplementation in a 2×2 design, giving four arms: Control (IFA/IFA), prenatal-only (BEP/IFA), postnatal-only (IFA/BEP), and both periods (BEP/BEP). The postnatal (lactation-period) contrast is the one of interest, because any effect carried through milk would be expected to appear there in both milk and infant blood.
+The milk analyses in the rest of this online resource (§1–§9) cover all three trials (MISAME-III, Mumta-LW, ELICIT). The blood and cross-compartment analyses here use MISAME-III only, the one trial in which maternal plasma, dried-blood VAMS metabolomics, and blood proteomics were collected. MISAME-III randomized prenatal and postnatal balanced energy-protein (BEP) supplementation in a 2×2 design, giving four arms: Control (IFA/IFA), prenatal-only (BEP/IFA), postnatal-only (IFA/BEP), and both periods (BEP/BEP). The postnatal (lactation-period) contrast is the one of interest, because any effect carried through milk would be expected to appear there in both milk and infant blood.
 
 > **Visit codes.** Blood tables use MISAME-III visit codes; milk tables use calendar labels. `tri3` = third trimester · `incl` = enrollment · `acco` = birth/accouchement · `pn12` = 1–2 months postpartum · `pn34` = 3–4 months · `pn56` = 5–6 months. The text gives months; the data tables use the codes.
 
@@ -17,7 +17,7 @@ library(here)
 library(DT)
 library(plotly)
 source(here::here("functions.R"))
-ggplot2::theme_set(ggplot2::theme_minimal(base_size = 14))
+ggplot2::theme_set(theme_imic_web(base_size = 14))
 knitr::opts_chunk$set(fig.width = 12, fig.height = 8, dpi = 110)
 
 ## Reader that preserves original (pretty) column names and degrades gracefully.
@@ -160,7 +160,7 @@ cc_dt(read_cc("results/cross_compartment_proteome_overlap_adjusted.csv"), page_l
 
 A medium-chain acylcarnitine feature at *m/z* 286.202 increased in milk, maternal blood, and infant blood. In the arm-stratified models the effect was confined to the arms that received BEP after birth and was absent in the prenatal-only arm.
 
-> **Scope of the claim.** The manuscript's claim for this feature is directional only: it increased in milk, maternal blood, and infant blood. The manuscript does not name the compound because its identity is mass-based and unconfirmed (see the identity caveat below). This section reports the directional result and the evidence on the compound's identity.
+> **Scope of the claim.** The manuscript's claim for this feature is directional only: it increased in milk, maternal blood, and infant blood. The main text calls it a medium-chain acylcarnitine (*m/z* 286.202), and Table S8 and Fig. 6D give its putative annotation, octenoylcarnitine, marked as isobaric-ambiguous, because its identity is mass-based and unconfirmed (see the identity caveat below). This section reports the directional result and the evidence on the compound's identity.
 
 In infant blood at 1–2 months (pn12), the primary visit for this result, the *m/z* 286.202 feature was FDR-significantly increased relative to Control (IFA/IFA) in the two arms supplemented after birth but not in the prenatal-only arm:
 
@@ -170,7 +170,7 @@ In infant blood at 1–2 months (pn12), the primary visit for this result, the *
 
 Analytic *n* per arm at infant pn12 was Control 78, IFA/BEP 86, BEP/IFA 57, and BEP/BEP 64 (all estimable). An effect that is largest in the postnatal-only arm and absent in the prenatal-only arm points to postnatal exposure rather than prenatal carryover. The concordant increase in milk and infant blood is consistent with, but does not demonstrate, milk-mediated transfer. In the pooled postnatal-BEP contrast the feature increased in every measured compartment (milk +0.95, maternal plasma +1.33, postnatal maternal VAMS +0.78, infant VAMS +1.04 SD). Results at pn34 and pn56 are consistent with, and secondary to, the contemporaneous pn12 result.
 
-> **Identity caveat.** The *m/z* 286.202 assignment is provisional and mass-based, which is why the manuscript names no compound. Three checks using mass and RT only, without MS/MS (accurate mass, a search for co-occurring features, and elution order within the homolog series), favor octenoylcarnitine over the near-identical octanoylcarnitine: the feature lies within ~2.5 ppm of octenoylcarnitine [M+H]⁺ in the VAMS catalogue, and octanoylcarnitine appears as a separate feature. The targeted Biocrates panel, however, does not support a named acylcarnitine (octanoylcarnitine is unchanged, and acylcarnitine composition does not shift, with all changes < 6%). Most important for any inference from milk to infant, the milk feature lies ~11 ppm off the milk homolog series. Whether the milk and infant features are the same compound therefore awaits MS/MS annotation, and any claim that depends on that link carries this uncertainty.
+> **Identity caveat.** The *m/z* 286.202 assignment is provisional and mass-based, which is why the main text names no compound and the supplementary materials give octenoylcarnitine only as a putative, isobaric-ambiguous annotation. Three checks using mass and RT only, without MS/MS (accurate mass, a search for co-occurring features, and elution order within the homolog series), favor octenoylcarnitine over the near-identical octanoylcarnitine: the feature lies within ~2.5 ppm of octenoylcarnitine [M+H]⁺ in the VAMS catalogue, and octanoylcarnitine appears as a separate feature. The targeted Biocrates panel, however, does not support a named acylcarnitine (octanoylcarnitine is unchanged, and acylcarnitine composition does not shift, with all changes < 6%). Most important for any inference from milk to infant, the milk feature lies ~11 ppm off the milk homolog series. Whether the milk and infant features are the same compound therefore awaits MS/MS annotation, and any claim that depends on that link carries this uncertainty.
 
 ```{r cc-carnitine-figs, echo=FALSE, message=FALSE, warning=FALSE, out.width="100%", fig.show="hold"}
 safe_img("figures/cross_compartment/fig_F_crosstrial_octanoylcarnitine.png", "cross-trial octanoylcarnitine")
@@ -212,7 +212,7 @@ Twenty BEP-up features were matched across ≥2 of the three compartments (the f
 safe_img("figures/cross_compartment/figureS10_compartment_tracking.png", "features increased in two or more compartments")
 ```
 
-***Figure (online-only).** BEP-up feature groups by compartment (27 groups: the 20 increased in two or more of milk, maternal blood, and infant blood, and seven increased in one compartment only), with ATEs by compartment and BEP-supplement detection status.*
+***Figure (online-only).** BEP-up feature groups by compartment (27 groups: the 20 increased in two or more of milk, maternal blood, and infant blood, and seven increased in one compartment only), with ATEs by compartment and BEP-supplement detection status. Colors and symbols follow Fig. 6D: maternal plasma dark blue, maternal VAMS light blue, milk orange, and infant VAMS black; squares mark features detected in the BEP supplement and circles those not reliably detected.*
 
 The table below gives the compartment, visit, effect size, direction, and BEP-supplement match status of the linked features (51 rows for the 20 up-regulated features; 6 rows for three down-regulated linked features).
 

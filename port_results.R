@@ -93,8 +93,6 @@ files <- list(
        "results/microbiome_diversity_intervention_effects_results_arm_strat.RDS"),
   list("results/microbiome_intervention_effects_results.RDS",
        "results/microbiome_intervention_effects_results.RDS"),
-  list("results/microbiome_intervention_effects_results_arm_strat.RDS",
-       "results/microbiome_intervention_effects_results_arm_strat.RDS"),
   list("results/adjusted_combined_arms_intervention_effects_proteomics_results_clean.RDS",
        "results/adjusted_combined_arms_intervention_effects_proteomics_results_clean.RDS"),
   list("results/adjusted_combined_arms_intervention_effects_untargeted_results_clean.RDS",
@@ -107,14 +105,6 @@ files <- list(
        "results/adjusted_combined_arms_intervention_effects_unscaled_results_clean.RDS"),
   list("results/pca_intervention_effects_results_arm_strat.RDS",
        "results/pca_intervention_effects_results_arm_strat.RDS"),
-  list("results/SLvim_lab_plots.RDS",
-       "results/SLvim_lab_plots.RDS"),
-
-  ## ---- pre-rendered figure objects (already mostly ported) ---------------
-  list("figures/figure-data/volcano_plots.RDS",
-       "figures/figure-data/volcano_plots.RDS"),
-  list("figures/figure-data/volcano_plots_pooled_arms.RDS",
-       "figures/figure-data/volcano_plots_pooled_arms.RDS"),
 
   ## ---- chapter figure-data objects + metadata ----------------------------
   ## Consumed directly by chapters 2/3/7/8 (significance-dependent figure
@@ -131,10 +121,6 @@ files <- list(
        "figure-data/figure_s4_trajectory_plots.RDS"),
   list("figure-data/figure_sX_forest_plot_fat_adjusted.RDS",
        "figure-data/figure_sX_forest_plot_fat_adjusted.RDS"),
-  list("figure-data/figures8_network_plots_primary.RDS",
-       "figure-data/figures8_network_plots_primary.RDS"),
-  list("figure-data/figures8_network_plots_metabolomics.RDS",
-       "figure-data/figures8_network_plots_metabolomics.RDS"),
   list("figure-data/pca_intervention_effects_results.RDS",
        "figure-data/pca_intervention_effects_results.RDS"),
   list("figure-data/figureS1_growth_plot_data.RDS",
@@ -157,8 +143,8 @@ for (f in c("figures/figure3.png", "figures/figure3_stratified_supplement.png",
 
 ## Direction-split ORA composite figures (§9 primary/tertiary subsections). Named
 ## appendix_* upstream; kept under their figureS_* names here so the published
-## site carries no "appendix" file names. NOT regenerated on 2026-09-23, so they
-## still use the pre-Okabe-Ito study colours.
+## site carries no "appendix" file names. Regenerated 2026-09-27 in the style of the
+## printed enrichment panels (study colours and symbols, grey P / green Q lines).
 files[[length(files) + 1]] <- list("figures/appendix_primary_ora_by_direction.png",
                                    "figures/figureS_primary_ora_by_direction.png")
 files[[length(files) + 1]] <- list("figures/appendix_tertiary_ora_by_direction.png",

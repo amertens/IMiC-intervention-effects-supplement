@@ -2,7 +2,7 @@
 
 This section reports the primary covariate-adjusted estimates of maternal nutritional intervention effects on individual human milk components. Each component appears in an interactive forest plot and a searchable table, stratified by study and milk collection visit. We estimated average treatment effects (ATEs) with targeted maximum likelihood estimation (TMLE), adjusting for prespecified baseline prognostic factors, and applied Benjamini–Hochberg false discovery rate (FDR) correction within each outcome group × study × visit. Every results table also includes `pval_adj_global`, a more conservative correction pooled across all studies and visits within an outcome group, which we retain as a sensitivity analysis; the significance flag (`sigFDR`) is based on the per-visit `pval_adj`.
 
-Each outcome group appears twice. The first view pools the intervention arms (all maternal nutritional intervention arms combined vs. the corresponding control) to maximize precision. The second stratifies by randomized arm, comparing each randomized nutritional arm with its trial's control. In the forest plots, filled triangles mark effects that survive FDR correction, filled circles ("Sig before FDR") mark nominal *P* < 0.05 that did not survive correction, and open circles mark neither; in the arm-stratified plots, each contrast also has its own color and CI line type. Hovering over a point shows the exact estimate, 95% CI, and *Q*-value, and the column filters in each table narrow the view to specific components, studies, or visits.
+Each outcome group appears twice. The first view pools the intervention arms (all maternal nutritional intervention arms combined vs. the corresponding control) to maximize precision. The second stratifies by randomized arm, comparing each randomized nutritional arm with its trial's control. The forest plots follow Fig. 2: gray open circles are not significant, blue open circles are nominally significant (*P* < 0.05) but do not survive FDR correction, and orange filled circles are significant after FDR correction (*Q* < 0.05). In the arm-stratified plots each contrast has its own color and CI line type, and the symbol alone gives the significance (open circle, open triangle, filled circle). Hovering over a point shows the exact estimate, 95% CI, and *Q*-value, and the column filters in each table narrow the view to specific components, studies, or visits.
 
 These estimates correspond to Figure 2 (primary outcomes) of the manuscript and Figure S3 (secondary outcomes) of the supplementary materials, and supply the per-component estimates behind the Figure 5A targeted-metabolite volcano plot. The machine-learning prediction of treatment arm and the PCA composites of manuscript Figure 1 are in §8.
 
@@ -28,9 +28,9 @@ show_forest_and_table <- function(csv_path, arm_strat = FALSE, title = NULL,
     "Each point is the adjusted average treatment effect (ATE, SD units) with 95% CI for one milk component, ",
     "faceted by study and milk-collection visit. ",
     if (arm_strat)
-      "Each randomized contrast has its own color and CI line type (solid, dashed, dotted); filled triangles mark effects significant after FDR correction (Q < 0.05), filled circles nominal P < 0.05, and open circles non-significant. "
+      "Each randomized contrast has its own color and CI line type (solid, dashed, dotted); filled circles mark effects significant after FDR correction (Q < 0.05), open triangles nominal P < 0.05, and open circles non-significant. "
     else
-      "Orange filled triangles mark effects significant after FDR correction (Q < 0.05); gray filled circles are nominally significant (P < 0.05); open circles are non-significant. ",
+      "Orange filled circles mark effects significant after FDR correction (Q < 0.05), blue open circles nominally significant ones (P < 0.05), and gray open circles non-significant ones, as in Fig. 2. ",
     "FDR correction is applied within outcome group, study, and visit. Hover over a point for the exact estimate, 95% CI, and Q-value.")
   htmltools::tagList(
     forest_plot(df, arm_strat = arm_strat, title = ttl),
@@ -180,11 +180,11 @@ show_forest_and_table("results/subsetted results/secondary_bioactives_arm_strat.
 
 ## Targeted metabolites (tertiary outcomes)
 
-Summaries of the large targeted metabolomics panel (Biocrates MxP Quant 500) are elsewhere: pathway-level views in the *Pathway enrichment* section, and the corresponding volcano plot in manuscript Fig. 5A. The forest plots below show the same metabolites individually in one long plot (hover to identify points) and are most useful alongside a table filtered to a single compound class.
+Summaries of the large targeted metabolomics panel (Biocrates MxP Quant 500) are elsewhere: pathway-level views in the *Pathway enrichment* section, and the corresponding volcano plot in manuscript Fig. 5A (reproduced in §\@ref(path-tertiary)). The forest plots below show the same metabolites individually in one long plot (hover to identify points) and are most useful alongside a table filtered to a single compound class.
 
 ### Interactive explorer (linked volcano + table)
 
-With thousands of metabolite estimates in the targeted panel, the linked view below is often the quickest place to start. Drawing a box or lasso (Plotly's *Box Select* / *Lasso*) around points in the volcano plot filters the table to those metabolites, and the dropdowns and the table's column filters in turn narrow the plotted points. Each point is one metabolite (pooled intervention vs. control), placed by effect size and −log10(*P*); FDR-significant metabolites are orange triangles, nominal (*P* < 0.05) ones blue squares, and the rest gray circles.
+With thousands of metabolite estimates in the targeted panel, the linked view below is often the quickest place to start. Drawing a box or lasso (Plotly's *Box Select* / *Lasso*) around points in the volcano plot filters the table to those metabolites, and the dropdowns and the table's column filters in turn narrow the plotted points. Each point is one metabolite (pooled intervention vs. control), placed by effect size and −log~10~(*P*). As in Fig. 5A, metabolites that are not FDR-significant are black (squares if *P* < 0.05, circles otherwise), and FDR-significant metabolites take the color and symbol of their compound class. The gray line marks *P* = 0.05; FDR is controlled separately within each study and visit, so this pooled view has no single FDR line.
 
 ```{r effects-tertiary-linked, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7}
 df_ter <- safe_read_csv(here::here("results/subsetted results/tertiary_targeted_metabolomics.csv"))

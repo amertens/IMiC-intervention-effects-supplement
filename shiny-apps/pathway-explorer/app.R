@@ -87,6 +87,10 @@ harmonize <- function(d, type) {
                     enrichment = g("fold_enrichment"), stringsAsFactors = FALSE)
   )
   out <- out[!is.na(out$pathway) & out$pathway != "", , drop = FALSE]
+  # Trial names as printed (some tables use the internal Elicit/Misame/Vital labels).
+  s <- as.character(out$study)
+  out$study <- ifelse(s %in% c("Misame", "MISAME"), "MISAME-III",
+               ifelse(s == "Vital", "Mumta-LW", ifelse(s == "Elicit", "ELICIT", s)))
   # Direction of effect in one vocabulary (the source tables use up/down,
   # Upregulated/Downregulated, ...), so the plot can give it a symbol as well
   # as a colour.

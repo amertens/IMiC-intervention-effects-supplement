@@ -17,7 +17,7 @@ source(here::here("functions.R"))
 ## Reviewer flagged static plot labels as too small. Apply a larger base font
 ## for newly built plots and bump default fig dimensions for the trajectory
 ## line plots (saved upstream as smaller-font ggplots).
-ggplot2::theme_set(ggplot2::theme_minimal(base_size = 14))
+ggplot2::theme_set(theme_imic_web(base_size = 14))
 knitr::opts_chunk$set(fig.width = 12, fig.height = 9, dpi = 110)
 ```
 
@@ -37,8 +37,14 @@ if (is.data.frame(traj_primary)  && "measure" %in% names(traj_primary))
 if (is.data.frame(traj_combined) && "measure" %in% names(traj_combined))
   traj_combined <- traj_combined %>% dplyr::filter(measure == "ATE")
 
+## Each estimate is the effect on the change from the preceding visit, so panels
+## are titled by visit interval ("MISAME-III (14-21 days to 1-2 mo.)").
+traj_interval <- c("Misame 1-2 mo." = "14-21 days to 1-2 mo.", "Misame 3-4 mo." = "1-2 to 3-4 mo.",
+                   "Vital 2 mo." = "1.5 to 2 mo.", "Elicit 5 mo." = "1 to 5 mo.")
 make_traj_volcano <- function(df, cat_filter, title) {
   if (is.null(df) || !is.data.frame(df)) return(invisible(NULL))
+  key <- paste(df$study, df$visit)
+  df$visit[key %in% names(traj_interval)] <- traj_interval[key[key %in% names(traj_interval)]]
   cond <- rep(FALSE, nrow(df))
   if ("category" %in% names(df))      cond <- cond | df$category %in% cat_filter
   if ("outcome_group" %in% names(df)) cond <- cond | df$outcome_group %in% cat_filter
@@ -46,7 +52,8 @@ make_traj_volcano <- function(df, cat_filter, title) {
   sub <- df[cond, , drop = FALSE]
   if (!nrow(sub)) return(invisible(NULL))
   ## Cap interactive points for tertiary metabolites (thousands of features).
-  volcano_capped(sub, n_show = 1500, title = title)
+  volcano_capped(sub, n_show = 1500, title = title,
+                 x_lab = "Average treatment effect on the visit-to-visit change (SD units)")
 }
 
 make_traj_volcano(traj_combined,
@@ -60,7 +67,7 @@ make_traj_volcano(traj_combined,
                   title = "Trajectory effects: tertiary outcomes (targeted metabolites)")
 ```
 
-**Trajectory volcano plots.** Each point is the adjusted intervention effect on the visit-to-visit *change* in one milk component (primary, secondary, and tertiary outcomes shown separately), pooled intervention vs. control. The x-axis is the ATE (SD units) and the y-axis is −log~10~(*P*), with the dotted line marking *P* = 0.05. Points are colored by significance. In the tertiary panel, which has thousands of features, the interactive plot shows the 1,500 features with the smallest raw *P*-values (of 6,182), and the full set is in the searchable table below.
+**Trajectory volcano plots.** Each point is the adjusted intervention effect on the visit-to-visit *change* in one milk component (primary, secondary, and tertiary outcomes shown separately), pooled intervention vs. control, and each panel is one study and visit interval. The x-axis is the ATE (SD units) and the y-axis is −log~10~(*P*). As in Figs. 3A and 5A, estimates that are not FDR-significant are black (squares if *P* < 0.05, circles otherwise), FDR-significant estimates take the color and symbol of their component category, the gray line marks *P* = 0.05, and the green line marks each panel's FDR threshold. In the tertiary panel, which has thousands of features, the interactive plot shows the 1,500 features with the smallest raw *P*-values (of 6,182), and the full set is in the searchable table below.
 
 ## Searchable tables of trajectory effects
 
@@ -86,10 +93,42 @@ if (!is.null(traj_combined) && is.data.frame(traj_combined)) {
 
 The line plots below trace mean human milk component levels over successive visits by randomized intervention arm within each study. For the category-level summaries, we averaged component values across all available biomarkers within a category in each study.
 
-```{r traj-lineplots, echo=FALSE, message=FALSE, warning=FALSE, fig.height=8, results='asis'}
+```{r traj-lineplots, echo=FALSE, message=FALSE, warning=FALSE, fig.width=13, fig.height=10, results='asis'}
 p_s5 <- safe_readRDS(here::here("figure-data/figure_s4_trajectory_plots.RDS"),
                      label = "figure_s4_trajectory_plots.RDS")
-show_any(p_s5)
+## The saved plots were built with ggplot2 3.x, which the installed ggplot2 4.x
+## cannot draw, so they are redrawn here from the data stored in them. Each
+## "scaled" plot carries both the Z-scored (value) and native-unit (value_raw)
+## category means, so all six views (three trials x two scales) come from those
+## three objects; the saved list itself repeats MISAME-III native units in place
+## of ELICIT's.
+if (is.list(p_s5)) {
+  traj_means <- dplyr::bind_rows(lapply(p_s5[grepl("_scaled$", names(p_s5))],
+                                        function(p) as.data.frame(dplyr::ungroup(p[["data"]])))) %>%
+    dplyr::mutate(visit = visit_name(study, visit), study = study_name(study))
+  for (st in c("MISAME-III", "Mumta-LW", "ELICIT")) {
+    d <- traj_means[traj_means$study == st, , drop = FALSE]
+    if (!nrow(d)) next
+    d$visit <- factor(d$visit, levels = intersect(c("14-21 days", "1-2 mo.", "3-4 mo.", "1.5 mo.",
+                                                    "2 mo.", "1 mo.", "5 mo."), unique(d$visit)))
+    for (sc in c("value", "value_raw")) {
+      cat(sprintf("\n\n**%s, %s**\n\n", st,
+                  if (sc == "value") "standardized (Z-scored) means" else "native-unit means"))
+      p <- ggplot2::ggplot(d, ggplot2::aes(x = visit, y = .data[[sc]], colour = arm,
+                                           linetype = arm, group = arm)) +
+        ggplot2::geom_line(linewidth = 0.6) +
+        ggplot2::geom_point(size = 1.6) +
+        ggplot2::scale_colour_manual(values = imic_arm_cols, name = "Arm") +
+        ggplot2::scale_linetype_manual(values = imic_arm_linetypes, name = "Arm") +
+        ggplot2::facet_wrap(~ category, scales = "free_y") +
+        ggplot2::labs(x = "Milk-collection visit",
+                      y = if (sc == "value") "Mean (Z-score)" else "Mean (native units)") +
+        theme_imic_web() +
+        ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 30, hjust = 1))
+      print(p)
+    }
+  }
+}
 ```
 
-**Trajectory line plots.** Mean human milk component levels across successive milk collection visits by randomized intervention arm within each study, averaged within biologically defined component categories (e.g. macronutrients, B-vitamins, HMOs, amino acids, other metabolite classes). Levels are shown on a standardized scale (Z-scored within study × visit) for cross-category comparison and on the original measurement scale, which preserves absolute concentrations.
+**Trajectory line plots.** Mean human milk component levels across successive milk-collection visits by randomized arm within each trial, averaged within biologically defined component categories (e.g. macronutrients, B-vitamins, HMOs, amino acids, other metabolite classes). Levels are shown on a standardized scale (Z-scored within study × visit) for cross-category comparison and on the original measurement scale, which preserves absolute concentrations. Each arm has the color of its randomized contrast elsewhere in this online resource (control in gray) and its own line type.

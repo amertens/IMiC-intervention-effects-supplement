@@ -18,7 +18,7 @@ This online resource accompanies the manuscript:
 
 It reports the analytical outputs behind the manuscript in more detail than the printed article can hold: interactive forest and volcano plots, searchable and filterable estimate tables, longitudinal trajectory plots, MILQ-referenced deficiency analyses, BMI-stratified subgroup analyses, reproducible pathway-enrichment results, and the cross-compartment analyses in maternal and infant blood.
 
-The online resource has ten numbered sections, preceded by this unnumbered overview and followed by a page recording the R session that produced it. The paper cites Sections 1–8 by number in its Methods, Results, and figure legends. §9 (reproducible pathway and enrichment analyses) holds the full results behind the manuscript's pathway tables (Tables S2–S7), and §10 (cross-compartment analyses in maternal and infant blood) those behind its cross-compartment tables (Tables S8–S11) and main-text Fig. 6D; the Results cite both as "the online resource".
+The online resource has ten numbered sections, preceded by this unnumbered overview and followed by a page recording the R session that produced it. The paper cites Sections 1–6 by number in its Methods, Results, and figure legends, and cites the rest of the online resource without a section number. §9 (reproducible pathway and enrichment analyses) holds the full results behind the manuscript's pathway tables (Tables S2–S7), and §10 (cross-compartment analyses in maternal and infant blood) those behind its cross-compartment tables (Tables S8–S11) and main-text Fig. 6D; the Results cite both as "the online resource".
 
 Table and figure numbers throughout this online resource match the manuscript's supplementary materials (Tables S1–S11 and Figs. S1–S5). The supplementary figures appear here as follows:
 
@@ -45,7 +45,7 @@ Figures with no supplementary-figure counterpart (the direction-split pathway OR
 | Longitudinal change in HM composition | [§7 Trajectory analyses of HM component change across lactation](#trajectory-analyses-of-human-milk-component-change-across-lactation) |
 | manuscript Fig. 1 (treatment-arm prediction & PCA composites); Fig. S1 (growth); Fig. S4 (TG fat adjustment); **Table S1** (native-unit concentrations, §\@ref(native-units-table)) and the native-unit estimates for every targeted metabolite (§\@ref(native-units-tertiary)); sensitivity analyses | [§8 Sensitivity analyses and additional outputs](#sensitivity-analyses-and-additional-outputs) |
 | manuscript Fig. 3B (primary pathway analysis), Fig. 5B–C and Fig. 6A–C (tertiary/untargeted enrichment); **Tables S2–S7** (pathway enrichment); Results: "up- and down-regulated pathways are reported separately in the online resource" (§\@ref(path-tertiary)) and "Amino-acid and central-carbon pathways recurred across the targeted and untargeted metabolome … as detailed in the online resource" (§\@ref(path-tertiary), §\@ref(path-untargeted-msea)); direction-split ORA panels (online-only) | [§9 Reproducible pathway and enrichment analyses](#reproducible-pathway-and-enrichment-analyses) |
-| Results: "BEP-associated changes are concordant across maternal blood, milk, and infant blood (MISAME-III)"; **Table S8** (cross-compartment features), **Table S9** (chemical-class enrichment), **Table S10** (temporal persistence), and **Table S11**/main-text **Fig. 6D** (features increased in two or more compartments, and their pathway enrichment). No supplementary figure; all figures here are online-only | [§10 Cross-compartment analyses in maternal and infant blood](#cross-compartment-analyses-in-maternal-and-infant-blood) |
+| Results subsection "BEP-associated changes in maternal blood, milk, and infant blood (MISAME-III)"; **Table S8** (cross-compartment features), **Table S9** (chemical-class enrichment), **Table S10** (temporal persistence), and **Table S11**/main-text **Fig. 6D** (features increased in two or more compartments, and their pathway enrichment). No supplementary figure; all figures here are online-only | [§10 Cross-compartment analyses in maternal and infant blood](#cross-compartment-analyses-in-maternal-and-infant-blood) |
 
 Each "Section *N* of the online resource" in the manuscript corresponds to §*N* here.
 
@@ -62,7 +62,13 @@ The enrichment and cross-compartment sections use two different mass tolerances,
 
 In the web version, forest and volcano plots are interactive `plotly` widgets. Hovering over a point shows the component name, study, visit, ATE, 95% CI, and FDR-adjusted *Q*-value, and the mode bar at the top right of each plot zooms, pans, lasso-selects, or exports a PNG. Each plot is paired with a searchable table of the same data, with column filters and sortable columns.
 
-Plots drawn for this online resource use the colorblind-safe Okabe–Ito palette. Significance levels, studies, BMI strata, and randomized contrasts also differ in symbol shape or line type, so the plots can be read with a color-vision deficiency or in grayscale.
+Plots drawn for this online resource follow the conventions of the printed figures, and panels are titled by study and visit, as in "MISAME-III (1-2 mo.)":
+
+- **Forest plots** (as in Fig. 2 and Figs. S2–S3) mark each estimate as not significant (gray open circle), nominally significant at *P* < 0.05 (blue open circle), or significant after FDR correction at *Q* < 0.05 (orange filled circle). Where randomized arms are shown separately, each contrast has its own color and CI line type, and the symbol alone gives the significance (open circle, open triangle, filled circle).
+- **Volcano plots** (as in Figs. 3A and 5A) draw estimates that are not FDR-significant in black (squares if *P* < 0.05, circles otherwise) and give FDR-significant estimates the color and symbol of their component category. The gray line marks *P* = 0.05 and the green line the FDR threshold of each panel.
+- **Studies** are colored and shaped as in the pathway figures: ELICIT blue circles, MISAME-III orange triangles, and Mumta-LW reddish-purple squares.
+
+Every color code has a second cue (symbol shape, fill, or line type), so the plots can be read with a color-vision deficiency or in grayscale.
 
 If a data file that a section depends on is missing, the section prints a notice naming the file in place of its output. Rerunning the analysis code (see *Reproducing the online resource* in the repository README) regenerates these files.
 

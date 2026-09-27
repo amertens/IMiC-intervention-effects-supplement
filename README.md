@@ -27,7 +27,7 @@ resource is reader-facing and cited from the paper, so it should not carry an in
 
 ## Section map
 
-The chapter Rmd files are numbered to match the manuscript's *"Section N of the online resource"* citations — for example, *"Section 3"* (BMI subgroup) and *"Section 4"* (microbiome individual taxa) resolve directly to §3 and §4 of the rendered book, and the paper cites §8.2 (native-unit effects) as well. These numbers must not change. The online resource has **ten numbered sections**: the paper cites §1–§8 by number, and §9–§10 hold the enrichment and cross-compartment results it cites as "the online resource".
+The chapter Rmd files are numbered to match the manuscript's *"Section N of the online resource"* citations — for example, *"Section 3"* (BMI subgroup) and *"Section 4"* (microbiome individual taxa) resolve directly to §3 and §4 of the rendered book. These numbers must not change. The online resource has **ten numbered sections**: the submitted paper cites §1–§6 by number and the rest (including the enrichment and cross-compartment results in §9–§10) as "the online resource".
 
 | # | Section | Source Rmd |
 |---|---|---|
@@ -39,12 +39,12 @@ The chapter Rmd files are numbered to match the manuscript's *"Section N of the 
 | 5 | Adjusted intervention effects on individual milk components | `05_intervention_effects.Rmd` |
 | 6 | Targeted-metabolite metadata and reductions in HM nutrient deficiency (Figure S2) | `06_milq_deficiency.Rmd` |
 | 7 | Trajectory analyses of HM component change across lactation | `07_trajectory_plots.Rmd` |
-| 8 | Sensitivity analyses and additional outputs (unadjusted, unscaled [Table S1], fat-adjusted TGs [Figure S4], SuperLearner [Fig. 1A], PCA [Fig. 1B], pathway-network views, infant growth [Figure S1]) | `08_sensitivity_supplementary.Rmd` |
+| 8 | Sensitivity analyses and additional outputs (unadjusted, unscaled [Table S1], fat-adjusted TGs [Figure S4], SuperLearner [Fig. 1A], PCA [Fig. 1B], infant growth [Figure S1]) | `08_sensitivity_supplementary.Rmd` |
 | 9 | Reproducible pathway and enrichment analyses (MetaboAnalystR KEGG pathway / ORA / MSEA / Mummichog / GO; Tables S2–S7, Fig. 3B, 5B–C, 6A–C; direction-split ORA panels are online-only) | `09_pathway_enrichment.Rmd` |
 | 10 | Cross-compartment analyses in maternal and infant blood (MISAME-III; Tables S8–S11 and main-text Fig. 6D; no printed-supplement figure, all figures here are online-only) | `10_cross_compartment_blood.Rmd` |
 | – | Reproducibility / sessionInfo | `99_session_info.Rmd` |
 
-The scripted pathway-enrichment tables that were previously described under §8.6 now live in full in **§9**; §8 retains only the pathway-network views and a pointer.
+The scripted pathway-enrichment tables that were previously described under §8.6 now live in full in **§9**; §8.6 is a pointer to them. (The old pathway-network views were retired on 2026-09-27: they were ggplot2 3.x objects the current ggplot2 cannot draw, and the manuscript does not cite them.)
 
 ## Display conventions
 
@@ -64,8 +64,8 @@ Each chapter consumes one of these types of upstream artefact:
 | `results/metaboanalyst/*` | Scripted MetaboAnalystR enrichment tables (§9) | Upstream analysis repo (`src/metaboanalyst/`) |
 | `results/*cross_compartment*`, `results/blood_*`, `results/compartment_tracking/*` | Blood / cross-compartment outputs (§10) | Upstream analysis repo (`src/2 analysis/`, blood pipeline) |
 | `data-files/*.csv` (tracked) | Machine-readable files the supplementary materials point to: Table S1 (long and wide), Tables S3, S6, S7, and `targeted_metabolites_native_units.csv`; published to `docs/data-files/` by `index.Rmd` | Upstream `results/tables/` (`src/pipeline/rebuild-submission-tables.R`) |
-| `figure-data/*.RDS` | Pre-rendered ggplot / plotly / data.frame objects backing specific manuscript figures (S1–S7 etc.) | Upstream analysis repo (figure-prep step) |
-| `figures/**/*.png` | Pre-rendered static figures (manuscript Fig. 3 composites, direction-split ORA panels, cross-compartment panels) | Upstream analysis repo (figure scripts) |
+| `figure-data/*.RDS` | Pre-rendered ggplot / plotly / data.frame objects backing specific manuscript figures (e.g. the Fig. 4 panels and the Fig. S1 data) | Upstream analysis repo (figure-prep step) |
+| `figures/**/*.png` | Pre-rendered static figures (manuscript Figs. 3, 5, 6 and S4, direction-split ORA panels, cross-compartment panels) | Upstream analysis repo (figure scripts) |
 | `metadata/milk_component.Rdata` | Canonical mapping of biomarker name → outcome class (macro / micro / B-vit / HMO / protein / metabolomics) | Maintained alongside this repo |
 
 Paths consumed by each chapter are referenced via `here::here(...)` in the source Rmd. The full TMLE / SuperLearner / enrichment / blood pipelines that produce these inputs live in the upstream analysis repository:

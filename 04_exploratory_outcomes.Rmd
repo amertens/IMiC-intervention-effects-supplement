@@ -37,6 +37,37 @@ prep_explor <- function(rds_path) {
   if (!"pval_adj" %in% names(df) && "chi_pval_adj" %in% names(df)) df$pval_adj <- df$chi_pval_adj
   df
 }
+
+## Fig. S5 as printed (figS5-microbiome-diversity.R upstream): one row per study and
+## visit, coloured by study, a triangle for the FDR-significant estimate and circles
+## otherwise, one panel per diversity index.
+diversity_forest <- function(df) {
+  d <- .harmonize_factors(df)
+  d$index <- sub("_imp$", " diversity", as.character(d$biomarker))
+  d$row   <- factor(paste0(d$study, " (", d$visit, ")"),
+                    levels = rev(c("ELICIT (1 mo.)", "ELICIT (5 mo.)", "MISAME-III (14-21 days)",
+                                   "MISAME-III (1-2 mo.)", "MISAME-III (3-4 mo.)",
+                                   "Mumta-LW (1.5 mo.)", "Mumta-LW (2 mo.)")))
+  d$tier  <- factor(ifelse(.flag(d$sigFDR), "FDR-significant", "Not significant"),
+                    levels = c("Not significant", "FDR-significant"))
+  d$tooltip <- paste0(d$index, "<br>", d$row, "<br>ATE: ", round(d$est, 3),
+                      " (", round(d$cil, 3), ", ", round(d$ciu, 3), ")",
+                      "<br>Q = ", signif(d$pval_adj, 3))
+  p <- ggplot2::ggplot(d, ggplot2::aes(x = est, y = row, colour = study, shape = tier, text = tooltip)) +
+    ggplot2::geom_vline(xintercept = 0, linetype = "dashed") +
+    ggplot2::geom_errorbar(ggplot2::aes(xmin = cil, xmax = ciu), width = 0, orientation = "y") +
+    ggplot2::geom_point(size = 2.2) +
+    ggplot2::scale_colour_manual(values = imic_study_cols, guide = "none") +
+    ggplot2::scale_shape_manual(values = c("Not significant" = 16, "FDR-significant" = 17),
+                                drop = FALSE, name = "Statistical Significance") +
+    ggplot2::facet_wrap(~ index, scales = "free_x") +
+    ggplot2::labs(title = "Intervention effect (BEP or nicotinamide)",
+                  x = "Z-score difference", y = "Study and timepoint") +
+    theme_imic_web()
+  w <- as_widget(p)
+  if (inherits(w, "plotly")) w <- plotly::layout(w, showlegend = FALSE)
+  w
+}
 ```
 
 ## Microbiome
@@ -50,9 +81,9 @@ The forest plots show ATEs on Z-scored α-diversity metrics (observed richness a
 ```{r microbiome-div-combined, echo=FALSE, message=FALSE, warning=FALSE, fig.height=6}
 df <- prep_explor("results/microbiome_diversity_intervention_effects_results.RDS")
 if (!is.null(df)) htmltools::tagList(
-  forest_plot(df, title = "Microbiome α-diversity: pooled"),
+  diversity_forest(df),
   htmltools::tags$p(htmltools::tags$strong("Figure S5. "),
-    htmltools::tags$em("Maternal nutritional intervention effects on human milk microbiota alpha diversity (observed richness and Shannon diversity), Z-scored for cross-study comparability of intervention effects, by study, visit, and intervention contrast (pooled intervention vs. control). Orange triangles are significant after FDR correction, filled gray circles nominally significant (P < 0.05), and open circles non-significant. Results for individual microbial taxa appear later in this section (cited in the manuscript as Section 4 of the online resource).")),
+    htmltools::tags$em("Maternal nutritional intervention effects on human milk microbiota alpha diversity. Alpha diversity of the human milk microbiome, assessed using observed richness and Shannon diversity indices, is shown by study, visit, and intervention contrast (pooled intervention vs. control), with each study in its own color. The indices are Z-scored for comparability of intervention effects. The triangle marks the one estimate significant after FDR correction (observed richness, Mumta-LW, 1.5 months); circles are not significant. Results for individual microbial taxa appear later in this section (cited in the manuscript as Section 4 of the online resource).")),
   clean_tab(df, caption = "Adjusted ATEs on milk-microbiome α-diversity metrics, pooled intervention vs. control (manuscript Fig. S5)."))
 ```
 
@@ -67,9 +98,7 @@ if (!is.null(df)) htmltools::tagList(forest_plot(df, arm_strat = TRUE,
 
 ### Intervention effects on individual microbial features
 
-The volcano plots below show per-taxon (or per-ASV) intervention effects. No individual taxon reached FDR significance in any study or visit.
-
-#### Combined intervention arms
+The volcano plot below shows per-taxon (or per-ASV) intervention effects, pooled intervention vs. control. No individual taxon reached FDR significance in any study or visit.
 
 ```{r microbiome-vol-combined, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7, results='asis'}
 df <- prep_explor("results/microbiome_intervention_effects_results.RDS")
@@ -80,16 +109,7 @@ if (!is.null(df)) {
 }
 ```
 
-#### Stratified by randomized arm
-
-```{r microbiome-vol-strat, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7, results='asis'}
-df <- prep_explor("results/microbiome_intervention_effects_results_arm_strat.RDS")
-if (!is.null(df)) {
-  p <- volcano_capped(df, title = "Microbial features: per arm")
-  print(htmltools::tagList(p, nice_dt(df %>% dplyr::mutate(dplyr::across(where(is.numeric), ~ signif(.x, 3))),
-          caption = "Per-taxon adjusted intervention effects on milk-microbiome features, by randomized arm vs. control.")))
-}
-```
+Per-taxon estimates are shown for the pooled contrasts only.
 
 ## Untargeted proteomics
 
@@ -135,15 +155,3 @@ if (!is.null(df)) {
 }
 ```
 
-## Pre-rendered volcano plot objects (manuscript figure panels)
-
-These are the volcano plots used to build the manuscript figure panels, shown as static images.
-
-```{r explor-prerendered, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7, results='asis'}
-v_combined <- safe_readRDS(here::here("figures/figure-data/volcano_plots_pooled_arms.RDS"),
-                           label = "volcano_plots_pooled_arms.RDS")
-show_any(v_combined)
-v_strat <- safe_readRDS(here::here("figures/figure-data/volcano_plots.RDS"),
-                        label = "volcano_plots.RDS")
-show_any(v_strat)
-```

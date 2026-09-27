@@ -11,7 +11,7 @@ source(here::here("functions.R"))
 safe_load(here::here("metadata/milk_component.Rdata"))
 ## Reviewer flagged static plot labels as too small. Apply a larger base font
 ## to all new ggplots in this chapter and bump default fig dimensions.
-ggplot2::theme_set(ggplot2::theme_minimal(base_size = 14))
+ggplot2::theme_set(theme_imic_web(base_size = 14))
 knitr::opts_chunk$set(fig.width = 14, fig.height = 11, dpi = 110)
 ```
 
@@ -71,51 +71,82 @@ p_s2 <- safe_readRDS(here::here("figure-data/figure_s2_plots.RDS"),
 show_any(p_s2)
 ```
 
-**Figure 4.** IMiC distributions of HM nutrients relative to MILQ reference standards. Each panel shows one primary component with a significant intervention effect (total energy, total fat, total protein, vitamins B~1~, B~2~, B~3~, B~5~, B~6~, B~7~, and B~12~, vitamin A, α- and γ-tocopherol, selenium, and copper) as violin plots of its native-unit concentration, with the horizontal line within each violin marking the median. Distributions are stratified by study (El: ELICIT, Mi: MISAME-III, Mu: Mumta-LW) and visit in months, given together in the x-axis labels, and by intervention arm: within each study × visit pair the control arm is the left, blue violin and the pooled intervention arms the right, orange violin. Horizontal gray and red lines mark the 50th and 10th percentiles of the age-specific MILQ reference distribution, respectively; asterisks mark average treatment effects significant after FDR correction (\* *Q* < 0.05, \*\* *Q* < 0.01, \*\*\* *Q* < 0.001). Y-axes are log-transformed.
+**Figure 4.** IMiC distributions of HM nutrients relative to MILQ reference standards. Each panel shows one of 15 primary components (total energy, total fat, total protein, vitamins B~1~, B~2~, B~3~, B~5~, B~6~, B~7~, and B~12~, vitamin A, α- and γ-tocopherol, selenium, and copper) as violin plots of its native-unit concentration, with the horizontal line within each violin marking the median. Distributions are stratified by study (El: ELICIT, Mi: MISAME-III, Mu: Mumta-LW) and visit in months, given together in the x-axis labels, and by intervention arm: within each study × visit pair the control arm is the left, blue violin and the pooled intervention arms the right, orange violin. Horizontal gray and red lines mark the 50th and 10th percentiles of the age-specific MILQ reference distribution, respectively; asterisks mark average treatment effects significant after FDR correction (\* *Q* < 0.05, \*\* *Q* < 0.01, \*\*\* *Q* < 0.001). Y-axes are log-transformed.
 
 ### Per-component boxplots by study, visit, and arm
 
-These boxplots summarize the raw concentration of each component on its native assay scale.
+These boxplots show the raw concentration of each primary and secondary component on its native assay scale, one figure per outcome class, by study, milk-collection visit, and randomized arm. Boxes show the median and IQR, whiskers extend to 1.5 × IQR, and the y-axes are log-transformed. Boxes are filled by arm, in the color each randomized contrast has throughout this online resource (control in gray), and dodged in legend order. The 581 targeted metabolites are too many to plot one by one; their native-unit arm means and intervention effects are in `targeted_metabolites_native_units.csv` (§\@ref(native-units-tertiary)).
 
-```{r distributions-boxplots, echo=FALSE, message=FALSE, warning=FALSE, fig.width=14, fig.height=11}
+```{r distributions-boxplots-setup, include=FALSE}
 raw_path <- here::here("data/merged_analysis_datasets.RDS")
-metadata_loaded <- safe_load(here::here("metadata/milk_component.Rdata"))
-
-if (file.exists(raw_path) && isTRUE(metadata_loaded)) {
-  df <- readRDS(raw_path)
-  comps <- unique(unlist(all_milk_components, use.names = FALSE))
-  comps <- intersect(comps, names(df))
-  if (length(comps) == 0) {
-    cat("*No matching milk-component columns were found in the merged analysis dataset.*")
-  } else {
-    long <- df %>%
-      dplyr::select(studyid, visit, arm, dplyr::all_of(comps)) %>%
-      tidyr::pivot_longer(dplyr::all_of(comps),
-                          names_to = "component", values_to = "value") %>%
-      dplyr::filter(!is.na(value))
-    ## Okabe-Ito fills, one per randomised arm; boxes are dodged in legend
-    ## order, so position is a second cue alongside colour.
-    arm_fill <- c("Control" = "grey80", "Az." = okabe_ito[["skyblue"]],
-                  "Nico" = okabe_ito[["blue"]], "Nico+Az." = okabe_ito[["purple"]],
-                  "BEP/IFA" = okabe_ito[["yellow"]], "IFA/BEP" = okabe_ito[["orange"]],
-                  "BEP/BEP" = okabe_ito[["vermillion"]], "BEP+ExBf" = okabe_ito[["green"]],
-                  "BEP+ExBf+AZT" = okabe_ito[["black"]])
-    p <- ggplot2::ggplot(long,
-                         ggplot2::aes(x = paste(studyid, visit), y = value, fill = arm)) +
-      ggplot2::geom_boxplot(outlier.size = 0.5, alpha = 0.7) +
-      ggplot2::scale_fill_manual(values = arm_fill, na.value = "grey50") +
-      ggplot2::scale_y_log10() +
-      ggplot2::facet_wrap(~ component, scales = "free_y") +
-      ggplot2::labs(x = "Study and visit", y = "Concentration (native units, log scale)",
-                    fill = "Arm") +
-      ggplot2::theme_minimal() +
-      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1),
-                     legend.position = "bottom")
-    show_any(p)
+box_ok <- file.exists(raw_path) && exists("all_milk_components")
+box_df <- if (box_ok) readRDS(raw_path) else NULL
+## The analyzed components of each class, labeled as in the results tables.
+box_class <- function(csv) {
+  d <- safe_read_csv(here::here("results/subsetted results", csv))
+  if (is.null(d) || !box_ok) return(NULL)
+  d <- unique(d[, c("biomarker", "label_f")])
+  d <- d[d$biomarker %in% names(box_df), , drop = FALSE]
+  stats::setNames(canonical_label(d$biomarker, d$label_f), d$biomarker)
+}
+box_classes <- list(macro = box_class("primary_macro.csv"), micro = box_class("primary_micro.csv"),
+                    bvit = box_class("primary_bvit.csv"), hmo = box_class("secondary_hmo.csv"),
+                    protein = box_class("secondary_bioactives.csv"))
+box_height <- function(k) max(3.5, 2.4 * ceiling(length(box_classes[[k]]) / 4) + 1.4)
+box_plot <- function(k) {
+  labs_k <- box_classes[[k]]
+  if (!box_ok || !length(labs_k)) {
+    cat("*The dyad-level dataset is not available in this build; the boxplots are drawn when `data/merged_analysis_datasets.RDS` is present.*")
+    return(invisible(NULL))
   }
-} else {
-  cat("*The IMiC dyad-level dataset or component metadata are not available in this build; the boxplots are drawn when `data/merged_analysis_datasets.RDS` and `metadata/milk_component.Rdata` are present.*")
+  long <- box_df %>%
+    dplyr::select(studyid, visit, arm, dplyr::all_of(names(labs_k))) %>%
+    tidyr::pivot_longer(dplyr::all_of(names(labs_k)), names_to = "component", values_to = "value") %>%
+    dplyr::filter(!is.na(value), value > 0) %>%
+    dplyr::mutate(component = factor(labs_k[component], levels = unique(labs_k)),
+                  sv = study_visit_panel(study_name(studyid), visit_name(studyid, visit), order = "study"))
+  ## One fill per randomized arm (its contrast colour; control gray); boxes are
+  ## dodged in legend order, so position is a second cue alongside colour.
+  p <- ggplot2::ggplot(long, ggplot2::aes(x = sv, y = value, fill = arm)) +
+    ggplot2::geom_boxplot(outlier.size = 0.4, alpha = 0.8, linewidth = 0.3) +
+    ggplot2::scale_fill_manual(values = imic_arm_cols, na.value = "grey50", name = "Arm") +
+    ggplot2::scale_y_log10() +
+    ggplot2::facet_wrap(~ component, scales = "free_y", ncol = 4) +
+    ggplot2::labs(x = NULL, y = "Concentration (native units, log scale)") +
+    theme_imic_web() +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1))
+  show_any(p)
 }
 ```
 
-**Figure (online-only).** Native-unit concentration of every measured human-milk component (log10 scale), shown as boxplots by study, milk-collection visit, and randomized arm. Boxes show the median and IQR; whiskers extend to 1.5×IQR. Boxes are filled by arm (Okabe–Ito palette, control in light gray) and dodged in legend order.
+#### Macronutrients
+
+```{r distributions-box-macro, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.width=14, fig.height=box_height("macro")}
+box_plot("macro")
+```
+
+#### Micronutrients (including fat-soluble vitamins)
+
+```{r distributions-box-micro, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.width=14, fig.height=box_height("micro")}
+box_plot("micro")
+```
+
+#### B-vitamins
+
+```{r distributions-box-bvit, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.width=14, fig.height=box_height("bvit")}
+box_plot("bvit")
+```
+
+#### Human milk oligosaccharides
+
+```{r distributions-box-hmo, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.width=14, fig.height=box_height("hmo")}
+box_plot("hmo")
+```
+
+#### Bioactive proteins
+
+```{r distributions-box-protein, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.width=14, fig.height=box_height("protein")}
+box_plot("protein")
+```
+
+**Figures (online-only).** Native-unit concentrations of the primary and secondary human-milk components by study, milk-collection visit, and randomized arm.

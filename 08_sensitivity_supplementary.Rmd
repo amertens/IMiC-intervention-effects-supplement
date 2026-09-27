@@ -7,7 +7,7 @@ This section collects the sensitivity analyses and additional outputs cited in t
 - **8.3 Fat-adjusted triglyceride effects (Figure S4):** separates changes in triglyceride composition from transient changes in total milk fat.
 - **8.4 SuperLearner CV-AUC treatment-arm prediction (Fig. 1A):** a multivariate check of whether each class of HM components predicts treatment arm.
 - **8.5 PCA-based composite outcome scores (Fig. 1B):** ATEs on the first principal component of each class of milk components, testing whether each class moved as a whole.
-- **8.6 Pathway enrichment analyses:** reported in full in [§9 *Reproducible pathway and enrichment analyses*](#reproducible-pathway-and-enrichment-analyses); only the network views remain here.
+- **8.6 Pathway enrichment analyses:** reported in full in [§9 *Reproducible pathway and enrichment analyses*](#reproducible-pathway-and-enrichment-analyses).
 - **8.7 Infant growth analyses (Figure S1):** intervention effects on infant anthropometry within the IMiC subsamples, as a within-trial check.
 
 Conclusions about whether intervention effects are present and consistent rest on the adjusted analyses in §5; the analyses in this section put those findings in context.
@@ -21,7 +21,7 @@ source(here::here("functions.R"))
 
 ## Apply a slightly larger base font to all static ggplots in this chapter
 ## (reviewer flagged static plot labels as too small to read).
-ggplot2::theme_set(ggplot2::theme_minimal(base_size = 14))
+ggplot2::theme_set(theme_imic_web(base_size = 14))
 
 metadata_loaded <- safe_load(here::here("metadata/milk_component.Rdata"))
 ```
@@ -50,7 +50,7 @@ if (!is.null(res_unadj) && isTRUE(metadata_loaded)) {
     out <- htmltools::tagList(
       out,
       htmltools::h3(g),
-      forest_plot(sub, title = paste0("Unadjusted ATEs: ", g)),
+      forest_plot(sub, arm_strat = TRUE, title = paste0("Unadjusted ATEs: ", g)),
       clean_tab(sub)
     )
   }
@@ -82,7 +82,7 @@ if (!is.null(res_unscaled) && isTRUE(metadata_loaded)) {
     out <- htmltools::tagList(
       out,
       htmltools::h3(g),
-      forest_plot(sub, title = g),
+      forest_plot(sub, title = g, x_lab = "Average treatment effect (native units)"),
       clean_tab(sub)
     )
   }
@@ -110,7 +110,8 @@ if (!is.null(res_unscaled) && isTRUE(metadata_loaded)) {
     out_ter <- htmltools::tagList(
       out_ter,
       htmltools::h4(g),
-      forest_plot(sub, title = paste0(g, " (native units, µM)")),
+      forest_plot(sub, title = paste0(g, " (native units, µM)"),
+                  x_lab = "Average treatment effect (µM)"),
       clean_tab(sub)
     )
   }
@@ -142,7 +143,7 @@ if (!is.null(tab_s1_wide)) {
 
 ## Fat-adjusted triglyceride effects (Figure S4)
 
-Triglycerides (TGs) accounted for 73.4% of the FDR-significant tertiary effects. In MISAME-III they mostly increased at 14–21 days and 3–4 months but mostly decreased at 1–2 months. This reversal disappears when concentrations are adjusted for total fat, which suggests that the apparent decrease at 1–2 months reflects the transient drop in total fat at that visit rather than a change in TG composition. Figure S4 below shows treatment-specific TG means with and without fat adjustment; the plot beneath it shows the fat-adjusted means alone.
+Triglycerides (TGs) accounted for 73.4% of the FDR-significant tertiary effects. In MISAME-III they mostly increased at 14–21 days and 3–4 months but mostly decreased at 1–2 months. After adjustment for total fat, most FDR-significant TG effects are increases at every MISAME-III visit, so the apparent decrease at 1–2 months likely reflects the transient drop in total fat at that visit rather than a reversal of TG-specific effects. Figure S4 below shows treatment-specific TG means with and without fat adjustment; the plot beneath it shows the fat-adjusted means alone.
 
 > **Milk-volume caveat.** None of the three IMiC trials measured total milk output. The transient fall in milk fat concentration at 1–2 months in MISAME-III may therefore reflect dilution by greater milk volume in the supplemented arm rather than reduced fat synthesis or secretion. Without total daily output, a change in the concentration of a macronutrient or fat-dependent metabolite cannot be translated directly into a change in infant nutrient intake. Fat adjustment separates TG composition from total fat concentration but cannot account for milk volume.
 
@@ -157,102 +158,95 @@ p_s6 <- safe_readRDS(here::here("figure-data/figure_sX_forest_plot_fat_adjusted.
 show_any(p_s6)
 ```
 
-**Figure S4.** Milk triglyceride means by intervention arm in MISAME-III, with and without adjustment for total fat. Treatment-specific means (and 95% CIs) of Z-scored concentrations of 235 of the 240 TG species measured by targeted metabolomics, colored by the significance of the ATE estimate and sorted by the mean control-arm concentration at the first visit (panel a). Rows are the four arms (control, prenatal BEP, postnatal BEP, pre- and postnatal BEP); columns are the three visits (14–21 days, 1–2 months, 3–4 months), each shown unadjusted and adjusted for total fat. The decreases at 1–2 months in the postnatal BEP arms (panels o and u) disappear after fat adjustment (panels p and v). The second plot repeats the fat-adjusted means alone; after fat adjustment, most FDR-significant TG effects are increases at every visit.
+**Figure S4.** Milk triglyceride means by intervention arm in MISAME-III, with and without adjustment for total fat. Treatment-specific means (and 95% CIs) of Z-scored concentrations of 235 of the 240 TG species measured by targeted metabolomics, colored by the significance of the ATE estimate and sorted by the mean control-arm concentration at the first visit (panel a). Rows are the four arms (control, prenatal BEP, postnatal BEP, pre- and postnatal BEP); columns are the three visits (14–21 days, 1–2 months, 3–4 months), each shown unadjusted and adjusted for total fat. Most of the decreases at 1–2 months in the postnatal BEP arms (panels o and u) are no longer seen after fat adjustment (panels p and v). The second plot repeats the fat-adjusted means alone; after fat adjustment, most FDR-significant TG effects are increases at every visit.
 
 ## SuperLearner multi-class treatment-arm prediction
 
 As described in the Methods, SuperLearner ensembles were trained to predict multi-class randomized treatment-arm membership from the measured primary, secondary, and tertiary HM outcomes within each study and visit. A cross-validated AUC (CV-AUC) above 0.5 (chance) means that the components of a class, taken together, predict treatment arm; comparing CV-AUC across classes shows which classes carry the signal. This multivariate analysis complements the per-component forest plots in §5.
 
-```{r sens-sl-vimp, echo=FALSE, message=FALSE, warning=FALSE, fig.height=8}
+```{r sens-sl-vimp, echo=FALSE, message=FALSE, warning=FALSE, fig.height=10}
 sl <- safe_readRDS(here::here("figure-data/SL_vim_plot_data.RDS"),
                    label = "SL_vim_plot_data.RDS")
+## Drawn as the printed Fig. 1A (fig1-ml-vim-classifier.R upstream): one panel per
+## trial and randomized arm, predictor classes top to bottom in the printed order,
+## colored by milk-collection time, with the dashed line at chance (CV-AUC = 0.5).
+## The data's one "blank" row keeps Mumta-LW's empty first panel, as in print.
 if (!is.null(sl) && is.data.frame(sl)) {
   sl <- sl %>% dplyr::mutate(
-    tooltip = paste0("Study: ", studyid,
-                     "<br>Visit: ", visit,
-                     "<br>Arm: ", arm,
-                     "<br>Group: ", group,
-                     "<br>N: ", N_obs,
-                     "<br>CV-AUC: ", round(cvAUC, 3),
-                     " (", round(ci.lb, 3), ", ", round(ci.ub, 3), ")")
-  )
-  p_sl <- ggplot2::ggplot(sl,
-                          ggplot2::aes(x = cvAUC,
-                                       y = stats::reorder(paste(studyid, visit_f, arm_f, sep=" | "), cvAUC),
-                                       color = group, shape = group, text = tooltip)) +
-    ggplot2::geom_point(size = 2.4) +
-    ggplot2::geom_errorbar(ggplot2::aes(xmin = ci.lb, xmax = ci.ub),
-                           width = 0.2, orientation = "y") +
-    ggplot2::geom_vline(xintercept = 0.5, linetype = "dashed", color = "grey50") +
-    ## Outcome group is carried by colour AND symbol shape (upstream category maps).
-    ggplot2::scale_color_manual(values = rep_len(imic_cat_cols, length(unique(sl$group)))) +
-    ggplot2::scale_shape_manual(values = rep_len(imic_cat_shapes, length(unique(sl$group)))) +
-    ggplot2::labs(x = "Cross-validated AUC",
-                  y = NULL,
-                  color = "Outcome group", shape = "Outcome group",
-                  title = "SuperLearner multi-class treatment-arm prediction (CV-AUC)")
-  out_sl <- if (knitr::is_html_output() && requireNamespace("plotly", quietly = TRUE)) {
-    conv <- try(plotly::ggplotly(p_sl, tooltip = "text"), silent = TRUE)
-    if (!inherits(conv, "try-error")) conv else p_sl
-  } else p_sl
-  htmltools::tagList(out_sl,
-    nice_dt(sl %>% dplyr::select(studyid, visit, arm, group, N_obs, cvAUC, ci.lb, ci.ub) %>%
+    study = study_name(studyid),
+    arm   = gsub("\\s*\n\\s*", " ", as.character(arm_f)),
+    arm   = sub("Pre+Postnatal BEP", "Pre + Postnatal BEP", arm, fixed = TRUE),
+    group = factor(group, levels = rev(c("All", "Macronutrients", "Micronutrients", "B-vitamins",
+                                         "HMOs", "Targeted proteins", "Targeted metabolomics"))),
+    visit_f = factor(visit_f, levels = names(imic_time_cols)),
+    tooltip = paste0(study, ": ", arm, "<br>Visit: ", visit, "<br>Predictors: ", group,
+                     "<br>N: ", N_obs, "<br>CV-AUC: ", round(cvAUC, 3),
+                     " (", round(ci.lb, 3), ", ", round(ci.ub, 3), ")"))
+  panels <- c("ELICIT: Infant Azithromycin", "ELICIT: Nicotinamide",
+              "ELICIT: Nicotinamide + Infant Azithromycin",
+              " ", "Mumta-LW: Postnatal BEP",
+              "Mumta-LW: Postnatal BEP + Infant Azithromycin",
+              "MISAME-III: Prenatal BEP", "MISAME-III: Postnatal BEP", "MISAME-III: Pre + Postnatal BEP")
+  sl$panel <- factor(ifelse(sl$arm == "", " ", paste0(sl$study, ": ", sl$arm)),
+                     levels = panels)
+  p_sl <- ggplot2::ggplot(sl, ggplot2::aes(x = cvAUC, y = group, colour = visit_f, text = tooltip)) +
+    ggplot2::geom_vline(xintercept = 0.5, linetype = "dashed") +
+    ggplot2::geom_errorbar(ggplot2::aes(xmin = ci.lb, xmax = ci.ub), width = 0, orientation = "y",
+                           position = ggplot2::position_dodge(width = 0.6)) +
+    ggplot2::geom_point(size = 2, position = ggplot2::position_dodge(width = 0.6)) +
+    ggplot2::scale_colour_manual(values = imic_time_cols, drop = FALSE, name = "Collection time") +
+    ggplot2::facet_wrap(~ panel, ncol = 3, drop = FALSE) +
+    ggplot2::labs(x = "CV-AUC", y = NULL) +
+    theme_imic_web()
+  htmltools::tagList(
+    as_widget(p_sl),
+    nice_dt(sl %>% dplyr::filter(!is.na(cvAUC)) %>%
+              dplyr::select(study, visit, arm, group, N_obs, cvAUC, ci.lb, ci.ub) %>%
               dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 3))),
             caption = "SuperLearner CV-AUC for multi-class treatment-arm prediction."))
 }
 ```
 
-**Figure 1A.** Cross-validated AUC (CV-AUC) from SuperLearner ensembles trained to predict randomized treatment arm from each class of milk components (and from all classes combined), by study and milk-collection visit; each component class has its own color and symbol shape. CV-AUC ≈ 0.5 (dashed line) is chance level; higher values mean that the component class predicts treatment arm better than chance. B-vitamins give the strongest and most consistent signal (CV-AUC 0.73–0.94 in the postnatal BEP and nicotinamide arms), followed by targeted metabolites; the azithromycin-only and prenatal-BEP arms show no consistent signal.
+**Figure 1A.** Results of the ensemble machine-learning analysis identifying treatment arm from each class of milk components, or from all classes combined, by trial and randomized arm. The x-axis is the cross-validated area under the receiver-operator curve (CV-AUC), where 0.5 (dashed line) is analogous to a random prediction of the treatment arm. The "Micronutrients" class covers all minerals and non-B-vitamin micronutrients. Estimates are colored by milk-collection time (gray, <1 month; orange, 1–2 months; teal, 2–5 months). B-vitamins give the strongest and most consistent signal (CV-AUC 0.73–0.94 in the postnatal BEP and nicotinamide arms), followed by targeted metabolites; the azithromycin-only and prenatal-BEP arms show no consistent signal.
 
-### Per-study CV-AUC by class of predictors
-
-The plots below show, for each trial, CV-AUC by class of predictors and visit.
-
-```{r sens-sl-vimp-perstudy, echo=FALSE, message=FALSE, warning=FALSE, fig.height=8, results='asis'}
-sl_plots <- safe_readRDS(here::here("results/SLvim_lab_plots.RDS"),
-                         label = "SLvim_lab_plots.RDS")
-show_any(sl_plots)
-```
 
 ## PCA-based composite outcome scores
 
 We also estimated ATEs on the first principal component (PC1) of each class of milk components (macronutrients, micronutrients, B-vitamins, HMOs, proteins, targeted and untargeted metabolites, and the microbiome). PC1 summarizes correlated components within a class as a single score along the main axis of variation, so it can detect coordinated shifts that do not survive per-component FDR correction. A single estimate per class shows whether that class moved as a whole.
 
-```{r sens-pca, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7}
+```{r sens-pca, echo=FALSE, message=FALSE, warning=FALSE, fig.height=8}
 pca <- safe_readRDS(here::here("figure-data/pca_intervention_effects_results.RDS"),
                     label = "pca_intervention_effects_results.RDS")
+## Drawn as the printed Fig. 1B: one panel per trial and visit (ELICIT and Mumta-LW
+## keep an empty first panel, as in print), classes top to bottom in the printed
+## order and colored as printed. Q-values are in the hover text and the table.
+pca_classes <- c("Macronutrients", "Micronutrients", "B-vitamins", "HMOs", "Proteins",
+                 "Targeted metabolomics", "Untargeted metabolomics", "Microbiome")
 if (!is.null(pca) && is.data.frame(pca)) {
   pca <- pca %>% dplyr::filter(measure == "ATE" | is.na(measure)) %>%
     dplyr::mutate(
-      sigFDR = factor(sigFDR, levels = c(0, 1)),
-      tooltip = paste0(label_f,
-                       "<br>", studytime, " | ", contrast,
-                       "<br>ATE: ", round(est, 3),
-                       " (", round(cil, 3), ", ", round(ciu, 3), ")",
-                       "<br>Q: ", signif(chi_pval_adj, 3))
-    )
-  p_pca <- ggplot2::ggplot(pca,
-                           ggplot2::aes(y = stats::reorder(label_f, est), x = est,
-                                        color = contrast, shape = sigFDR, text = tooltip)) +
-    ggplot2::geom_point(position = ggplot2::position_dodge(width = 0.5), size = 2) +
-    ggplot2::geom_errorbar(ggplot2::aes(xmin = cil, xmax = ciu, linetype = contrast), width = 0.2,
-                           orientation = "y",
-                           position = ggplot2::position_dodge(width = 0.5)) +
-    ggplot2::geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
-    ggplot2::scale_shape_manual(values = c(1, 19),
-                                labels = c("Not significant","Significant (FDR)")) +
-    imic_contrast_scales(pca$contrast) +
-    ggplot2::facet_wrap(~ studytime) +
-    ggplot2::labs(y = "Outcome-group PC1", x = "ATE on standardized PC1",
-                  shape = NULL,
-                  title = "Adjusted ATEs on outcome-group PC1 composites") +
-    ggplot2::theme(legend.position = "bottom")
+      panel   = studytime_label(studytime),
+      label_f = factor(label_f, levels = rev(pca_classes)),
+      tooltip = paste0(label_f, "<br>", panel, " | ", contrast,
+                       "<br>ATE: ", round(est, 3), " (", round(cil, 3), ", ", round(ciu, 3), ")",
+                       "<br>Q = ", signif(chi_pval_adj, 3)))
+  pca_panels <- c(" ", "ELICIT (1 mo.)", "ELICIT (5 mo.)",
+                  "  ", "Mumta-LW (1.5 mo.)", "Mumta-LW (2 mo.)",
+                  "MISAME-III (14-21 days)", "MISAME-III (1-2 mo.)", "MISAME-III (3-4 mo.)")
+  pca$panel <- factor(pca$panel, levels = pca_panels)
+  p_pca <- ggplot2::ggplot(pca, ggplot2::aes(x = est, y = label_f, colour = label_f, text = tooltip)) +
+    ggplot2::geom_vline(xintercept = 0, linetype = "dashed") +
+    ggplot2::geom_errorbar(ggplot2::aes(xmin = cil, xmax = ciu), width = 0, orientation = "y") +
+    ggplot2::geom_point(size = 2) +
+    ggplot2::scale_colour_manual(values = imic_class_cols, guide = "none") +
+    ggplot2::facet_wrap(~ panel, ncol = 3, drop = FALSE) +
+    ggplot2::labs(x = "Average Treatment Effect", y = "Milk Modality") +
+    theme_imic_web()
+  p_pca <- as_widget(p_pca)
+  if (inherits(p_pca, "plotly")) p_pca <- plotly::layout(p_pca, showlegend = FALSE)
   htmltools::tagList(
-    if (knitr::is_html_output() && requireNamespace("plotly", quietly = TRUE)) {
-      conv <- try(plotly::ggplotly(p_pca, tooltip = "text"), silent = TRUE)
-      if (!inherits(conv, "try-error")) conv else p_pca
-    } else p_pca,
-    nice_dt(pca %>% dplyr::select(studytime, contrast, outcome_group, label_f,
+    p_pca,
+    nice_dt(pca %>% dplyr::select(panel, contrast, outcome_group, label_f,
                                   est, cil, ciu, chi_pval, chi_pval_adj, sig, sigFDR) %>%
               dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 3))),
             caption = "PCA-based composite outcome ATEs (pooled intervention vs. control).")
@@ -260,7 +254,7 @@ if (!is.null(pca) && is.data.frame(pca)) {
 }
 ```
 
-**Figure 1B.** Adjusted ATEs (95% CI) on the first principal component (PC1) of each milk-component class, pooled intervention vs. control, by study and visit. Effects are oriented positive for comparability across classes; each contrast has its own color and CI line type, and filled symbols are significant after FDR correction. B-vitamin PC1 increased across trials and timepoints, with no consistent effect on the other component classes.
+**Figure 1B.** Effects of the pooled postnatal BEP and nicotinamide interventions on the first principal component (PC1) of each class of milk components, by trial and visit (ATE with 95% CI; the two nicotinamide arms are pooled in ELICIT, and the two postnatal BEP arms in Mumta-LW and MISAME-III). Effects are scaled to always be in the positive direction for comparability, and each class has its own color, as in the printed figure. B-vitamin PC1 increased across trials and timepoints, with no consistent effect on the other component classes.
 
 ### Arm-stratified PCA composites
 
@@ -268,37 +262,36 @@ if (!is.null(pca) && is.data.frame(pca)) {
 pca_strat <- safe_readRDS(here::here("results/pca_intervention_effects_results_arm_strat.RDS"),
                           label = "pca_intervention_effects_results_arm_strat.RDS")
 if (!is.null(pca_strat) && is.data.frame(pca_strat)) {
-  pca_strat <- pca_strat %>% dplyr::filter(measure == "ATE" | is.na(measure)) %>%
+  pca_strat <- pca_strat %>% dplyr::filter(measure == "ATE" | is.na(measure), contrast != "Control") %>%
     dplyr::mutate(
       sigFDR  = factor(sigFDR, levels = c(0, 1)),
+      panel   = factor(studytime_label(studytime), levels = panel_orders$study),
+      label_f = factor(label_f, levels = rev(pca_classes)),
       tooltip = paste0(label_f,
-                       "<br>", studytime, " | ", contrast,
+                       "<br>", panel, " | ", contrast,
                        "<br>ATE: ", round(est, 3),
                        " (", round(cil, 3), ", ", round(ciu, 3), ")",
-                       "<br>Q: ", signif(chi_pval_adj, 3))
+                       "<br>Q = ", signif(chi_pval_adj, 3))
     )
+  pca_strat$sigcat <- sig_tier(pca_strat)
   p_pca_strat <- ggplot2::ggplot(pca_strat,
-                                 ggplot2::aes(y = stats::reorder(label_f, est), x = est,
-                                              color = contrast, shape = sigFDR, text = tooltip)) +
-    ggplot2::geom_point(position = ggplot2::position_dodge(width = 0.5), size = 2) +
-    ggplot2::geom_errorbar(ggplot2::aes(xmin = cil, xmax = ciu, linetype = contrast), width = 0.2,
-                           orientation = "y",
-                           position = ggplot2::position_dodge(width = 0.5)) +
-    ggplot2::geom_vline(xintercept = 0, linetype = "dashed", color = "grey50") +
-    ggplot2::scale_shape_manual(values = c(1, 19),
-                                labels = c("Not significant","Significant (FDR)")) +
+                                 ggplot2::aes(y = label_f, x = est, text = tooltip)) +
+    ggplot2::geom_vline(xintercept = 0, linetype = "dashed", colour = "grey60") +
+    ggplot2::geom_errorbar(ggplot2::aes(xmin = cil, xmax = ciu, colour = contrast,
+                                        linetype = contrast, group = contrast), width = 0.2,
+                           orientation = "y", position = ggplot2::position_dodge(width = 0.6)) +
+    ggplot2::geom_point(ggplot2::aes(colour = contrast, shape = sigcat, group = contrast),
+                        size = 2, position = ggplot2::position_dodge(width = 0.6)) +
+    ggplot2::scale_shape_manual(values = sig_tier_shapes_strat, drop = FALSE,
+                                name = "Statistical Significance") +
     imic_contrast_scales(pca_strat$contrast) +
-    ggplot2::facet_wrap(~ studytime) +
-    ggplot2::labs(y = "Outcome-group PC1", x = "ATE on standardized PC1",
-                  shape = NULL,
+    ggplot2::facet_wrap(~ panel, ncol = 4) +
+    ggplot2::labs(y = "Milk Modality", x = "Average Treatment Effect",
                   title = "Arm-stratified PCA composite ATEs (per arm vs. control)") +
-    ggplot2::theme(legend.position = "bottom")
+    theme_imic_web()
   htmltools::tagList(
-    if (knitr::is_html_output() && requireNamespace("plotly", quietly = TRUE)) {
-      conv <- try(plotly::ggplotly(p_pca_strat, tooltip = "text"), silent = TRUE)
-      if (!inherits(conv, "try-error")) conv else p_pca_strat
-    } else p_pca_strat,
-    nice_dt(pca_strat %>% dplyr::select(studytime, contrast, outcome_group, label_f,
+    as_widget(p_pca_strat),
+    nice_dt(pca_strat %>% dplyr::select(panel, contrast, outcome_group, label_f,
                                         est, cil, ciu, chi_pval, chi_pval_adj, sig, sigFDR) %>%
               dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 3))),
             caption = "Arm-stratified PCA-based composite outcome ATEs.")
@@ -312,80 +305,57 @@ Pathway and enrichment analyses of the high-dimensional milk data are reported i
 
 The compositional fatty-acid enrichment of intervention-responsive triglycerides (Table S4, Fig. 5C) complements the fat-adjusted triglyceride analysis in §8.3; its table is in §\@ref(path-tg-fa).
 
-### Network views of pathway and feature relationships
-
-The network diagrams below show how intervention-responsive pathways and features relate to one another for the primary outcomes and the metabolome. Nodes are pathways or features, and edges denote shared members or co-occurrence.
-
-```{r path-networks, echo=FALSE, message=FALSE, warning=FALSE, fig.height=8, results='asis'}
-net_primary <- safe_readRDS(here::here("figure-data/figures8_network_plots_primary.RDS"),
-                            label = "figures8_network_plots_primary.RDS")
-net_metab   <- safe_readRDS(here::here("figure-data/figures8_network_plots_metabolomics.RDS"),
-                            label = "figures8_network_plots_metabolomics.RDS")
-show_any(net_primary)
-show_any(net_metab)
-```
-
-**Network views.** Intervention-responsive pathway/feature networks for the primary outcomes (top) and the metabolome (bottom). Nodes are pathways or features; edges denote shared members or co-occurrence.
 
 ## Infant growth analyses (Figure S1)
 
 We estimated the effects of maternal nutritional supplementation on infant length-for-age (LAZ) and weight-for-length (WLZ) z-scores within the IMiC subsample of each trial, at birth (MISAME-III only) and at 3 and 6 months. Estimates use the same covariate-adjusted TMLE framework as the primary milk-component analyses. They allow comparison with the parent trials' published growth results and place the HM-composition findings alongside infant growth.
 
 ```{r growth-forest, echo=FALSE, message=FALSE, warning=FALSE, fig.height=8}
-## The data behind the printed Fig. S1 (figS1-growth-outcomes.R upstream). Its
-## contrast labels carry line breaks for the print layout; flatten them here.
+## Drawn as the printed Fig. S1 (figS1-growth-outcomes.R upstream) from the data
+## behind it: trials in rows and infant ages in columns, one row per randomized arm
+## (each vs. control), LAZ blue with solid CIs and WLZ orange with dashed CIs, and a
+## filled symbol where the 95% CI excludes zero.
 g <- safe_readRDS(here::here("figure-data/figureS1_growth_plot_data.RDS"),
                   label = "figureS1_growth_plot_data.RDS")
 if (!is.null(g) && is.data.frame(g)) {
+  arm_rows <- c("Azithromycin", "Nicotinamide", "Nicotinamide + Azithromycin",
+                "Prenatal BEP", "Pre + Postnatal BEP", "Postnatal BEP",
+                "Postnatal BEP + Azithromycin")
   g <- g %>% dplyr::mutate(
-    Measure = factor(Measure),
     contrast = gsub("\\s*\n\\s*", " ", as.character(contrast)),
-    contrast = sub("^Nicotinamide\\+ ?Azithromycin$", "Nicotinamide + Azithromycin", contrast),
-    contrast = sub("^Postnatal BEP Azithromycin$", "Postnatal BEP + Azithromycin", contrast),
-    contrast = factor(contrast),
-    age     = factor(age, levels = c("Birth", "3mo", "6mo"), labels = c("Birth", "3 mo.", "6 mo.")),
-    study   = factor(study, levels = c("MISAME-III", "Mumta-LW", "ELICIT")) %>%
-               droplevels(),
-    sigFDR  = factor(sigFDR, levels = c(0, 1)),
-    tooltip = paste0(Measure, " at ", age,
-                     "<br>Study: ", study,
-                     "<br>Contrast: ", contrast,
-                     "<br>ATE: ", round(est, 3),
-                     " (", round(cil, 3), ", ", round(ciu, 3), ")",
-                     "<br>Q: ", signif(chi_pval_adj, 3))
-  )
-  p <- ggplot2::ggplot(g,
-                       ggplot2::aes(x = age, y = est, color = contrast,
-                                    shape = sigFDR, text = tooltip)) +
-    ggplot2::geom_point(position = ggplot2::position_dodge(width = 0.6), size = 2) +
-    ggplot2::geom_errorbar(ggplot2::aes(ymin = cil, ymax = ciu, linetype = contrast),
-                           width = 0.2,
-                           position = ggplot2::position_dodge(width = 0.6)) +
-    ggplot2::geom_hline(yintercept = 0, linetype = "dashed", color = "grey50") +
-    ggplot2::scale_shape_manual(values = c(1, 19),
-                                labels = c("Not significant","Significant (FDR)")) +
-    imic_contrast_scales(g$contrast) +
-    ggplot2::facet_grid(Measure ~ study, scales = "free") +
-    ggplot2::labs(x = "Infant age at measurement",
-                  y = "Adjusted ATE on z-score",
-                  shape = NULL,
-                  title = "Intervention effects on infant anthropometry (IMiC subsamples)") +
-    ggplot2::theme(legend.position = "bottom")
-  out <- if (knitr::is_html_output() && requireNamespace("plotly", quietly = TRUE)) {
-    conv <- try(plotly::ggplotly(p, tooltip = "text"), silent = TRUE)
-    if (!inherits(conv, "try-error")) conv else p
-  } else p
-  out
+    contrast = factor(contrast, levels = rev(arm_rows)),
+    study    = factor(as.character(study), levels = c("ELICIT", "MISAME-III", "Mumta-LW")),
+    age      = factor(as.character(age), levels = c("Birth", "3 mo.", "6 mo.")),
+    Measure  = factor(Measure, levels = names(imic_measure_cols)),
+    Significant = factor(ifelse(.flag(sig), "Yes", "No"), levels = c("No", "Yes")),
+    tooltip  = paste0(Measure, " at ", age, "<br>", study, ": ", contrast,
+                      "<br>ATE: ", round(est, 3), " (", round(cil, 3), ", ", round(ciu, 3), ")",
+                      "<br>P = ", signif(pval, 3)))
+  dodge <- ggplot2::position_dodge(width = 0.5)
+  p <- ggplot2::ggplot(g, ggplot2::aes(x = est, y = contrast, colour = Measure, group = Measure,
+                                       text = tooltip)) +
+    ggplot2::geom_vline(xintercept = 0, linetype = "dashed") +
+    ggplot2::geom_errorbar(ggplot2::aes(xmin = cil, xmax = ciu, linetype = Measure), width = 0,
+                           orientation = "y", position = dodge) +
+    ggplot2::geom_point(ggplot2::aes(shape = Significant, alpha = Significant), size = 2.4,
+                        position = dodge) +
+    ggplot2::scale_colour_manual(values = imic_measure_cols, name = "Measure") +
+    ggplot2::scale_linetype_manual(values = imic_measure_linetypes, name = "Measure") +
+    ggplot2::scale_shape_manual(values = c("No" = 1, "Yes" = 19), drop = FALSE, name = "Significant") +
+    ggplot2::scale_alpha_manual(values = c("No" = 0.7, "Yes" = 1), guide = "none") +
+    ggplot2::facet_grid(study ~ age, scales = "free_y", space = "free_y") +
+    ggplot2::labs(x = "Z-score difference", y = "Intervention arm (compared to Control)") +
+    theme_imic_web()
+  as_widget(p)
 }
 ```
 
-**Figure S1.** Adjusted intervention effects (ATE on z-score, with 95% CI) on infant length-for-age (LAZ) and weight-for-length (WLZ), by study, randomized contrast, and infant age at measurement. Each contrast has its own color and CI line type; filled symbols mark study–age–measure groups whose joint test across contrasts is FDR-significant. Birth outcomes are shown for MISAME-III only, because the ELICIT and Mumta-LW interventions were all delivered after birth. The azithromycin and infant nicotinamide in ELICIT were given after 6 months of age, so no difference is expected between the Nicotinamide and Nicotinamide + Azithromycin arms, which act as a negative control.
+**Figure S1.** Impact of maternal balanced energy-protein (BEP) and nicotinamide interventions on child growth outcomes within the IMiC substudies of the three intervention trials: adjusted intervention effects (z-score difference, with 95% CI) on length-for-age (LAZ; blue, solid CIs) and weight-for-length (WLZ; orange, dashed CIs) z-scores, by trial, randomized arm (each compared with control), and infant age. Filled symbols mark estimates whose 95% CI excludes zero (*P* < 0.05); open symbols do not. Birth outcomes were not included for ELICIT and Mumta-LW because all intervention arms were delivered after birth. The azithromycin and infant nicotinamide in ELICIT were given after child age 6 months, so no difference is expected between the Nicotinamide and Nicotinamide + Azithromycin arms, and they act as a negative control on analyses of growth and human milk components.
 
 ```{r growth-table, echo=FALSE, message=FALSE, warning=FALSE}
 if (!is.null(g) && is.data.frame(g)) {
   out <- g %>%
-    dplyr::select(study, age, Measure, contrast, est, cil, ciu,
-                  chi_pval, chi_pval_adj, sig, sigFDR) %>%
+    dplyr::select(study, age, Measure, contrast, est, cil, ciu, pval, sig) %>%
     dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 3)))
   nice_dt(out,
           caption = "Adjusted ATEs on infant anthropometric z-scores within the IMiC subsamples (Figure S1).")
