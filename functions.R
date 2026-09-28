@@ -19,20 +19,10 @@ imic_study_cols <- c(
   "MISAME-III" = "#E69F00",  # Okabe-Ito orange
   "Mumta-LW"   = "#CC79A7"   # Okabe-Ito reddish purple
 )
-imic_study_shapes <- c(
-  "ELICIT"     = 16,         # filled circle
-  "MISAME-III" = 17,         # filled triangle
-  "Mumta-LW"   = 15          # filled square
-)
 ## Milk-component categories of the FDR-significant volcano points (Figs. 3A, 5A):
 ## colour i always travels with symbol i.
 imic_cat_cols   <- c("#0072B2", "#E69F00", "#009E73", "#D55E00", "#CC79A7", "#56B4E9", "#882255")
 imic_cat_shapes <- c(17, 18, 25, 8, 4, 3, 10)   # triangle, diamond, down-triangle, asterisk, x, plus, circle-plus
-imic_shapes_for <- function(keys) {
-  s <- unname(imic_study_shapes[keys])
-  s[is.na(s)] <- 16
-  stats::setNames(s, keys)
-}
 
 ## Significance tiers of the forest plots (Figs. 2, S2, S3): not significant =
 ## grey open circle; nominally significant (P < 0.05) = blue open circle;
@@ -41,8 +31,6 @@ imic_shapes_for <- function(keys) {
 ## alone (open circle, open triangle, filled circle).
 sig_tier_levels <- c("Not significant", "Nominally significant", "FDR-significant")
 sig_tier_cols   <- stats::setNames(c("grey60", "#1F77B4", "#FF7F0E"), sig_tier_levels)
-sig_tier_shapes <- stats::setNames(c(1, 1, 19), sig_tier_levels)
-sig_tier_shapes_strat <- stats::setNames(c(1, 2, 19), sig_tier_levels)
 
 ## Volcano plots (Figs. 3A, 5A): points not FDR-significant are black (circle =
 ## not significant, square = nominally significant only); FDR-significant points
@@ -51,14 +39,6 @@ sig_tier_shapes_strat <- stats::setNames(c(1, 2, 19), sig_tier_levels)
 volcano_line_cols <- c(p = "#BAB0AC", q = "#59A14F")
 logp_title <- "–Log₁₀(P-value)"   # en dash, subscript 10, as on the printed axes
 
-## Fig. 1A (collection time), Fig. 1B (milk component class), Fig. S1 (growth measure).
-imic_time_cols <- c("<1 month" = "#7F7F7F", "1-2 months" = "#FF7F0E", "2-5 months" = "#17BECF")
-imic_class_cols <- c("Macronutrients" = "#2CA02C", "Micronutrients" = "#D62728",
-                     "B-vitamins" = "#9467BD", "HMOs" = "#8C564B", "Proteins" = "#E377C2",
-                     "Targeted metabolomics" = "#7F7F7F",
-                     "Untargeted metabolomics" = "#BCBD22", "Microbiome" = "#17BECF")
-imic_measure_cols      <- c("LAZ" = "#0072B2", "WLZ" = "#E69F00")
-imic_measure_linetypes <- c("LAZ" = "solid",   "WLZ" = "dashed")
 
 ## Theme of the printed figures: white background, a border round each panel,
 ## vertical gridlines only, no y-axis ticks, and unshaded facet titles. The printed
@@ -150,35 +130,12 @@ imic_contrast_cols <- c(
   "IFA/BEP" = "#E69F00", "BEP/BEP" = "#D55E00", "BEP/IFA" = "#56B4E9",    # MISAME-III
   "BEP+ExBf" = "#009E73", "BEP+ExBf+AZT" = "#000000"                      # Mumta-LW
 )
-imic_contrast_linetypes <- c(
-  "Nico" = "solid", "Az." = "dashed", "Nico+Az." = "dotted",
-  "IFA/BEP" = "solid", "BEP/BEP" = "dashed", "BEP/IFA" = "dotted",
-  "BEP+ExBf" = "solid", "BEP+ExBf+AZT" = "dashed"
-)
 ## Randomized arms (boxplots in Section 2, trajectory lines in Section 7): each
 ## intervention arm in its contrast colour, control in gray. The boxplots also dodge
 ## in legend order and the trajectory lines also differ in line type, so arm never
 ## rests on colour alone.
 imic_arm_cols      <- c("Control" = "grey60",   imic_contrast_cols)
-imic_arm_linetypes <- c("Control" = "longdash", imic_contrast_linetypes)
 
-## Colour and line-type scales for a categorical variable (typically `contrast`).
-## Known contrast names get their fixed colour/line type; anything else (e.g. the
-## growth-plot contrast labels) is filled in from the remaining Okabe-Ito colours
-## and a cycle of line types. Use both scales with the same `name` so ggplot
-## merges them into one legend.
-imic_contrast_scales <- function(keys, name = "Contrast") {
-  keys <- sort(unique(as.character(keys[!is.na(keys)])))
-  cols <- unname(imic_contrast_cols[keys])
-  spare <- setdiff(c(imic_cat_cols, okabe_ito[["black"]]), cols)
-  cols[is.na(cols)] <- rep_len(spare, sum(is.na(cols)))
-  lts <- unname(imic_contrast_linetypes[keys])
-  spare_lt <- setdiff(c("solid", "dashed", "dotted", "dotdash", "longdash", "twodash"), lts)
-  if (!length(spare_lt)) spare_lt <- c("dotdash", "longdash", "twodash")
-  lts[is.na(lts)] <- rep_len(spare_lt, sum(is.na(lts)))
-  list(ggplot2::scale_colour_manual(name = name, values = stats::setNames(cols, keys)),
-       ggplot2::scale_linetype_manual(name = name, values = stats::setNames(lts, keys)))
-}
 
 ## Volcano colour and symbol for each point: the two non-FDR tiers in black, and
 ## FDR-significant points by component category. As in Fig. 5A, categories holding
@@ -309,61 +266,21 @@ as_widget <- function(p, interactive = TRUE, tooltip = "text") {
   if (interactive && requireNamespace("plotly", quietly = TRUE) &&
       isTRUE(knitr::is_html_output())) {
     conv <- try(plotly::ggplotly(p, tooltip = tooltip), silent = TRUE)
-    if (!inherits(conv, "try-error")) return(tidy_plotly_legend(conv))
+    if (!inherits(conv, "try-error")) {
+      conv <- tidy_plotly_legend(conv)
+      ## Fill the text column instead of knitr's fixed pixel width, which a
+      ## chapter inherits from earlier fig.width settings (14 in at 110 dpi is
+      ## 1,540 px, wider than the page); keep the chunk's height.
+      conv$width <- "100%"
+      h <- knitr::opts_current$get("out.height.px")
+      if (is.null(h)) h <- knitr::opts_current$get("fig.height") * knitr::opts_current$get("dpi")
+      if (length(h) == 1 && is.finite(h)) conv$height <- h
+      return(conv)
+    }
   }
   p
 }
 
-## Interactive forest plot in the style of Fig. 2 and Fig. S3: one panel per study
-## and visit ("Study (visit)", Fig. 2 panel order), components ordered by effect,
-## the three significance tiers, and a dashed grey line at zero. In arm-stratified
-## plots each contrast has its own colour and CI line type and the tier is carried
-## by the symbol.
-forest_plot <- function(tab, arm_strat = FALSE, interactive = TRUE, title = NULL,
-                        x_lab = "Average treatment effect (SD units)") {
-  tab <- .harmonize_factors(tab)
-  tab$sigcat <- sig_tier(tab)
-  ## ggplotly() cannot draw facet_wrap(study ~ visit) over a grid with empty cells
-  ## or coord_flip() with facets, so the forest uses one combined facet variable
-  ## and a horizontal (orientation = "y") error bar.
-  tab$panel <- if (all(c("study", "visit") %in% names(tab))) study_visit_panel(tab$study, tab$visit)
-               else if ("study" %in% names(tab)) factor(tab$study) else factor("All")
-  tab$tooltip <- paste0(tab$label_f,
-                        "<br>", tab$panel,
-                        if ("contrast" %in% names(tab)) paste0("<br>Contrast: ", tab$contrast) else "",
-                        "<br>ATE: ", round(tab$est, 3),
-                        " (", round(tab$cil, 3), ", ", round(tab$ciu, 3), ")",
-                        if ("pval" %in% names(tab)) paste0("<br>P = ", signif(tab$pval, 3)) else "",
-                        if ("pval_adj" %in% names(tab)) paste0("<br>Q = ", signif(tab$pval_adj, 3)) else "")
-
-  p <- ggplot2::ggplot(tab, ggplot2::aes(y = stats::reorder(label_f, -est), x = est, text = tooltip)) +
-    ggplot2::geom_vline(xintercept = 0, linetype = "dashed", colour = "grey60")
-  if (arm_strat) {
-    dodge <- ggplot2::position_dodge(width = 0.6)
-    p <- p +
-      ggplot2::geom_errorbar(ggplot2::aes(xmin = cil, xmax = ciu, colour = contrast,
-                                          linetype = contrast, group = contrast),
-                             width = 0.2, orientation = "y", position = dodge) +
-      ggplot2::geom_point(ggplot2::aes(colour = contrast, shape = sigcat, group = contrast),
-                          size = 2, position = dodge) +
-      ggplot2::scale_shape_manual(values = sig_tier_shapes_strat, drop = FALSE,
-                                  name = "Statistical Significance") +
-      imic_contrast_scales(tab$contrast)
-  } else {
-    p <- p +
-      ggplot2::geom_errorbar(ggplot2::aes(xmin = cil, xmax = ciu, colour = sigcat),
-                             width = 0.2, orientation = "y") +
-      ggplot2::geom_point(ggplot2::aes(colour = sigcat, shape = sigcat), size = 2) +
-      ggplot2::scale_colour_manual(values = sig_tier_cols, drop = FALSE,
-                                   name = "Statistical Significance") +
-      ggplot2::scale_shape_manual(values = sig_tier_shapes, drop = FALSE,
-                                  name = "Statistical Significance")
-  }
-  p <- p + ggplot2::facet_wrap(~ panel, ncol = 4) +
-    ggplot2::labs(title = title, x = x_lab, y = NULL) +
-    theme_imic_web()
-  as_widget(p, interactive)
-}
 
 ## Interactive volcano plot in the style of Figs. 3A and 5A. `tab` needs est, pval,
 ## pval_adj, and label_f; a `category` column colours the FDR-significant points.
@@ -372,7 +289,7 @@ forest_plot <- function(tab, arm_strat = FALSE, interactive = TRUE, title = NULL
 ## panel's Benjamini-Hochberg threshold (the largest raw P with Q < fdr_thresh), so
 ## panels without an FDR-significant point have no green line.
 volcano_plot <- function(tab, fdr_thresh = 0.05, interactive = TRUE, title = NULL,
-                         x_lab = "Scaled average treatment effect (SD units)") {
+                         x_lab = "Scaled average treatment effect (SD units)", ncol = 3) {
   tab <- .harmonize_factors(tab)
   if (!"pval_adj" %in% names(tab)) tab$pval_adj <- NA_real_
   tab <- tab[is.finite(tab$est) & is.finite(tab$pval), , drop = FALSE]
@@ -408,10 +325,19 @@ volcano_plot <- function(tab, fdr_thresh = 0.05, interactive = TRUE, title = NUL
     ggplot2::scale_colour_manual(values = enc$cols, drop = FALSE, name = NULL) +
     ggplot2::scale_fill_manual(values = enc$cols, drop = FALSE, name = NULL) +
     ggplot2::scale_shape_manual(values = enc$shapes, drop = FALSE, name = NULL) +
-    ggplot2::facet_wrap(~ panel, scales = "free", ncol = 3) +
+    ggplot2::facet_wrap(~ panel, scales = "free", ncol = ncol) +
     ggplot2::labs(title = title, x = x_lab, y = logp_title) +
-    theme_imic_web()
-  as_widget(p, interactive)
+    theme_imic_web() +
+    ggplot2::theme(panel.spacing = ggplot2::unit(1.5, "lines"))
+  w <- as_widget(p, interactive)
+  if (inherits(w, "plotly")) {
+    ## About 300 px per row of panels, so a panel's title clears the tick
+    ## labels of the panel above; and room for the axis titles.
+    rows <- ceiling(length(unique(tab$panel)) / ncol)
+    w$height <- max(if (is.numeric(w$height)) w$height else 0, 300 * rows + 170)
+    w <- plotly::layout(w, margin = list(l = 95, r = 30, b = 70, t = 90))
+  }
+  w
 }
 
 ## Render an estimates table with consistent column formatting and column filters.
@@ -462,7 +388,7 @@ clean_tab <- function(tab, caption = NULL) {
   DT::datatable(
     tab,
     extensions = "FixedHeader",
-    options = list(pageLength = 15, dom = "frtip",
+    options = list(pageLength = 15, dom = "frtip", deferRender = TRUE,
                    fixedHeader = TRUE, scrollX = TRUE),
     caption = caption, filter = "top", rownames = FALSE
   ) %>% DT::formatStyle(columns = keep, fontSize = "11px")
@@ -477,7 +403,7 @@ nice_dt <- function(df, caption = NULL, page_length = 15, round_digits = 3) {
   dt <- DT::datatable(
     df,
     extensions = "FixedHeader",
-    options = list(pageLength = page_length, dom = "frtip",
+    options = list(pageLength = page_length, dom = "frtip", deferRender = TRUE,
                    fixedHeader = TRUE, scrollX = TRUE),
     caption = caption, filter = "top", rownames = FALSE
   )
@@ -514,21 +440,6 @@ safe_read_csv <- function(path, ...) {
   utils::read.csv(path, ...)
 }
 
-## Embed a pre-rendered static image (PNG) shipped by the upstream analysis
-## pipeline, degrading gracefully to an inline notice when the file is absent
-## (mirrors safe_readRDS / safe_read_csv). Unlike the plot helpers, the
-## cross-compartment and blood-volcano figures in §§9–10 are rendered upstream
-## and copied in by port_results.R rather than rebuilt from R objects here.
-## Return the value of this directly as the last expression of a chunk (no
-## results='asis' needed — asis_output / include_graphics both handle it).
-safe_img <- function(path, label = basename(path)) {
-  if (!file.exists(path)) {
-    return(knitr::asis_output(sprintf(
-      "\n\n*Figure not found at `%s`. Run `port_results.R` to copy `%s` from the upstream analysis repo.*\n\n",
-      path, label)))
-  }
-  knitr::include_graphics(path)
-}
 
 ## Print an object whose type may vary across builds (single ggplot, list of
 ## ggplots, plotly, data.frame). Used in chapters that consume saved RDS
@@ -600,11 +511,11 @@ show_any <- function(x, label = NULL) {
 ## whenever the table is filtered, so the sub-cap cannot promise rows the reader
 ## will not find (e.g. the untargeted-metabolomics volcano, whose table is
 ## restricted to q < 0.10).
-volcano_capped <- function(df, n_show = 2000, table_note = "the full table below contains every feature", ...) {
+volcano_capped <- function(df, n_show = 2000, table_note = "the table lists all of them", ...) {
   if (is.null(df) || !nrow(df)) { cat("*No rows to plot.*\n\n"); return(invisible(NULL)) }
   if (nrow(df) > n_show && "pval" %in% names(df)) {
     df_show <- df %>% dplyr::arrange(pval) %>% dplyr::slice_head(n = n_show)
-    cat(sprintf("\n*Interactive volcano shows top %s features by raw p-value (of %s total); %s.*\n\n",
+    cat(sprintf("\n*The plot shows the %s estimates with the smallest P, of %s; %s.*\n\n",
                 format(n_show, big.mark = ","), format(nrow(df), big.mark = ","), table_note))
   } else {
     df_show <- df
@@ -683,73 +594,6 @@ linked_volcano_table <- function(df, fdr_thresh = 0.05,
     p, dt)
 }
 
-## Interactive LINKED scatter (feature map) + table (crosstalk). A general
-## companion to linked_volcano_table for tables that aren't volcanoes — e.g.
-## an m/z-vs-effect feature map of putatively annotated features. Brushing the
-## scatter filters the table and vice versa. Client-side only (static-Pages safe).
-linked_scatter_table <- function(df, x_col, y_col, color_col = NULL, key_col,
-                                 title = "", x_lab = x_col, y_lab = y_col,
-                                 filter_cols = character(0),
-                                 show_cols = names(df)) {
-  if (is.null(df) || !nrow(df)) return(htmltools::tags$em("No rows to display."))
-  if (!all(c(x_col, y_col, key_col) %in% names(df))) {
-    return(htmltools::tags$em("Table lacks the columns needed for this feature map."))
-  }
-  df$tooltip <- paste0(df[[key_col]],
-                       "<br>", x_lab, ": ", signif(df[[x_col]], 5),
-                       " | ", y_lab, ": ", signif(df[[y_col]], 3))
-  keep <- union(intersect(show_cols, names(df)),
-                c(x_col, y_col, color_col, "tooltip", key_col))
-  df   <- df[, intersect(keep, names(df)), drop = FALSE]
-
-  if (!knitr::is_html_output() || !requireNamespace("crosstalk", quietly = TRUE)) {
-    return(nice_dt(df[, setdiff(names(df), "tooltip"), drop = FALSE]))
-  }
-  sd <- crosstalk::SharedData$new(df)
-  args <- list(sd, x = stats::as.formula(paste0("~`", x_col, "`")),
-               y = stats::as.formula(paste0("~`", y_col, "`")),
-               type = "scatter", mode = "markers", text = ~tooltip, hoverinfo = "text",
-               marker = list(size = 6, opacity = 0.6))
-  if (!is.null(color_col) && color_col %in% names(df)) {
-    ## Colour and symbol both encode the category. An up/down direction gets
-    ## pointing triangles; any other category cycles through distinct symbols.
-    lv   <- sort(unique(as.character(df[[color_col]][!is.na(df[[color_col]])])))
-    dirn <- ifelse(grepl("^up", lv, ignore.case = TRUE), "up",
-            ifelse(grepl("^down", lv, ignore.case = TRUE), "down", NA))
-    if (!anyNA(dirn)) {
-      cols <- ifelse(dirn == "up", okabe_ito[["vermillion"]], okabe_ito[["blue"]])
-      syms <- ifelse(dirn == "up", "triangle-up", "triangle-down")
-    } else {
-      cols <- rep_len(imic_cat_cols, length(lv))
-      syms <- rep_len(c("circle", "triangle-up", "square", "diamond", "x", "cross", "star"), length(lv))
-    }
-    args$color   <- stats::as.formula(paste0("~`", color_col, "`"))
-    args$colors  <- stats::setNames(cols, lv)
-    args$symbol  <- stats::as.formula(paste0("~`", color_col, "`"))
-    args$symbols <- stats::setNames(syms, lv)
-  }
-  p <- do.call(plotly::plot_ly, args) %>%
-    plotly::layout(title = list(text = title), xaxis = list(title = x_lab),
-                   yaxis = list(title = y_lab), legend = list(orientation = "h"),
-                   shapes = list(list(type = "line", xref = "paper", x0 = 0, x1 = 1,
-                                      y0 = 0, y1 = 0, line = list(dash = "dash", color = "grey50")))) %>%
-    plotly::highlight(on = "plotly_selected", off = "plotly_deselect", persistent = FALSE)
-
-  hide_idx <- which(names(df) %in% "tooltip") - 1
-  dt <- DT::datatable(sd, extensions = "FixedHeader",
-                      options = list(pageLength = 10, dom = "frtip",
-                                     fixedHeader = TRUE, scrollX = TRUE,
-                                     columnDefs = list(list(visible = FALSE, targets = hide_idx))),
-                      filter = "top", rownames = FALSE) %>%
-    DT::formatStyle(columns = names(df), fontSize = "11px")
-
-  fcols <- intersect(filter_cols, names(df))
-  filt  <- lapply(fcols, function(cc)
-    crosstalk::filter_select(cc, cc, sd, stats::as.formula(paste0("~`", cc, "`"))))
-  htmltools::tagList(
-    if (length(filt)) do.call(crosstalk::bscols, filt) else NULL,
-    p, dt)
-}
 
 ## Unnest the upstream nested intervention-effects results (study, visit, res),
 ## where `res` is a list whose second element ("res") is the per-feature
@@ -767,13 +611,3 @@ unnest_imic_results <- function(df) {
   dplyr::bind_rows(out)
 }
 
-## Try to convert a ggplot to plotly; if conversion fails (older ggplot
-## internals, unsupported facet/coord combo, etc.) print the static plot.
-print_interactive <- function(p, tooltip = "text") {
-  if (!inherits(p, "gg")) { print(p); return(invisible(NULL)) }
-  if (knitr::is_html_output() && requireNamespace("plotly", quietly = TRUE)) {
-    conv <- try(plotly::ggplotly(p, tooltip = tooltip), silent = TRUE)
-    if (!inherits(conv, "try-error")) { print(conv); return(invisible(NULL)) }
-  }
-  print(p)
-}

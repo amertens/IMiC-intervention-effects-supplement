@@ -36,6 +36,11 @@ Rplots.pdf
 MANUSCRIPT_*_PROMPT.md
 
 # Individual-level (per-sample) data must never be committed. The dyad-level
-# dataset lives in data/ (ignored above); the saved Fig. 4 panels embed one row
-# per milk sample, so they are ported locally by port_results.R and ignored.
+# dataset lives in data/ (ignored above). These saved figure objects and one old
+# page embedded per-sample data and were purged from the history; ignore them so
+# they cannot come back.
 /figure-data/figure_s2_plots.RDS
+/figure-data/figure_s3_plots.RDS
+/figure-data/figure1c_subplot.RDS
+/figure-data/figures8_network_plots_*.RDS
+/docs/desc_stats.html

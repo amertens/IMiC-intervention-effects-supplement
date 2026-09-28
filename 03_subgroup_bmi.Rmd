@@ -1,10 +1,6 @@
 # Subgroup analyses stratified by maternal BMI
 
-This section examines whether intervention effects on human milk components depended on maternal nutritional status at baseline, using maternal body mass index (BMI) as a marker of that status, dichotomized into *underweight* (BMI ≤ 18.5 kg/m²) and *normal or overweight* (BMI > 18.5 kg/m²) strata. We estimated stratum-specific ATEs with the same TMLE framework used in the primary adjusted analyses. Interaction *P*-values come from a Wald-type test of the difference between the two stratum-specific estimates, divided by the standard error of the difference. The results shown here are the component × study × visit combinations with a nominally significant interaction (all interaction *P* < 0.01): 129 in Mumta-LW (1.5 and 2 months) and one in MISAME-III (3–4 months); six, all in Mumta-LW, remain significant after FDR correction.
-
-The manuscript cites this section as "Section 3 of the online resource" in the Results paragraph on macronutrient and micronutrient effects, where it reports that maternal BMI did not consistently modify macronutrient or micronutrient effects.
-
-> These subgroup analyses are exploratory and not powered to detect modest interactions, particularly in studies with a small underweight stratum. Differences in the size or direction of per-component estimates between BMI strata should be interpreted cautiously, especially when the 95% CIs are wide.
+Adjusted effects within two maternal BMI strata, underweight (BMI ≤ 18.5 kg/m², vermillion triangles, dashed lines) and normal or overweight (BMI > 18.5 kg/m², blue circles, solid lines), for the component, trial, and visit combinations with a nominally significant interaction. The interaction *P* value is a Wald test of the difference between the two stratum estimates.
 
 ```{r bmi-setup, include=FALSE}
 library(tidyverse)
@@ -35,6 +31,7 @@ stratified_forest <- function(tab, title = "BMI-stratified intervention effects"
                           width = 0.2, orientation = "y",
                           position = ggplot2::position_dodge(width = 0.6)) +
     ggplot2::geom_vline(xintercept = 0, linetype = "dashed", color = "grey60") +
+    ggplot2::scale_x_continuous(n.breaks = 4) +
     ggplot2::scale_color_manual(values = stats::setNames(
       rep_len(unname(okabe_ito[c("blue", "vermillion", "green", "purple")]), length(strata)), strata)) +
     ggplot2::scale_shape_manual(values = stats::setNames(rep_len(c(16, 17, 15, 18), length(strata)), strata)) +
@@ -44,7 +41,8 @@ stratified_forest <- function(tab, title = "BMI-stratified intervention effects"
     ggplot2::labs(title = title, y = NULL, x = "Average treatment effect (SD units)",
                   color = "Maternal BMI stratum", shape = "Maternal BMI stratum",
                   linetype = "Maternal BMI stratum") +
-    theme_imic_web()
+    theme_imic_web() +
+    ggplot2::theme(panel.spacing = ggplot2::unit(1.5, "lines"))
   as_widget(p)
 }
 
@@ -54,14 +52,12 @@ bmi_df <- safe_readRDS(here::here("figure-data/subgroup_results.RDS"),
 
 ## Per-component stratified forest plots
 
-**Figure (online-only).** Adjusted ATEs (SD units, with 95% CI), for component × study × visit combinations with a nominally significant interaction, within maternal-BMI strata (underweight, BMI ≤ 18.5 kg/m²; normal/overweight, BMI > 18.5 kg/m²), by study and milk-collection visit, shown separately for primary, secondary, and tertiary outcomes. BMI strata differ in color, symbol shape, and CI line type (normal/overweight: blue circles, solid lines; underweight: vermillion triangles, dashed lines). In the web version, hovering over a point shows the stratum-specific estimate, *Q*-value, and Wald-type interaction *P*-value.
-
 ```{r bmi-primary, echo=FALSE, message=FALSE, warning=FALSE, fig.height=14}
 if (!is.null(bmi_df) && is.data.frame(bmi_df)) {
   primary <- bmi_df %>%
     dplyr::filter(outcome_group %in% c("primary","Primary","Macronutrients","Micronutrients","B-vitamins"))
   stratified_forest(primary,
-                    title = "Primary outcomes (macro / micro / B-vitamins): BMI-stratified ATEs")
+                    title = "Primary outcomes")
 }
 ```
 
@@ -70,7 +66,7 @@ if (!is.null(bmi_df) && is.data.frame(bmi_df)) {
   sec <- bmi_df %>%
     dplyr::filter(outcome_group %in% c("secondary","Secondary","HMOs","Bioactive proteins"))
   stratified_forest(sec,
-                    title = "Secondary outcomes (HMOs and bioactive proteins): BMI-stratified ATEs")
+                    title = "Secondary outcomes")
 }
 ```
 
@@ -79,7 +75,7 @@ if (!is.null(bmi_df) && is.data.frame(bmi_df)) {
   tert <- bmi_df %>%
     dplyr::filter(outcome_group %in% c("tertiary","Tertiary","Targeted metabolites"))
   stratified_forest(tert,
-                    title = "Tertiary outcomes (targeted metabolites): BMI-stratified ATEs")
+                    title = "Targeted metabolites")
 }
 ```
 

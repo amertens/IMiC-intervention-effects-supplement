@@ -109,7 +109,7 @@ DIR_SYMS <- c("up-regulated" = "triangle-up", "down-regulated" = "triangle-down"
 
 # ---- UI --------------------------------------------------------------------
 ui <- fluidPage(
-  titlePanel("IMiC — Pathway-Enrichment Explorer"),
+  titlePanel("IMiC pathway-enrichment explorer"),
   tags$p(style = "color:#555;",
          "Scripted MetaboAnalystR enrichment across studies, timepoints, and contrasts ",
          "(manuscript Tables S2–S7). Pick an analysis, filter, and read the enriched ",

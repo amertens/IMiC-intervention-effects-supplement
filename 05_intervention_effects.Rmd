@@ -1,12 +1,6 @@
 # Adjusted intervention effects on individual milk components
 
-This section reports the primary covariate-adjusted estimates of maternal nutritional intervention effects on individual human milk components. Each component appears in an interactive forest plot and a searchable table, stratified by study and milk collection visit. We estimated average treatment effects (ATEs) with targeted maximum likelihood estimation (TMLE), adjusting for prespecified baseline prognostic factors, and applied Benjamini–Hochberg false discovery rate (FDR) correction within each outcome group × study × visit. Every results table also includes `pval_adj_global`, a more conservative correction pooled across all studies and visits within an outcome group, which we retain as a sensitivity analysis; the significance flag (`sigFDR`) is based on the per-visit `pval_adj`.
-
-Each outcome group appears twice. The first view pools the intervention arms (all maternal nutritional intervention arms combined vs. the corresponding control) to maximize precision. The second stratifies by randomized arm, comparing each randomized nutritional arm with its trial's control. The forest plots follow Fig. 2: gray open circles are not significant, blue open circles are nominally significant (*P* < 0.05) but do not survive FDR correction, and orange filled circles are significant after FDR correction (*Q* < 0.05). In the arm-stratified plots each contrast has its own color and CI line type, and the symbol alone gives the significance (open circle, open triangle, filled circle). Hovering over a point shows the exact estimate, 95% CI, and *Q*-value, and the column filters in each table narrow the view to specific components, studies, or visits.
-
-These estimates correspond to Figure 2 (primary outcomes) of the manuscript and Figure S3 (secondary outcomes) of the supplementary materials, and supply the per-component estimates behind the Figure 5A targeted-metabolite volcano plot. The machine-learning prediction of treatment arm and the PCA composites of manuscript Figure 1 are in §8.
-
-> **Native assay units.** The estimates below are on the standardized (SD) scale so that components can be compared directly. The same intervention effects in native assay units (g/100 mL for macronutrients; µg/L or mg/L for micronutrients; nmol/mL for HMOs) are in §8.2 "Unscaled (natural-unit) intervention effects" of the *Sensitivity analyses and additional outputs* section, and each results table below includes an `ATE_unscaled` column with the natural-unit estimate next to the standardized one. Unadjusted estimates, for sensitivity, are in §8.1.
+Covariate-adjusted effects on each primary, secondary, and tertiary milk component, by trial and visit, for the pooled intervention arms and for each randomized arm vs. control. In the tables, `ATE` is the effect in SD units and `ATE_unscaled` in native units, both with 95% CIs; `perc_imp` is the difference between the intervention and control means as a percentage of the control mean; `pval_adj` is FDR-adjusted within outcome group, trial, and visit; `pval_adj_global` is adjusted across all trials and visits of an outcome group; and asterisks mark *P* or *Q* below 0.05, 0.01, and 0.001.
 
 ```{r effects-setup, include=FALSE}
 library(tidyverse)
@@ -15,39 +9,20 @@ library(DT)
 library(plotly)
 source(here::here("functions.R"))
 
-## Render the forest plot and the searchable estimates table for one CSV.
-## Returns an htmltools tagList so that htmlwidgets (plotly and DT) are picked
-## up by knit_print at the chunk top level, since print() of widgets from inside
-## a function does not trigger the htmlwidget rendering path.
-show_forest_and_table <- function(csv_path, arm_strat = FALSE, title = NULL,
-                                  fig_legend = NULL, tab_caption = NULL) {
+## Searchable table of the estimates in one results CSV.
+effects_table <- function(csv_path, caption) {
   df <- safe_read_csv(here::here(csv_path))
   if (is.null(df) || !nrow(df)) return(htmltools::tagList())
-  ttl <- title %||% "Forest plot of adjusted ATEs"
-  legend <- fig_legend %||% paste0(
-    "Each point is the adjusted average treatment effect (ATE, SD units) with 95% CI for one milk component, ",
-    "faceted by study and milk-collection visit. ",
-    if (arm_strat)
-      "Each randomized contrast has its own color and CI line type (solid, dashed, dotted); filled circles mark effects significant after FDR correction (Q < 0.05), open triangles nominal P < 0.05, and open circles non-significant. "
-    else
-      "Orange filled circles mark effects significant after FDR correction (Q < 0.05), blue open circles nominally significant ones (P < 0.05), and gray open circles non-significant ones, as in Fig. 2. ",
-    "FDR correction is applied within outcome group, study, and visit. Hover over a point for the exact estimate, 95% CI, and Q-value.")
-  htmltools::tagList(
-    forest_plot(df, arm_strat = arm_strat, title = ttl),
-    htmltools::tags$p(htmltools::tags$strong("Figure legend. "), htmltools::tags$em(legend)),
-    clean_tab(df, caption = tab_caption %||% paste0("Adjusted ATEs, 95% CIs, and FDR-adjusted Q-values: ", ttl, "."))
-  )
+  clean_tab(df, caption = caption)
 }
+metadata_loaded <- safe_load(here::here("metadata/milk_component.Rdata"))
 ```
 
 ## Primary and secondary component metadata {#primary-component-metadata}
 
-Primary outcomes are the macronutrients, micronutrients, and B-vitamins; secondary outcomes are the human milk oligosaccharides and bioactive proteins. The table below lists each component, grouped by prespecified outcome class, with indicators of whether it was measured in each of the three IMiC trials.
-
-The manuscript's Fig. 3A legend cites this inventory as Section 5 of the online resource. The corresponding targeted-metabolite metadata, cited from Fig. 5A, are in [§6.1](#targeted-metabolite-metadata), and the complete inventory across all outcome classes, including tertiary, is in [§2 *Outcomes and human milk component distributions*](#outcomes-and-human-milk-component-distributions). The intervention-effect estimates for these components follow in the rest of this section.
+Primary and secondary components by outcome class, with the trials that measured each.
 
 ```{r primary-component-metadata, echo=FALSE, message=FALSE, warning=FALSE}
-metadata_loaded <- safe_load(here::here("metadata/milk_component.Rdata"))
 if (isTRUE(metadata_loaded) && exists("all_milk_components")) {
   groups <- list(
     "Macronutrients (primary)"                = all_milk_components$macro,
@@ -70,16 +45,56 @@ if (isTRUE(metadata_loaded) && exists("all_milk_components")) {
     if (is.null(per_study[[s]])) next
     ps_tbl[[paste0("measured_in_", s)]] <- ps_tbl$component %in% per_study[[s]]
   }
-  nice_dt(ps_tbl,
-          caption = "Primary and secondary human milk component metadata: outcome class and per-study availability. Referenced from Fig. 3A of the manuscript.")
+  nice_dt(ps_tbl, caption = "Primary and secondary components.")
 } else {
   cat("*Component metadata is not available in this build (`metadata/milk_component.Rdata` did not load).*")
 }
 ```
 
+## Targeted-metabolite metadata {#targeted-metabolite-metadata}
+
+The targeted metabolites (Biocrates MxP Quant 500 panel) by compound class, with the trials that measured each.
+
+```{r targeted-metabolite-metadata, echo=FALSE, message=FALSE, warning=FALSE}
+if (isTRUE(metadata_loaded) && exists("all_milk_components") &&
+    !is.null(all_milk_components$metabolomics)) {
+  ## all_milk_components$metabolomics may be a single character vector or a
+  ## named list keyed by Biocrates category. Handle both.
+  metab_obj <- all_milk_components$metabolomics
+  if (is.list(metab_obj) && !is.null(names(metab_obj))) {
+    metab_tbl <- dplyr::bind_rows(lapply(names(metab_obj), function(cat) {
+      tibble::tibble(
+        biocrates_category = cat,
+        metabolite         = unlist(metab_obj[[cat]], use.names = FALSE)
+      )
+    }))
+  } else {
+    metab_tbl <- tibble::tibble(
+      biocrates_category = "Targeted metabolites",
+      metabolite         = unlist(metab_obj, use.names = FALSE)
+    )
+  }
+  metab_tbl <- dplyr::distinct(metab_tbl)
+  pick_metab <- function(x) if (is.list(x)) unlist(x$metabolomics %||% x, use.names = FALSE)
+                            else unlist(x, use.names = FALSE)
+  per_study <- list(
+    "MISAME-III" = if (exists("misame_milk_components")) pick_metab(misame_milk_components) else NULL,
+    "Mumta-LW"   = if (exists("vital_milk_components"))  pick_metab(vital_milk_components)  else NULL,
+    "ELICIT"     = if (exists("elicit_milk_components")) pick_metab(elicit_milk_components) else NULL
+  )
+  for (s in names(per_study)) {
+    if (is.null(per_study[[s]])) next
+    metab_tbl[[paste0("measured_in_", s)]] <- metab_tbl$metabolite %in% per_study[[s]]
+  }
+  nice_dt(metab_tbl, caption = "Targeted metabolites.")
+} else {
+  cat("*Targeted-metabolite metadata is not available in this build (`metadata/milk_component.Rdata` did not load).*")
+}
+```
+
 ## Interactive effect explorer {#effect-explorer-app}
 
-The app below collects every primary, secondary, and tertiary intervention effect. You can choose an outcome group, switch between standardized (SD) and native assay units, filter by study, visit, and pooled or arm-stratified contrasts, and move between volcano, forest, and table views. It runs in the browser on a WebAssembly build of R, with no server, so the first load takes a moment while the R runtime downloads. If the frame is cramped, [open the explorer full-screen in a new tab](apps/effect-explorer/).
+Every primary, secondary, and tertiary effect as a volcano plot, forest plot, or table, in SD or native units, filtered by trial, visit, and contrast. The app runs R in the browser, so the first load takes a moment. [Open it in a new tab](apps/effect-explorer/).
 
 ```{r effect-explorer-embed, echo=FALSE, results='asis'}
 if (knitr::is_html_output()) {
@@ -93,116 +108,56 @@ if (knitr::is_html_output()) {
 
 ## Macronutrients
 
-> Total protein, fat, and digestible carbohydrate (primarily lactose), measured in g/100 mL, and total energy (kcal/L).
-
-### Combined intervention arms
-
-```{r effects-macro-combined, echo=FALSE, message=FALSE, warning=FALSE, fig.height=8}
-show_forest_and_table("results/subsetted results/primary_macro.csv",
-                      title = "Macronutrients: pooled intervention vs. control")
-```
-
-### Stratified by randomized arm
-
-```{r effects-macro-strat, echo=FALSE, message=FALSE, warning=FALSE, fig.height=8}
-show_forest_and_table("results/subsetted results/primary_macro_arm_strat.csv",
-                      arm_strat = TRUE,
-                      title = "Macronutrients: per-arm contrasts vs. control")
+```{r effects-macro, echo=FALSE, message=FALSE, warning=FALSE}
+htmltools::tagList(
+  effects_table("results/subsetted results/primary_macro.csv", "Pooled intervention vs. control."),
+  effects_table("results/subsetted results/primary_macro_arm_strat.csv", "Each randomized arm vs. control."))
 ```
 
 ## Micronutrients (including fat-soluble vitamins)
 
-### Combined intervention arms
-
-```{r effects-micro-combined, echo=FALSE, message=FALSE, warning=FALSE, fig.height=12}
-show_forest_and_table("results/subsetted results/primary_micro.csv",
-                      title = "Micronutrients: pooled intervention vs. control")
-```
-
-### Stratified by randomized arm
-
-```{r effects-micro-strat, echo=FALSE, message=FALSE, warning=FALSE, fig.height=12}
-show_forest_and_table("results/subsetted results/primary_micro_arm_strat.csv",
-                      arm_strat = TRUE,
-                      title = "Micronutrients: per-arm contrasts vs. control")
+```{r effects-micro, echo=FALSE, message=FALSE, warning=FALSE}
+htmltools::tagList(
+  effects_table("results/subsetted results/primary_micro.csv", "Pooled intervention vs. control."),
+  effects_table("results/subsetted results/primary_micro_arm_strat.csv", "Each randomized arm vs. control."))
 ```
 
 ## B-vitamins
 
-### Combined intervention arms
-
-```{r effects-bvit-combined, echo=FALSE, message=FALSE, warning=FALSE, fig.height=12}
-show_forest_and_table("results/subsetted results/primary_bvit.csv",
-                      title = "B-vitamins: pooled intervention vs. control")
-```
-
-### Stratified by randomized arm
-
-```{r effects-bvit-strat, echo=FALSE, message=FALSE, warning=FALSE, fig.height=12}
-show_forest_and_table("results/subsetted results/primary_bvit_arm_strat.csv",
-                      arm_strat = TRUE,
-                      title = "B-vitamins: per-arm contrasts vs. control")
+```{r effects-bvit, echo=FALSE, message=FALSE, warning=FALSE}
+htmltools::tagList(
+  effects_table("results/subsetted results/primary_bvit.csv", "Pooled intervention vs. control."),
+  effects_table("results/subsetted results/primary_bvit_arm_strat.csv", "Each randomized arm vs. control."))
 ```
 
 ## Human milk oligosaccharides (HMOs)
 
-### Combined intervention arms
-
-```{r effects-hmo-combined, echo=FALSE, message=FALSE, warning=FALSE, fig.height=12}
-show_forest_and_table("results/subsetted results/secondary_hmo.csv",
-                      title = "HMOs: pooled intervention vs. control")
-```
-
-### Stratified by randomized arm
-
-```{r effects-hmo-strat, echo=FALSE, message=FALSE, warning=FALSE, fig.height=12}
-show_forest_and_table("results/subsetted results/secondary_hmo_arm_strat.csv",
-                      arm_strat = TRUE,
-                      title = "HMOs: per-arm contrasts vs. control")
+```{r effects-hmo, echo=FALSE, message=FALSE, warning=FALSE}
+htmltools::tagList(
+  effects_table("results/subsetted results/secondary_hmo.csv", "Pooled intervention vs. control."),
+  effects_table("results/subsetted results/secondary_hmo_arm_strat.csv", "Each randomized arm vs. control."))
 ```
 
 ## Bioactive proteins
 
-### Combined intervention arms
-
-```{r effects-bio-combined, echo=FALSE, message=FALSE, warning=FALSE, fig.height=12}
-show_forest_and_table("results/subsetted results/secondary_bioactives.csv",
-                      title = "Bioactive proteins: pooled intervention vs. control")
-```
-
-### Stratified by randomized arm
-
-```{r effects-bio-strat, echo=FALSE, message=FALSE, warning=FALSE, fig.height=12}
-show_forest_and_table("results/subsetted results/secondary_bioactives_arm_strat.csv",
-                      arm_strat = TRUE,
-                      title = "Bioactive proteins: per-arm contrasts vs. control")
+```{r effects-bio, echo=FALSE, message=FALSE, warning=FALSE}
+htmltools::tagList(
+  effects_table("results/subsetted results/secondary_bioactives.csv", "Pooled intervention vs. control."),
+  effects_table("results/subsetted results/secondary_bioactives_arm_strat.csv", "Each randomized arm vs. control."))
 ```
 
 ## Targeted metabolites (tertiary outcomes)
 
-Summaries of the large targeted metabolomics panel (Biocrates MxP Quant 500) are elsewhere: pathway-level views in the *Pathway enrichment* section, and the corresponding volcano plot in manuscript Fig. 5A (reproduced in §\@ref(path-tertiary)). The forest plots below show the same metabolites individually in one long plot (hover to identify points) and are most useful alongside a table filtered to a single compound class.
-
-### Interactive explorer (linked volcano + table)
-
-With thousands of metabolite estimates in the targeted panel, the linked view below is often the quickest place to start. Drawing a box or lasso (Plotly's *Box Select* / *Lasso*) around points in the volcano plot filters the table to those metabolites, and the dropdowns and the table's column filters in turn narrow the plotted points. Each point is one metabolite (pooled intervention vs. control), placed by effect size and −log~10~(*P*). As in Fig. 5A, metabolites that are not FDR-significant are black (squares if *P* < 0.05, circles otherwise), and FDR-significant metabolites take the color and symbol of their compound class. The gray line marks *P* = 0.05; FDR is controlled separately within each study and visit, so this pooled view has no single FDR line.
+Selecting points in the volcano plot (box or lasso select) filters the table beneath it, and the menus filter both. Each point is one metabolite, pooled intervention vs. control; FDR is controlled within each trial and visit, so this pooled view has no FDR line.
 
 ```{r effects-tertiary-linked, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7}
 df_ter <- safe_read_csv(here::here("results/subsetted results/tertiary_targeted_metabolomics.csv"))
 linked_volcano_table(df_ter,
-                     title = "Targeted metabolites: pooled intervention vs. control (select points to filter the table)")
+                     title = "Targeted metabolites")
 ```
 
-### Combined intervention arms
-
-```{r effects-tertiary-combined, echo=FALSE, message=FALSE, warning=FALSE, fig.height=14}
-show_forest_and_table("results/subsetted results/tertiary_targeted_metabolomics.csv",
-                      title = "Targeted metabolites: pooled intervention vs. control")
-```
-
-### Stratified by randomized arm
-
-```{r effects-tertiary-strat, echo=FALSE, message=FALSE, warning=FALSE, fig.height=14}
-show_forest_and_table("results/subsetted results/tertiary_targeted_metabolomics_arm_strat.csv",
-                      arm_strat = TRUE,
-                      title = "Targeted metabolites: per-arm contrasts vs. control")
+```{r effects-tertiary, echo=FALSE, message=FALSE, warning=FALSE}
+htmltools::tagList(
+  effects_table("results/subsetted results/tertiary_targeted_metabolomics.csv", "Pooled intervention vs. control."),
+  effects_table("results/subsetted results/tertiary_targeted_metabolomics_arm_strat.csv", "Each randomized arm vs. control."))
 ```

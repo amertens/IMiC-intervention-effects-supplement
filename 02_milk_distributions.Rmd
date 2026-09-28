@@ -1,7 +1,5 @@
 # Outcomes and human milk component distributions
 
-This section has two parts. The first is the outcomes list cited in the manuscript Methods (*"A list of all outcomes and descriptions is available in Section 2 of the online resource"*), a searchable inventory of every targeted milk component (primary, secondary, and tertiary outcomes) in the harmonized IMiC dataset, grouped by prespecified outcome class and annotated with per-study availability. The second part shows the distribution of each component, beginning with manuscript Figure 4.
-
 ```{r distributions-setup, include=FALSE}
 library(tidyverse)
 library(here)
@@ -17,7 +15,7 @@ knitr::opts_chunk$set(fig.width = 14, fig.height = 11, dpi = 110)
 
 ## Outcomes list
 
-The table below lists every targeted milk component (primary, secondary, and tertiary outcomes), grouped by the prespecified outcome class used throughout the manuscript (primary: macronutrients, micronutrients, B-vitamins; secondary: HMOs, bioactive proteins; tertiary: targeted metabolites from the Biocrates MxP Quant 500 panel). Per-study columns show which of the three IMiC trials measured each component.
+All primary, secondary, and tertiary milk components, by outcome class, with the trials that measured each.
 
 ```{r outcomes-dictionary, echo=FALSE}
 build_dict <- function() {
@@ -57,25 +55,9 @@ if (!is.null(dict) && nrow(dict)) {
 }
 ```
 
-Two subsets of this inventory are repeated in the sections that the manuscript figure legends name: the primary and secondary components cited in the Fig. 3A legend (*"metadata in Section 5 of the online resource"*) in [§5.1](#primary-component-metadata), and the full targeted-metabolite metadata cited in the Fig. 5A legend (*"metadata are in Section 6 of the online resource"*) in [§6.1](#targeted-metabolite-metadata).
-
 ## Distributions
 
-The rest of this section shows unadjusted distributions: first violin plots for the 15 primary components in manuscript Fig. 4, by study, visit, and intervention arm, then boxplots of every measured component, one panel per component, with study and visit on the x-axis and boxes filled by arm. In the violin plots, gray and red reference lines mark the 50th and 10th percentiles of the age-specific MILQ reference distribution, and asterisks mark average treatment effects significant after FDR correction (\* *Q* < 0.05, \*\* *Q* < 0.01, \*\*\* *Q* < 0.001). Y-axes are log-transformed.
-
-### MILQ-overlay density plots (Figure 4)
-
-```{r distributions-figure-s2, echo=FALSE, message=FALSE, warning=FALSE, fig.width=14, fig.height=11, results='asis'}
-p_s2 <- safe_readRDS(here::here("figure-data/figure_s2_plots.RDS"),
-                     label = "figure_s2_plots.RDS")
-show_any(p_s2)
-```
-
-**Figure 4.** IMiC distributions of HM nutrients relative to MILQ reference standards. Each panel shows one of 15 primary components (total energy, total fat, total protein, vitamins B~1~, B~2~, B~3~, B~5~, B~6~, B~7~, and B~12~, vitamin A, α- and γ-tocopherol, selenium, and copper) as violin plots of its native-unit concentration, with the horizontal line within each violin marking the median. Distributions are stratified by study (El: ELICIT, Mi: MISAME-III, Mu: Mumta-LW) and visit in months, given together in the x-axis labels, and by intervention arm: within each study × visit pair the control arm is the left, blue violin and the pooled intervention arms the right, orange violin. Horizontal gray and red lines mark the 50th and 10th percentiles of the age-specific MILQ reference distribution, respectively; asterisks mark average treatment effects significant after FDR correction (\* *Q* < 0.05, \*\* *Q* < 0.01, \*\*\* *Q* < 0.001). Y-axes are log-transformed.
-
-### Per-component boxplots by study, visit, and arm
-
-These boxplots show the raw concentration of each primary and secondary component on its native assay scale, one figure per outcome class, by study, milk-collection visit, and randomized arm. Boxes show the median and IQR, whiskers extend to 1.5 × IQR, and the y-axes are log-transformed. Boxes are filled by arm, in the color each randomized contrast has throughout this online resource (control in gray), and dodged in legend order. The 581 targeted metabolites are too many to plot one by one; their native-unit arm means and intervention effects are in `targeted_metabolites_native_units.csv` (§\@ref(native-units-tertiary)).
+Raw concentrations of each primary and secondary component in native units, by trial, visit, and randomized arm. Boxes show the median and interquartile range, whiskers extend to 1.5 times the interquartile range, and y-axes are on a log scale. Native-unit means for the targeted metabolites are in Section \@ref(native-units-tertiary).
 
 ```{r distributions-boxplots-setup, include=FALSE}
 raw_path <- here::here("data/merged_analysis_datasets.RDS")
@@ -119,34 +101,32 @@ box_plot <- function(k) {
 }
 ```
 
-#### Macronutrients
+### Macronutrients
 
 ```{r distributions-box-macro, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.width=14, fig.height=box_height("macro")}
 box_plot("macro")
 ```
 
-#### Micronutrients (including fat-soluble vitamins)
+### Micronutrients (including fat-soluble vitamins)
 
 ```{r distributions-box-micro, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.width=14, fig.height=box_height("micro")}
 box_plot("micro")
 ```
 
-#### B-vitamins
+### B-vitamins
 
 ```{r distributions-box-bvit, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.width=14, fig.height=box_height("bvit")}
 box_plot("bvit")
 ```
 
-#### Human milk oligosaccharides
+### Human milk oligosaccharides
 
 ```{r distributions-box-hmo, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.width=14, fig.height=box_height("hmo")}
 box_plot("hmo")
 ```
 
-#### Bioactive proteins
+### Bioactive proteins
 
 ```{r distributions-box-protein, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.width=14, fig.height=box_height("protein")}
 box_plot("protein")
 ```
-
-**Figures (online-only).** Native-unit concentrations of the primary and secondary human-milk components by study, milk-collection visit, and randomized arm.

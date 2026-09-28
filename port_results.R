@@ -116,14 +116,6 @@ files <- list(
        "metadata/milk_component.Rdata"),
   list("figure-data/SL_vim_plot_data.RDS",
        "figure-data/SL_vim_plot_data.RDS"),
-  ## INDIVIDUAL-LEVEL: the saved Fig. 4 panels embed one row per milk sample, so
-  ## this copy is gitignored; the site publishes only the rendered images.
-  list("figure-data/figure_s2_plots.RDS",
-       "figure-data/figure_s2_plots.RDS"),
-  list("figure-data/figure_s4_trajectory_plots.RDS",
-       "figure-data/figure_s4_trajectory_plots.RDS"),
-  list("figure-data/figure_sX_forest_plot_fat_adjusted.RDS",
-       "figure-data/figure_sX_forest_plot_fat_adjusted.RDS"),
   list("figure-data/pca_intervention_effects_results.RDS",
        "figure-data/pca_intervention_effects_results.RDS"),
   list("figure-data/figureS1_growth_plot_data.RDS",
@@ -132,121 +124,35 @@ files <- list(
        "figure-data/subgroup_results.RDS")
 )
 
-## ---- manuscript figures regenerated upstream 2026-09-23 (colourblind-safe) ---
-## Fig. 3 (fig3-primary-volcano-composite.R): the combined-arm composite and its
-## arm-stratified counterpart are embedded in §9.2, and the printed Fig. S4 in
-## §8.3. The others are the current print versions of Figs. 4-6, S1 and S5, kept
-## alongside for reference.
-for (f in c("figures/figure3.png", "figures/figure3_stratified_supplement.png",
-            "figures/figure4.jpeg", "figures/figure5.png", "figures/figure6.png",
-            "figures/figureS4_triglyceride_means.png",
-            "figures/figureS1_growth_outcomes.png",
-            "figures/figureS5_microbiome_diversity.png"))
-  files[[length(files) + 1]] <- list(f, f)
-
-## Direction-split ORA composite figures (§9 primary/tertiary subsections). Named
-## appendix_* upstream; kept under their figureS_* names here so the published
-## site carries no "appendix" file names. Regenerated 2026-09-27 in the style of the
-## printed enrichment panels (study colours and symbols, grey P / green Q lines).
-files[[length(files) + 1]] <- list("figures/appendix_primary_ora_by_direction.png",
-                                   "figures/figureS_primary_ora_by_direction.png")
-files[[length(files) + 1]] <- list("figures/appendix_tertiary_ora_by_direction.png",
-                                   "figures/figureS_tertiary_ora_by_direction.png")
-
-## Finalized milk-Mummichog feature-level annotation (§9 mummichog subsection).
-## These live at results/ top-level upstream; relocate under mummichog_s5/ here
-## so §9.8 loads them alongside the Table S6 pathway grid. (The direction-split
-## primary/tertiary ORA CSVs already live under results/metaboanalyst/ upstream
-## and are picked up by the copy_tree("results/metaboanalyst") call below.)
+## Finalized milk-Mummichog feature annotation (Section 9). It lives at results/
+## top level upstream; relocate it under mummichog_s5/ beside the Table S6 grid.
 files[[length(files) + 1]] <- list("results/milk_mummichog_annotation_finalized.csv",
                                    "results/metaboanalyst/mummichog_s5/milk_mummichog_annotation_finalized.csv")
-files[[length(files) + 1]] <- list("results/milk_mummichog_annotation_summary.csv",
-                                   "results/metaboanalyst/mummichog_s5/milk_mummichog_annotation_summary.csv")
 
-## CORRECTED untargeted milk proteome GO enrichment (Table S7 / Fig 6C, §9.9).
-## These live at results/ TOP-LEVEL upstream (NOT under metaboanalyst/), so the
-## copy_tree("results/metaboanalyst") call below does NOT pick them up. They are
-## the UniProt-native over-representation results that SUPERSEDE the retracted
-## gene-level proteomics_go_tableS6.csv. Relocate under proteomics_go/ here so
-## §9.9 reads the corrected, predominantly down-regulated GO-BP signature.
-files[[length(files) + 1]] <- list("results/proteomics_go_uniprot.csv",
-                                   "results/metaboanalyst/proteomics_go/proteomics_go_uniprot.csv")
+## UniProt-native proteome GO enrichment, FDR-significant terms (Section 9). At
+## results/ top level upstream, so copy_tree("results/metaboanalyst") below does
+## not pick it up; relocate it under proteomics_go/.
 files[[length(files) + 1]] <- list("results/proteomics_go_uniprot_fdrsig.csv",
                                    "results/metaboanalyst/proteomics_go/proteomics_go_uniprot_fdrsig.csv")
 
-## Chemical-class enrichment figure (§10.6) -- lives at results/ top-level
-## upstream; relocate under figures/cross_compartment/ here so §10.6 loads it
-## alongside the other cross-compartment figures.
-files[[length(files) + 1]] <- list("results/blood_class_enrichment_figure.png",
-                                   "figures/cross_compartment/blood_class_enrichment_figure.png")
-
-## ---- NEW: cross-compartment blood result CSVs (ch 10) --------------------
-## Only the CSVs that §10 actually renders are ported. Full per-feature tables
-## (per-pair cross_compartment_metab_*, fdr_sig_updown_lists,
-## four_compartment_bep_feature_screen, non-adjusted overlap/pathway duplicates,
-## etc.) run to tens of thousands of rows, are not rendered inline, and are not
-## exposed for download from the built site, so they are intentionally not
-## copied. §10 uses per-arrow / per-pathway summaries + the *_consistent /
-## *_shortlist / *_adjusted subsets instead.
+## ---- cross-compartment blood results (Section 10) ----------------------------
+## Only the tables Section 10 renders. The per-feature tables (tens of thousands
+## of rows) are not published.
 blood_csvs <- c(
-  # blood intervention effects (FDR-sig ATE; §10.1 summary counts)
-  "results/blood_compartment_all_FDRsig_ATE.csv",
-  # cross-compartment concordance summaries (§10.2)
-  "results/cross_compartment_arrow_contrast_summary.csv",
+  "results/blood_compartment_all_FDRsig_ATE.csv",              # FDR-significant counts; m/z 286.202
+  "results/fdr_sig_putative_annotation.csv",                   # blood feature annotations
+  "results/cross_compartment_arrow_contrast_summary.csv",      # concordance
   "results/cross_compartment_threshold_free_panel.csv",
-  "results/cross_compartment_fdr_first_lists.csv",
   "results/cross_compartment_matching_sensitivity.csv",
-  # selenoproteins / proteome overlap (§10.3, adjusted models)
-  "results/cross_compartment_proteome_overlap_adjusted.csv",
-  # m/z 286.202 acylcarnitine (§10.4). The mediation outputs that used to be ported
-  # here (tmle_mediation.csv, dyad_milk_infant_mediation.csv,
-  # mediation_measurement_error_sensitivity.csv) were withdrawn 2026-08-27
-  # along with their upstream scripts -- the analysis is not claimed by the
-  # manuscript or either response letter, and rested on an unconfirmed
-  # milk-to-infant feature identity.
+  "results/cross_compartment_proteome_overlap_adjusted.csv",   # milk vs maternal-blood proteome
+  "results/carnitine_annotation_support.csv",                  # m/z 286.202 annotation evidence
   "results/targeted_carnitine_crossvalidation.csv",
-  "results/targeted_acylcarnitine_class_summary.csv",
-  "results/acylcarnitine_composition.csv",
-  "results/carnitine_annotation_support.csv",
-  # pathway analyses (§10.6, adjusted / signed)
-  "results/blood_mummichog_pathways.csv",
-  "results/blood_mummichog_pathways_adjusted.csv",
-  "results/cross_compartment_pathways_adjusted.csv",
+  "results/compartment_tracking/trenton_linked_crosscompartment.csv",  # Fig. 6D features
+  "results/blood_mummichog_pathways_adjusted.csv",             # pathway direction
+  "results/fat_synthesis_timepoint_table.csv",
   "results/signed_pathway_direction.csv",
   "results/signed_pathway_direction_milk.csv",
-  "results/fat_synthesis_timepoint_table.csv",
-  # chemical-class enrichment (§10.6): the FDR-significant maternal-blood result
-  # (blood mummichog is nominal-only, 0 pathways survive FDR). Non-directional +
-  # directional (up/down) class over-representation by compartment.
-  "results/blood_chemical_class_enrichment.csv",
-  "results/blood_chemical_class_enrichment_directional.csv",
-  # putative annotation (§10.7)
-  "results/fdr_sig_putative_annotation.csv",
-  "results/milk_fdr_sig_putative_annotation.csv",
-  "results/blood_consistent_annotated_features_consistent.csv",
-  # BEP-product provenance (§10.8)
-  "results/bep_supplement_tracer.csv",
-  "results/bep_supplement_composition_xref.csv",
-  "results/four_compartment_bep_shortlist.csv",
-  "results/supplement_mummichog_pathways.csv",
-  # infant growth null control (§10.9)
-  "results/infant_carnitine_growth_assoc.csv",
-  "results/detectability_proxy_infant_carnitine.csv",
-  # consolidated cross-compartment table (§10.10)
-  "results/table_s8_cross_compartment.csv",
-  # compartment tracking (Trenton's name-based grouping rule -- the SAME rule
-  # behind manuscript Fig. 6D and Table S11 as of the 2026-08-25 reconciliation;
-  # see Manuscript/SUPPLEMENT_HANDOFF_FIG6D_RESOLUTION.md upstream). Table S11
-  # (§10.5) and its supporting compound list; the paired figure PNGs are
-  # ported explicitly further down.
-  "results/tables/table_s10_temporal_persistence.csv",   # Table S10 (§10.1)
-  "results/tables/table_s11_compartment_pathway.csv",
-  "results/compartment_tracking/trenton_linked_crosscompartment.csv",
-  "results/compartment_tracking/trenton_pathway_compound_list.csv",
-  "results/compartment_tracking/metabolite_pathways_trenton.csv"
-  # NOTE: pathway_results_local.csv / metabolite_pathways_local.csv /
-  # linked_upregulated_plot_data.csv (union-find grouping) are intentionally
-  # NOT ported — that rule was superseded by Trenton's original method above.
+  "results/blood_chemical_class_enrichment_directional.csv"   # Table S9, all rows
 )
 for (f in blood_csvs) files[[length(files) + 1]] <- list(f, f)
 
@@ -287,19 +193,8 @@ cat(sprintf("\nPorting analysis outputs\n  from: %s\n  to:   %s\n\n", upstream, 
 res <- vapply(files, function(f) copy_one(f[[1]], f[[2]]), logical(1))
 cat(sprintf("\nCopied %d of %d files.\n", sum(res), length(res)))
 
-## ---- recursive trees: enrichment CSV outputs + upstream figure PNGs -------
-## (ch 9) the scripted MetaboAnalystR ORA/MSEA/Mummichog/GO result tables:
+## ---- enrichment CSV outputs (Section 9 and the pathway-explorer app) ----
 copy_tree("results/metaboanalyst", "results/metaboanalyst", pattern = "\\.csv$")
-## (ch 10) pre-rendered cross-compartment figures. The blood-volcano PNGs
-## (figures/blood_volcano/) are no longer ported: they predate the 2026-07-13
-## blood re-run, so §10.1 reports the FDR-significant counts as tables instead.
-copy_tree("figures/cross_compartment", "figures/cross_compartment", pattern = "\\.png$")
-## The §10.5 figures are named appendix_* upstream; publish them under their
-## existing local names so the site carries no "appendix" file names.
-copy_one("figures/cross_compartment/appendix_crosscompartment_volcanoes.png",
-         "figures/cross_compartment/figureS11_crosscompartment_volcanoes.png")
-copy_one("figures/cross_compartment/appendix_compartment_tracking.png",
-         "figures/cross_compartment/figureS10_compartment_tracking.png")
 
 ## ---- attach pval_adj_global (sensitivity) to the subsetted CSVs --------------
 ## Upstream clean_results.R writes the per-visit pval_adj into the subsetted CSVs
@@ -350,6 +245,6 @@ attach_global_fdr <- function() {
 attach_global_fdr()
 
 ## The earlier "pathway_enrichment_*.RDS genuinely missing upstream" footer has
-## been removed: the pathway/enrichment chapter (§9) is now built from the
+## been removed: the pathway/enrichment chapter (Section 9) is now built from the
 ## scripted MetaboAnalystR CSV outputs under results/metaboanalyst/ (copied by
 ## the copy_tree() call above), which supersede those never-produced RDS files.

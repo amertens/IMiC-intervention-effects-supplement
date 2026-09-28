@@ -1,10 +1,6 @@
 # Baseline characteristics by study and intervention arm
 
-The IMiC subsamples analyzed here come from three randomized controlled trials: MISAME-III (Burkina Faso), Mumta-LW (Pakistan), and ELICIT (Tanzania). Baseline maternal, infant, and household characteristics are presented for each study by randomized intervention arm, at the earliest postnatal visit with milk sample collection in each trial.
-
-The tables report demographic, anthropometric, socioeconomic, and household variables plausibly associated with maternal nutritional status, breastfeeding context, or infant outcomes: infant sex, maternal age, education, height (Mumta-LW and ELICIT only), BMI, MUAC, parity, household size and number of rooms, flooring, cooking space, water source, season and place of delivery, asset-based household wealth, and food security. These variables were harmonized across studies during IMiC data curation; the manuscript's Materials and methods list those used as adjustment covariates. The manuscript Methods cite these summaries as Section 1 of the online resource. These tables have no supplementary-table number.
-
-The summaries are descriptive. They characterize the analytic population contributing milk samples in each trial (for MISAME-III, the 276 of 290 dyads with a 14–21-day sample) and show baseline balance across randomized arms. As is standard for randomized trials, between-arm differences were not tested statistically.
+Maternal, infant, and household characteristics by randomized arm, at each trial's first postnatal milk-collection visit (for MISAME-III, the 276 of 290 dyads with a 14–21-day sample). A variable a trial did not collect is left out of its table.
 
 ```{r baseline-setup, echo=FALSE, message=FALSE, warning=FALSE, results='asis'}
 library(tidyverse)
@@ -15,67 +11,64 @@ raw_path <- here::here("data/merged_analysis_datasets.RDS")
 have_baseline <- file.exists(raw_path)
 if (!have_baseline) {
   cat("*The baseline data file (`data/merged_analysis_datasets.RDS`) is not present in this build. Rerun the analysis code (see README) to generate it.*\n\n")
-  raw_df <- NULL
-} else {
-  raw_df <- readRDS(raw_path)
+}
+raw_df <- if (have_baseline) readRDS(raw_path) else NULL
 
-label(raw_df$sex)           <- "Infant sex"
-label(raw_df$mage)          <- "Maternal age (years)"
-label(raw_df$meducyrs)      <- "Maternal education (years)"
-label(raw_df$mbmi)          <- "Maternal BMI (kg/m^2)"
-label(raw_df$mmuaccm)       <- "Maternal MUAC (cm)"
-if ("mhtcm" %in% names(raw_df)) label(raw_df$mhtcm) <- "Maternal height (cm)"
-label(raw_df$parity)        <- "Parity"
-label(raw_df$nperson)       <- "Household size (persons)"
-label(raw_df$nrooms)        <- "Number of rooms in household"
-label(raw_df$imp_water_src) <- "Improved water source"
-label(raw_df$impfloor)      <- "Improved flooring"
-label(raw_df$cookplac)      <- "Separate cooking space"
-label(raw_df$dvseason)      <- "Season of delivery"
-label(raw_df$dlvloc)        <- "Place of delivery"
-label(raw_df$hhwealth)      <- "Household wealth index"
-label(raw_df$hhfoodsecure)  <- "Household food security"
-label(raw_df$arm)           <- "Intervention arm"
+baseline_labels <- c(
+  sex = "Infant sex", mage = "Maternal age (years)", meducyrs = "Maternal education (years)",
+  mbmi = "Maternal BMI (kg/m²)", mmuaccm = "Maternal MUAC (cm)", mhtcm = "Maternal height (cm)",
+  parity = "Parity", nperson = "Household size (persons)", nrooms = "Rooms in household",
+  imp_water_src = "Water source", impfloor = "Improved flooring", cookplac = "Separate cooking space",
+  dvseason = "Season of delivery", dlvloc = "Delivery location",
+  hhwealth = "Household wealth index", hhfoodsecure = "Household food security")
+
+## Continuous rows as table1 prints them, but with a floating-point mean of a
+## standardized index (e.g. 1e-16) shown as 0.
+render_cont <- function(x, ...) {
+  s <- table1::stats.default(x)
+  ms <- zapsmall(c(s$MEAN, s$SD)); s$MEAN <- ms[1]; s$SD <- ms[2]
+  s <- table1::stats.apply.rounding(s, digits = 3)
+  c("", "Mean (SD)" = sprintf("%s (%s)", s$MEAN, s$SD),
+    "Median [Min, Max]" = sprintf("%s [%s, %s]", s$MEDIAN, s$MIN, s$MAX))
 }
 
-drop_empty_levels <- function(df) df %>% dplyr::mutate(dplyr::across(where(is.factor), droplevels))
+## One table per trial. Codes are spelled out, and labels are set after
+## droplevels(), which strips them from factors.
+baseline_table <- function(study, first_visit, omit = character()) {
+  d <- raw_df[raw_df$studyid == study & raw_df$visit == first_visit, , drop = FALSE]
+  d$impfloor <- factor(c("0" = "No", "1" = "Yes")[as.character(d$impfloor)], levels = c("No", "Yes"))
+  ck <- as.character(d$cookplac)
+  ck[ck %in% "Separate space for cooking"] <- "Yes"
+  ck[!ck %in% c("No", "Yes")] <- NA
+  d$cookplac <- factor(ck, levels = c("No", "Yes"))
+  d <- droplevels(d)
+  vars <- setdiff(intersect(names(baseline_labels), names(d)), omit)
+  ## Not collected: all missing, or, for a number, a constant placeholder (food
+  ## security is 0 throughout where a trial did not measure it).
+  vars <- vars[vapply(vars, function(v) {
+    x <- stats::na.omit(d[[v]])
+    if (is.numeric(x)) length(unique(x)) > 1 else length(x) > 0
+  }, logical(1))]
+  for (v in vars) table1::label(d[[v]]) <- baseline_labels[[v]]
+  table1::table1(stats::as.formula(paste("~", paste(vars, collapse = " + "), "| arm")),
+                 data = d, render.continuous = render_cont)
+}
 ```
 
 ## MISAME-III (Burkina Faso)
 
-**Baseline characteristics: MISAME-III (Burkina Faso).** Maternal, infant, and household characteristics by randomized arm, at the earliest postnatal milk-collection visit.
-
 ```{r baseline-misame, echo=FALSE}
-if (have_baseline) table1(~ sex + mage + meducyrs + mbmi + mmuaccm + parity + nperson + nrooms +
-         imp_water_src + impfloor + cookplac + dvseason + dlvloc +
-         hhwealth + hhfoodsecure | arm,
-       data = raw_df %>% dplyr::filter(studyid == "MISAME-3", visit == 1) %>%
-         drop_empty_levels(),
-       transpose = FALSE)
+if (have_baseline) baseline_table("MISAME-3", 1, omit = "mhtcm")
 ```
 
 ## Mumta-LW (Pakistan)
 
-**Baseline characteristics: Mumta-LW (Pakistan).** Maternal, infant, and household characteristics by randomized arm, at the earliest postnatal milk-collection visit.
-
 ```{r baseline-mumta, echo=FALSE}
-if (have_baseline) table1(~ sex + mage + meducyrs + mbmi + mmuaccm + mhtcm + parity + nperson + nrooms +
-         imp_water_src + impfloor + cookplac + dvseason + dlvloc +
-         hhwealth + hhfoodsecure | arm,
-       data = raw_df %>% dplyr::filter(studyid == "VITAL-Lactation", visit == 40) %>%
-         drop_empty_levels(),
-       transpose = FALSE)
+if (have_baseline) baseline_table("VITAL-Lactation", 40)
 ```
 
 ## ELICIT (Tanzania)
 
-**Baseline characteristics: ELICIT (Tanzania).** Maternal, infant, and household characteristics by randomized arm, at the earliest postnatal milk-collection visit.
-
 ```{r baseline-elicit, echo=FALSE}
-if (have_baseline) table1(~ sex + mage + meducyrs + mbmi + mmuaccm + mhtcm + parity + nperson + nrooms +
-         imp_water_src + impfloor + cookplac + dvseason + dlvloc +
-         hhwealth + hhfoodsecure | arm,
-       data = raw_df %>% dplyr::filter(studyid == "ELICIT", visit == 1) %>%
-         drop_empty_levels(),
-       transpose = FALSE)
+if (have_baseline) baseline_table("ELICIT", 1)
 ```

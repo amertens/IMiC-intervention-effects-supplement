@@ -58,6 +58,17 @@ CAT_COLS <- c("#0072B2", "#E69F00", "#009E73", "#D55E00", "#CC79A7", "#56B4E9", 
 CAT_SYMS <- c("triangle-up", "diamond", "triangle-down", "asterisk-open", "x-thin-open",
               "cross-thin-open", "circle-cross-open")
 PRIMARY_CATS <- c("Other B vitamins", "B2", "B3 or related", "B1", "B6", "Micronutrient", "Macronutrient")
+# forest panels (one per trial and visit, in the order of the printed forest
+# plots) and, for arm-stratified contrasts, one colour and CI line type per arm
+PANEL_ORDER <- c("Mumta-LW (1.5 mo.)", "Mumta-LW (2 mo.)", "ELICIT (1 mo.)", "ELICIT (5 mo.)",
+                 "MISAME-III (14-21 days)", "MISAME-III (1-2 mo.)", "MISAME-III (3-4 mo.)")
+CONTRAST_COLS <- c("Nico" = "#0072B2", "Az." = "#882255", "Nico+Az." = "#CC79A7",
+                   "IFA/BEP" = "#E69F00", "BEP/BEP" = "#D55E00", "BEP/IFA" = "#56B4E9",
+                   "BEP+ExBf" = "#009E73", "BEP+ExBf+AZT" = "#000000", "BEP" = "#E69F00")
+CONTRAST_LTY  <- c("Nico" = "solid", "Az." = "dashed", "Nico+Az." = "dotted",
+                   "IFA/BEP" = "solid", "BEP/BEP" = "dashed", "BEP/IFA" = "dotted",
+                   "BEP+ExBf" = "solid", "BEP+ExBf+AZT" = "dashed", "BEP" = "solid")
+MAX_FOREST <- 3000   # more estimates than this cannot be read as a forest plot
 LOGP_TITLE <- "–Log₁₀(P-value)"
 
 read_group <- function(prefix, arm_coding) {
@@ -95,13 +106,58 @@ volcano_key <- function(d) {
                 stats::setNames(CAT_SYMS[seq_along(keep)], keep), "FDR-significant" = "triangle-up")[lv])
 }
 
+# Faceted forest plot: one panel per trial and visit, arm-stratified contrasts
+# dodged within each panel.
+forest_fig <- function(d, arm_strat) {
+  panels <- paste0(d$study, " (", d$visit, ")")
+  d$panel <- factor(panels, levels = c(intersect(PANEL_ORDER, panels), setdiff(unique(panels), PANEL_ORDER)))
+  ord <- sort(tapply(d$.est, as.character(d$label_f), mean, na.rm = TRUE))
+  d$label_f <- factor(d$label_f, levels = names(ord))
+  d$tier <- factor(d$Significance, levels = TIERS)
+  d$tip <- paste0(d$label_f, "<br>", d$panel, " | ", d$contrast,
+                  "<br>", signif(d$.est, 3), " (", signif(d$.cil, 3), ", ", signif(d$.ciu, 3), ")",
+                  "<br>P ", signif(d$pval, 3), " | Q ", signif(d$.q, 3))
+  p <- ggplot2::ggplot(d, ggplot2::aes(x = .est, y = label_f, text = tip)) +
+    ggplot2::geom_vline(xintercept = 0, linetype = "dashed", colour = "grey60")
+  if (arm_strat) {
+    dodge <- ggplot2::position_dodge(width = 0.7)
+    cols <- CONTRAST_COLS[intersect(names(CONTRAST_COLS), unique(as.character(d$contrast)))]
+    p <- p +
+      ggplot2::geom_errorbar(ggplot2::aes(xmin = .cil, xmax = .ciu, colour = contrast,
+                                          linetype = contrast, group = contrast),
+                             width = 0, orientation = "y", position = dodge) +
+      ggplot2::geom_point(ggplot2::aes(colour = contrast, shape = tier, group = contrast),
+                          size = 1.8, position = dodge) +
+      ggplot2::scale_colour_manual(values = cols, name = "Contrast") +
+      ggplot2::scale_linetype_manual(values = CONTRAST_LTY[names(cols)], name = "Contrast") +
+      ggplot2::scale_shape_manual(values = c(1, 2, 19), limits = TIERS, drop = FALSE,
+                                  name = "Statistical Significance")
+  } else {
+    p <- p +
+      ggplot2::geom_errorbar(ggplot2::aes(xmin = .cil, xmax = .ciu, colour = tier),
+                             width = 0, orientation = "y") +
+      ggplot2::geom_point(ggplot2::aes(colour = tier, shape = tier), size = 1.8) +
+      ggplot2::scale_colour_manual(values = FOREST_COLS, limits = TIERS, drop = FALSE,
+                                   name = "Statistical Significance") +
+      ggplot2::scale_shape_manual(values = c(1, 1, 19), limits = TIERS, drop = FALSE,
+                                  name = "Statistical Significance")
+  }
+  p <- p +
+    ggplot2::facet_wrap(~ panel, ncol = 3) +
+    ggplot2::labs(x = d$.xlab[1], y = NULL) +
+    ggplot2::theme_bw(base_size = 11) +
+    ggplot2::theme(panel.spacing = ggplot2::unit(1, "lines"), legend.position = "bottom")
+  ggplotly(p, tooltip = "text") |>
+    layout(legend = list(orientation = "h", y = -0.05, yanchor = "top"),
+           margin = list(l = 10, r = 10, t = 40, b = 60))
+}
+
 # ---- UI --------------------------------------------------------------------
 ui <- fluidPage(
-  titlePanel("IMiC — Intervention-Effect Explorer"),
+  titlePanel("IMiC intervention-effect explorer"),
   tags$p(style = "color:#555;",
-         "Every point is one human-milk component (adjusted TMLE effect vs. control). ",
-         "Filter with the controls; hover for details. This app runs in your browser — ",
-         "the first load fetches the R runtime, then it is instant."),
+         "Adjusted TMLE effects of the interventions on each milk component. ",
+         "Hover over a point for its values. The app runs R in your browser, so the first load takes a moment."),
   sidebarLayout(
     sidebarPanel(
       width = 3,
@@ -122,7 +178,7 @@ ui <- fluidPage(
       width = 9,
       tabsetPanel(
         tabPanel("Volcano",   plotlyOutput("volcano", height = "560px")),
-        tabPanel("Forest",    plotlyOutput("forest",  height = "700px")),
+        tabPanel("Forest",    uiOutput("forest_ui")),
         tabPanel("Table",     DT::dataTableOutput("table"))
       )
     )
@@ -191,21 +247,25 @@ server <- function(input, output, session) {
              legend = list(orientation = "h"), shapes = ref_lines(TRUE))
   })
 
+  # One panel per trial and visit, so estimates of the same component from
+  # different trials and visits no longer share a row; arm-stratified contrasts
+  # are dodged within each panel, each in its own colour and CI line type, with
+  # the significance tier carried by the symbol (as in the rest of the site).
+  forest_height <- reactive({
+    d <- dat()
+    n_comp  <- length(unique(d$label_f))
+    n_rows  <- ceiling(length(unique(paste(d$study, d$visit))) / 3)
+    per     <- if (identical(input$arm, "Arm-stratified")) 26 else 16
+    max(450, min(6000, n_rows * (n_comp * per + 70) + 140))
+  })
+  output$forest_ui <- renderUI(plotlyOutput("forest", height = paste0(forest_height(), "px")))
+
   output$forest <- renderPlotly({
     d <- dat(); validate(need(nrow(d) > 0, "No rows match the current filters."))
-    d <- d[order(d$.est), ]; d$label_f <- factor(d$label_f, levels = unique(d$label_f))
-    d$tier <- factor(d$Significance, levels = TIERS)
-    plot_ly(d, x = ~.est, y = ~label_f, type = "scatter", mode = "markers",
-            color = ~tier, colors = FOREST_COLS, symbol = ~tier, symbols = unname(FOREST_SYMS),
-            error_x = list(type = "data", symmetric = FALSE,
-                           array = ~(.ciu - .est), arrayminus = ~(.est - .cil)),
-            text = ~paste0(study, " (", visit, ") | ", contrast,
-                           "<br>", signif(.est,3), " (", signif(.cil,3), ", ", signif(.ciu,3), ")",
-                           "<br>Q ", signif(.q, 3)),
-            hoverinfo = "text", marker = list(size = 7)) |>
-      layout(xaxis = list(title = d$.xlab[1]), yaxis = list(title = ""),
-             legend = list(orientation = "h", title = list(text = "Statistical Significance")),
-             shapes = ref_lines(FALSE))
+    validate(need(nrow(d) <= MAX_FOREST, sprintf(
+      "%s estimates are too many for a forest plot. Narrow the selection with the trial, visit, or FDR filters, or use the volcano or table view.",
+      format(nrow(d), big.mark = ","))))
+    forest_fig(d, arm_strat = identical(input$arm, "Arm-stratified"))
   })
 
   output$table <- DT::renderDataTable({

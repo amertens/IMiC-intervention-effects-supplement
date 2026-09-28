@@ -1,146 +1,12 @@
-# Targeted-metabolite metadata and reductions in HM nutrient deficiency
+# Effects on human milk nutrient deficiency
 
-This section has two parts. The first, *Targeted-metabolite metadata*, is the inventory of the Biocrates MxP Quant 500 panel cited in the manuscript's Fig. 5A legend ("metadata are in Section 6 of the online resource").
+Relative risks (RRs) of nutrient deficiency, pooled intervention vs. control, estimated by TMLE within each trial and visit. A sample is deficient when its concentration is below the 10th percentile of the age-specific reference distribution from the Mothers, Infants, and Lactation Quality (MILQ) study; RR < 1 means less deficiency with the intervention. `nY` of `N` samples were deficient. Components with fewer than five deficient samples in a trial and visit were not analyzed. *Q* (`pval_adj`) is FDR-adjusted within visit and outcome group.
 
-The rest of the section examines how maternal nutritional supplementation affects the prevalence of human milk (HM) nutrient deficiency, defined as concentrations below the 10th percentile of age-specific reference distributions from the Mothers, Infants, and Lactation Quality (MILQ) study. For each milk sample, infant age at collection was mapped to a MILQ age band (0–3, 4–17, 18–31 days; 1–2, 2–3, 3–4, 4–5, 5–6 months), concentrations were harmonized to MILQ units, and deficiency was scored as a binary indicator at the 10th percentile threshold. Components with fewer than five inadequate samples within a study × visit stratum were excluded to avoid sparse-data bias. We estimated relative risks (RRs) with TMLE, adjusting for the same prespecified baseline prognostic factors as the primary analyses and contrasting pooled maternal nutritional intervention arms with the corresponding control. FDR correction was applied within visit × outcome group. These analyses correspond to Figure S2 of the supplementary materials.
-
-## Targeted-metabolite metadata {#targeted-metabolite-metadata}
-
-Tertiary outcomes were measured on the Biocrates MxP Quant 500 panel, a broad targeted metabolomics assay covering acylcarnitines, amino acids and biogenic amines, bile acids, ceramides, cholesteryl esters, di- and triglycerides, free fatty acids, lysophosphatidyl- and phosphatidylcholines, sphingomyelins, hexosyl- and trihexosylceramides, and other classes. The table below lists every metabolite analyzed in this online resource as a tertiary outcome, grouped by Biocrates category, with indicators of whether it was measured in each of the three IMiC trials.
-
-The manuscript's Fig. 5A legend cites this inventory as Section 6 of the online resource. Intervention-effect estimates for these metabolites are in [§5 *Adjusted intervention effects on individual milk components*](#adjusted-intervention-effects-on-individual-milk-components) (tertiary-outcome subsections, pooled and per-arm), effects on within-mother trajectories are in [§7 *Trajectory analyses*](#trajectory-analyses-of-human-milk-component-change-across-lactation), and pathway-level enrichment summaries (MetaboAnalyst ORA/MSEA, Mummichog, GO) are in [§9 *Reproducible pathway and enrichment analyses*](#reproducible-pathway-and-enrichment-analyses).
-
-```{r milq-metabolite-metadata, echo=FALSE, message=FALSE, warning=FALSE}
-metadata_loaded <- safe_load(here::here("metadata/milk_component.Rdata"))
-if (isTRUE(metadata_loaded) && exists("all_milk_components") &&
-    !is.null(all_milk_components$metabolomics)) {
-  ## all_milk_components$metabolomics may be a single character vector or a
-  ## named list keyed by Biocrates category. Handle both.
-  metab_obj <- all_milk_components$metabolomics
-  if (is.list(metab_obj) && !is.null(names(metab_obj))) {
-    metab_tbl <- dplyr::bind_rows(lapply(names(metab_obj), function(cat) {
-      tibble::tibble(
-        biocrates_category = cat,
-        metabolite         = unlist(metab_obj[[cat]], use.names = FALSE)
-      )
-    }))
-  } else {
-    metab_tbl <- tibble::tibble(
-      biocrates_category = "Targeted metabolites",
-      metabolite         = unlist(metab_obj, use.names = FALSE)
-    )
-  }
-  metab_tbl <- dplyr::distinct(metab_tbl)
-  pick_metab <- function(x) if (is.list(x)) unlist(x$metabolomics %||% x, use.names = FALSE)
-                            else unlist(x, use.names = FALSE)
-  per_study <- list(
-    "MISAME-III" = if (exists("misame_milk_components")) pick_metab(misame_milk_components) else NULL,
-    "Mumta-LW"   = if (exists("vital_milk_components"))  pick_metab(vital_milk_components)  else NULL,
-    "ELICIT"     = if (exists("elicit_milk_components")) pick_metab(elicit_milk_components) else NULL
-  )
-  for (s in names(per_study)) {
-    if (is.null(per_study[[s]])) next
-    metab_tbl[[paste0("measured_in_", s)]] <- metab_tbl$metabolite %in% per_study[[s]]
-  }
-  nice_dt(metab_tbl,
-          caption = "Targeted-metabolite metadata: Biocrates MxP Quant 500 panel inventory, by category and per-study availability. Referenced from Fig. 5A of the manuscript.")
-} else {
-  cat("*Targeted-metabolite metadata is not available in this build (`metadata/milk_component.Rdata` did not load).*")
-}
-```
-
-## MILQ-deficiency reductions: headline findings
-
-```{r milq-headline-data, include=FALSE}
+```{r milq-table, echo=FALSE, message=FALSE, warning=FALSE}
 suppressPackageStartupMessages({ library(dplyr); library(here) })
 source(here::here("functions.R"))
 milq_df <- safe_readRDS(here::here("figure-data/fig-milq-deficiency-reduction-data.RDS"),
                         label = "fig-milq-deficiency-reduction-data.RDS")
-
-## Format "RR x.xx, 95% CI lo–hi, q = ..." directly from the MILQ
-## deficiency-reduction data so the headline figures below cannot drift from
-## the forest plot and table further down this chapter.
-milq_rr <- function(study_pat, label_pat, visit_val) {
-  if (is.null(milq_df) || !is.data.frame(milq_df)) return("[data unavailable]")
-  r <- milq_df %>% dplyr::filter(grepl(study_pat, study, ignore.case = TRUE),
-                                 grepl(label_pat, label_f, ignore.case = TRUE),
-                                 as.character(visit) == as.character(visit_val))
-  if (!nrow(r)) return("[not estimated]")
-  r <- r[1, ]
-  qtxt <- if (is.na(r$pval_adj)) "*Q* = NA" else if (r$pval_adj < 0.001) "*Q* < 0.001" else sprintf("*Q* = %.3f", r$pval_adj)
-  sprintf("RR %.2f, 95%% CI %.2f–%.2f, %s", r$RR, r$ci.lb, r$ci.ub, qtxt)
-}
-milq_se_range <- if (is.null(milq_df) || !is.data.frame(milq_df)) "[data unavailable]" else {
-  se <- milq_df %>% dplyr::filter(grepl("selen", label_f, ignore.case = TRUE),
-                                   grepl("misame", study, ignore.case = TRUE))
-  if (!nrow(se)) "[not estimated]" else sprintf("%.2f–%.2f", min(se$RR, na.rm = TRUE), max(se$RR, na.rm = TRUE))
-}
-```
-
-- ELICIT (high-dose nicotinamide) lowered HM vitamin B3 deficiency at 1 month (`r milq_rr("ELICIT", "Vitamin B3", 1)`) and significantly at 5 months (`r milq_rr("ELICIT", "Vitamin B3", 5)`).
-- Mumta-LW (postnatal BEP) reduced pantothenic acid, B2, and B3 deficiencies at 1.5 months only.
-- MISAME-III (postnatal BEP) reduced pantothenic acid and B3 deficiencies at all three visits (14–21 days, 1–2 months, 3–4 months) and B2 deficiency at 14–21 days. Selenium deficiency was lower at every visit (RR range `r milq_se_range`), significantly at 14–21 days and 3–4 months.
-
-```{r milq-setup, include=FALSE}
-library(tidyverse)
-library(here)
-library(plotly)
-library(DT)
-source(here::here("functions.R"))
-ggplot2::theme_set(theme_imic_web(base_size = 14))
-knitr::opts_chunk$set(fig.width = 12, fig.height = 10, dpi = 110)
-```
-
-## Forest plot of relative risks (Figure S2)
-
-```{r milq-forest, echo=FALSE, message=FALSE, warning=FALSE, fig.height=10}
-milq_df <- safe_readRDS(here::here("figure-data/fig-milq-deficiency-reduction-data.RDS"),
-                        label = "fig-milq-deficiency-reduction-data.RDS")
-
-## Drawn as the printed Fig. S2 (figS2-milq-deficiency.R upstream): "Study (visit)"
-## panels in the printed order, every component on every panel in the printed
-## order, the three significance tiers, and RR on a log scale marked in doublings.
-if (!is.null(milq_df) && is.data.frame(milq_df)) {
-  d <- as.data.frame(dplyr::ungroup(milq_df))
-  d$study   <- study_name(d$study)
-  d$panel   <- factor(paste0(d$study, " (", visit_name(d$study, d$visit), ")"),
-                      levels = panel_orders$study)
-  d$label_f <- canonical_label(d$biomarker, d$label_f)
-  printed_order <- c("Total Energy", "Total Fat", "Total Protein", "Vitamin B₂", "Vitamin B₃",
-                     "Vitamin B₅", "Vitamin B₆", "Vitamin B₇", "Vitamin B₁₂",
-                     "Vitamin A", "α-Tocopherol", "γ-Tocopherol", "Calcium", "Choline", "Copper",
-                     "Iron", "Magnesium", "Phosphorus", "Potassium", "Selenium", "Sodium", "Zinc")
-  d$label_f <- factor(d$label_f, levels = rev(unique(c(printed_order, sort(unique(d$label_f))))))
-  d$tier    <- sig_tier(d[, c("sig", "sigFDR")])
-  d$tooltip <- paste0(d$label_f, "<br>", d$panel,
-                      "<br>RR: ", signif(d$RR, 3), " (", signif(d$ci.lb, 3), ", ", signif(d$ci.ub, 3), ")",
-                      "<br>P = ", signif(d$pvalue, 3), "<br>Q = ", signif(d$pval_adj, 3),
-                      "<br>Deficient: ", d$nY, " of ", d$N)
-  milq_cols  <- c("Not significant" = "grey50", "Nominally significant" = "#1F77B4",
-                  "FDR-significant" = "#FF7F0E")
-  milq_alpha <- c("Not significant" = 0.3, "Nominally significant" = 0.5, "FDR-significant" = 0.8)
-  p <- ggplot2::ggplot(d, ggplot2::aes(x = RR, y = label_f, colour = tier, shape = tier,
-                                       alpha = tier, text = tooltip)) +
-    ggplot2::geom_vline(xintercept = 1, linetype = "dashed") +
-    ggplot2::geom_errorbar(ggplot2::aes(xmin = ci.lb, xmax = ci.ub), width = 0, orientation = "y") +
-    ggplot2::geom_point(size = 2) +
-    ggplot2::scale_x_log10(breaks = c(1/16, 1/4, 1, 4), labels = c("1/16", "1/4", "1", "4")) +
-    ggplot2::coord_cartesian(xlim = c(0.025, 8)) +
-    ggplot2::scale_colour_manual(values = milq_cols, drop = FALSE, name = "Statistical Significance") +
-    ggplot2::scale_shape_manual(values = sig_tier_shapes, drop = FALSE, name = "Statistical Significance") +
-    ggplot2::scale_alpha_manual(values = milq_alpha, drop = FALSE, name = "Statistical Significance") +
-    ggplot2::facet_wrap(~ panel, nrow = 2, drop = FALSE) +
-    ggplot2::labs(x = "Relative Risk", y = "Milk component") +
-    theme_imic_web()
-  as_widget(p)
-}
-```
-
-**Figure S2.** Study- and visit-specific maternal nutritional intervention effects on human milk micronutrient deficiencies. Deficiencies were defined as HM concentrations below the age-specific 10th percentile of the MILQ reference distributions. The plot shows relative risks (RRs, log scale) and 95% CIs for the pooled maternal nutritional intervention arms vs. control, estimated by TMLE within each study and visit with adjustment for prespecified baseline prognostic factors; RR < 1 means a lower risk of deficiency under intervention. As in the printed figure, gray open circles are not significant, blue open circles are nominally significant (*P* < 0.05), and orange filled circles are significant after FDR correction (*Q* < 0.05, applied within visit × outcome group). Components with fewer than five deficient samples within a study × visit stratum are omitted. Hover over a point for the exact RR, 95% CI, *P*, *Q*, and the number of deficient samples.
-
-## Searchable table of MILQ-deficiency effects
-
-```{r milq-table, echo=FALSE, message=FALSE, warning=FALSE}
 if (!is.null(milq_df) && is.data.frame(milq_df)) {
   out <- milq_df %>%
     dplyr::ungroup() %>%
@@ -151,15 +17,6 @@ if (!is.null(milq_df) && is.data.frame(milq_df)) {
       "N","nY","RR","ci.lb","ci.ub","pvalue","pval_adj","sig","sigFDR"
     ))) %>%
     dplyr::mutate(dplyr::across(where(is.numeric), ~ signif(.x, 3)))
-  nice_dt(out,
-          caption = "Relative risks of HM nutrient deficiency (defined at the MILQ 10th percentile), pooled intervention vs. control, by study and visit.")
+  nice_dt(out, caption = "Relative risks of deficiency, pooled intervention vs. control.")
 }
 ```
-
-## Interpretation
-
-The MILQ analysis complements the continuous-scale TMLE. Dichotomizing at the 10th percentile of the MILQ reference distribution asks whether supplementation shrinks the low tail of the HM distribution, where infant supply is plausibly inadequate. The randomized comparison is unchanged; only the threshold comes from an external reference population.
-
-The two analyses largely agree: components with clear mean increases in the manuscript (B3 in ELICIT; riboflavin, pantothenic acid, and B3 with postnatal BEP; selenium in MISAME-III) are those whose deficiency prevalence fell. Vitamin B12 shifted upward without a consistent fall in deficiency.
-
-Two caveats apply. First, components excluded for sparse data (fewer than five deficient samples within a stratum) are absent from the plot and table. Exclusion is more likely for components on which the IMiC populations already exceed the MILQ 10th percentile (e.g. thiamin, B6, and biotin, which in control milk already exceeded the MILQ median), so a missing row is not a null result. Second, RRs cannot address effects at the upper tail of the distribution; for large increases, seen most clearly for B3 in ELICIT, see the continuous-scale forest plots in the *Adjusted intervention effects* section.
