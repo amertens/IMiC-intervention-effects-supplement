@@ -26,6 +26,9 @@ if (!dir.exists(upstream)) {
 ## Add an entry whenever a chapter starts consuming a new artefact.
 files <- list(
   ## ---- dyad-level dataset --------------------------------------------------
+  ## INDIVIDUAL-LEVEL (one row per mother x visit): stays local, never committed
+  ## (data/ is gitignored); Sections 1 and 2 read it for the baseline tables and
+  ## boxplots, which publish only summaries.
   list("data/merged_analysis_datasets.RDS",
        "data/merged_analysis_datasets.RDS"),
 
@@ -115,6 +118,8 @@ files <- list(
        "metadata/milk_component.Rdata"),
   list("figure-data/SL_vim_plot_data.RDS",
        "figure-data/SL_vim_plot_data.RDS"),
+  ## INDIVIDUAL-LEVEL: the saved Fig. 4 panels embed one row per milk sample, so
+  ## this copy is gitignored; the site publishes only the rendered images.
   list("figure-data/figure_s2_plots.RDS",
        "figure-data/figure_s2_plots.RDS"),
   list("figure-data/figure_s4_trajectory_plots.RDS",

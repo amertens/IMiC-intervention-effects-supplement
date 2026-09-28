@@ -34,3 +34,8 @@ Rplots.pdf
 
 # One-off investigation prompts (working notes, not part of the supplement)
 MANUSCRIPT_*_PROMPT.md
+
+# Individual-level (per-sample) data must never be committed. The dyad-level
+# dataset lives in data/ (ignored above); the saved Fig. 4 panels embed one row
+# per milk sample, so they are ported locally by port_results.R and ignored.
+/figure-data/figure_s2_plots.RDS
