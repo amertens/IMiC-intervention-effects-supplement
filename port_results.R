@@ -244,6 +244,43 @@ attach_global_fdr <- function() {
 }
 attach_global_fdr()
 
+## ---- one row per estimate in the arm-stratified CSVs --------------------------
+## Upstream clean_results.R joins the arm-stratified native-unit results without
+## keeping only the ATE rows (its pooled join does), so every estimate appears
+## twice: once with its native-unit ATE and once with the arm's mean (MN row) in
+## the *_unscaled columns. Keep the row whose native-unit value matches the ATE.
+## Once the upstream join is fixed this finds no duplicates and changes nothing.
+dedupe_arm_strat <- function() {
+  un_rel <- "results/adjusted_intervention_effects_unscaled_results_clean.RDS"
+  un_p <- file.path(upstream, un_rel)
+  if (!file.exists(un_p)) { cat(sprintf("[skip ] arm-strat dedupe: missing %s\n", un_rel)); return(invisible(FALSE)) }
+  un <- as.data.frame(readRDS(un_p))
+  un <- un[un$measure == "ATE", , drop = FALSE]
+  ate_key <- paste(un$study, un$visit, un$contrast, tolower(un$biomarker))
+  ate_est <- stats::setNames(un$est, ate_key)
+  for (fname in paste0(c("primary_macro", "primary_micro", "primary_bvit", "secondary_hmo",
+                         "secondary_bioactives", "tertiary_targeted_metabolomics"), "_arm_strat")) {
+    path <- file.path(dest, "results/subsetted results", paste0(fname, ".csv"))
+    if (!file.exists(path)) next
+    df <- utils::read.csv(path, check.names = FALSE)
+    key <- paste(df$study, df$visit, df$contrast, tolower(df$biomarker))
+    target <- ate_est[key]
+    is_ate <- !is.na(target) & !is.na(df$est_unscaled) &
+      abs(df$est_unscaled - target) <= 1e-8 * pmax(1, abs(target))
+    dup <- key %in% key[duplicated(key)]
+    ## keep unduplicated rows; among duplicates keep the ATE match, or else the first
+    keep <- !dup | is_ate
+    lost <- setdiff(unique(key[dup]), unique(key[dup & is_ate]))
+    keep[dup & key %in% lost & !duplicated(key)] <- TRUE
+    out <- df[keep, , drop = FALSE]
+    out <- out[!duplicated(paste(out$study, out$visit, out$contrast, tolower(out$biomarker))), , drop = FALSE]
+    if (nrow(out) < nrow(df)) utils::write.csv(out, path, row.names = FALSE)
+    cat(sprintf("[dedup] %s: %d -> %d rows\n", fname, nrow(df), nrow(out)))
+  }
+  invisible(TRUE)
+}
+dedupe_arm_strat()
+
 ## The earlier "pathway_enrichment_*.RDS genuinely missing upstream" footer has
 ## been removed: the pathway/enrichment chapter (Section 9) is now built from the
 ## scripted MetaboAnalystR CSV outputs under results/metaboanalyst/ (copied by
