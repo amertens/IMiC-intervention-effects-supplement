@@ -57,21 +57,17 @@ files <- list(
        "results/subsetted results/tertiary_targeted_metabolomics_arm_strat.csv"),
 
   ## ---- Table S1: native-unit descriptive concentrations + ATEs (ch 8.2) ---
-  list("results/tables/table_s1_primary_secondary_native_units.csv",
-       "results/tables/table_s1_primary_secondary_native_units.csv"),
 
   ## ---- machine-readable data files (published under data-files/) ---------
   ## The supplementary materials externalise four oversized tables (S1, S3, S6,
   ## S7) and name the CSV for each, telling readers to find it in the online
-  ## resource -- i.e. here -- plus a fifth file with the native-unit estimates
-  ## for every targeted metabolite. index.Rmd publishes data-files/ into docs/
+  ## resource -- i.e. here -- plus a file with the native-unit estimates for
+  ## every targeted metabolite. index.Rmd publishes data-files/ into docs/
   ## (Machine-readable data files section), so they must be ported under that
   ## folder, not just left in results/. Written upstream by
   ## src/pipeline/rebuild-submission-tables.R.
   list("results/tables/table_s1_primary_secondary_native_units.csv",
        "data-files/table_s1_primary_secondary_native_units.csv"),
-  list("results/tables/table_s1_primary_secondary_native_units_wide.csv",
-       "data-files/table_s1_primary_secondary_native_units_wide.csv"),
   list("results/tables/targeted_metabolites_native_units.csv",
        "data-files/targeted_metabolites_native_units.csv"),
   list("results/tables/table_s3_tertiary_msea_full.csv",

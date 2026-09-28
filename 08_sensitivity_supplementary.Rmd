@@ -64,16 +64,11 @@ if (!is.null(nu) && nrow(nu)) {
 
 ### Table S1 {#native-units-table}
 
-Table S1 in full, in the two formats of its data files: [long](data-files/table_s1_primary_secondary_native_units.csv), one row per trial, visit, outcome, and arm, with the sample size, the adjusted mean and 95% CI, and the raw mean, SD, median, and quartiles in native units; and [wide](data-files/table_s1_primary_secondary_native_units_wide.csv), one row per trial, visit, and outcome, with the arms side by side and the native-unit ATE, 95% CI, *P*, and *Q*.
+Table S1 in full: one row per trial, visit, and outcome, with each arm's sample size and raw mean, SD, median, and quartiles in native units side by side, and the native-unit ATE, 95% CI, *P*, and *Q* ([`table_s1_primary_secondary_native_units.csv`](data-files/table_s1_primary_secondary_native_units.csv)).
 
 ```{r sens-table-s1, echo=FALSE, message=FALSE, warning=FALSE}
-tab_s1 <- safe_read_csv(here::here("results/tables/table_s1_primary_secondary_native_units.csv"))
-if (!is.null(tab_s1)) nice_dt(tab_s1, caption = "Table S1, long format.")
-```
-
-```{r sens-table-s1-wide, echo=FALSE, message=FALSE, warning=FALSE}
-tab_s1_wide <- safe_read_csv(here::here("data-files/table_s1_primary_secondary_native_units_wide.csv"))
-if (!is.null(tab_s1_wide)) nice_dt(tab_s1_wide, caption = "Table S1, wide format.")
+tab_s1 <- safe_read_csv(here::here("data-files/table_s1_primary_secondary_native_units.csv"))
+if (!is.null(tab_s1)) nice_dt(tab_s1, caption = "Table S1.")
 ```
 
 ## Treatment-arm prediction

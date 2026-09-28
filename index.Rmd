@@ -52,10 +52,8 @@ if (dir.exists(src)) {
 }
 ## file name | section label it is rendered in | description
 files <- list(
-  c("table_s1_primary_secondary_native_units_wide.csv", "native-units-table",
-    "Table S1, one row per trial, visit, and outcome: both arms side by side, with the native-unit ATE, 95% CI, *P*, and *Q*"),
   c("table_s1_primary_secondary_native_units.csv", "native-units-table",
-    "Table S1, one row per trial, visit, outcome, and arm: sample size, adjusted mean, and raw distribution"),
+    "Table S1, one row per trial, visit, and outcome: per-arm sample size and raw distribution side by side, with the native-unit ATE, 95% CI, *P*, and *Q*"),
   c("targeted_metabolites_native_units.csv", "native-units-tertiary",
     "native-unit arm means and effects for the 581 targeted metabolites, one row per trial, visit, and metabolite"),
   c("table_s3_tertiary_msea_full.csv", "path-tertiary-msea",
