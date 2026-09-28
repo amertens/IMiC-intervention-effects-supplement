@@ -12,10 +12,8 @@
 ##   options(imic.dest     = ".")
 ## before sourcing.
 
-upstream <- getOption(
-  "imic.upstream",
-  "C:/Users/andre/OneDrive/Documents/imic_intervention_effects"
-)
+## Default: the analysis repo checked out next to this one.
+upstream <- getOption("imic.upstream", file.path("..", "imic_intervention_effects"))
 dest <- getOption("imic.dest", ".")
 
 if (!dir.exists(upstream)) {
