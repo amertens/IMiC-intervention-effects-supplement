@@ -1,6 +1,6 @@
 # Adjusted intervention effects on individual milk components
 
-Covariate-adjusted effects on each primary, secondary, and tertiary milk component, by trial and visit, for the pooled intervention arms and for each randomized arm vs. control. In the tables, `ATE` is the effect in SD units and `ATE_unscaled` in native units, both with 95% CIs; `perc_imp` is the difference between the intervention and control means as a percentage of the control mean; `pval_adj` is FDR-adjusted within outcome group, trial, and visit; `pval_adj_global` is adjusted across all trials and visits of an outcome group; and asterisks mark *P* or *Q* below 0.05, 0.01, and 0.001.
+Covariate-adjusted effects on each primary, secondary, and tertiary milk component, by trial and visit, for the pooled intervention arms and for each randomized arm vs. control. In the tables, the average treatment effect (ATE) is given in SD units and in each component's native units, both with 95% CIs. The difference is that between the intervention and control means, as a percentage of the control mean. *Q* is adjusted for the false discovery rate (FDR) within outcome group, trial, and visit, and the second *Q* across all trials and visits of an outcome group. Asterisks mark *P* or *Q* below 0.05, 0.01, and 0.001.
 
 ```{r effects-setup, include=FALSE}
 library(tidyverse)
@@ -27,7 +27,7 @@ if (isTRUE(metadata_loaded) && exists("all_milk_components")) {
   groups <- list(
     "Macronutrients (primary)"                = all_milk_components$macro,
     "Micronutrients (primary)"                = all_milk_components$micro,
-    "B-vitamins (primary)"                    = all_milk_components$bvit,
+    "B vitamins (primary)"                    = all_milk_components$bvit,
     "Human milk oligosaccharides (secondary)" = all_milk_components$hmo,
     "Bioactive proteins (secondary)"          = all_milk_components$protein
   )
@@ -122,7 +122,7 @@ htmltools::tagList(
   effects_table("results/subsetted results/primary_micro_arm_strat.csv", "Each randomized arm vs. control."))
 ```
 
-## B-vitamins
+## B vitamins
 
 ```{r effects-bvit, echo=FALSE, message=FALSE, warning=FALSE}
 htmltools::tagList(
@@ -148,7 +148,7 @@ htmltools::tagList(
 
 ## Targeted metabolites (tertiary outcomes)
 
-Selecting points in the volcano plot (box or lasso select) filters the table beneath it, and the menus filter both. Each point is one metabolite, pooled intervention vs. control; FDR is controlled within each trial and visit, so this pooled view has no FDR line.
+Selecting points in the volcano plot (box or lasso select) filters the table beneath it, and the menus filter both. Each point is one metabolite, pooled intervention vs. control. The FDR is controlled within each trial and visit, so this view of all trials and visits together has no FDR line.
 
 ```{r effects-tertiary-linked, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7}
 df_ter <- safe_read_csv(here::here("results/subsetted results/tertiary_targeted_metabolomics.csv"))

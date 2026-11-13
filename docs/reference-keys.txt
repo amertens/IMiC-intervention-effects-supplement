@@ -37,7 +37,7 @@ per-arm-contrasts
 combined-intervention-arms
 sensitivity-analyses-and-additional-outputs
 unadjusted-intervention-effects
-unscaled-natural-unit-intervention-effects
+native-unit-intervention-effects
 native-units-tertiary
 native-units-table
 treatment-arm-prediction

@@ -26,7 +26,7 @@ build_dict <- function() {
   groups <- list(
     "Macronutrients (primary)"                = all_milk_components$macro,
     "Micronutrients (primary)"                = all_milk_components$micro,
-    "B-vitamins (primary)"                    = all_milk_components$bvit,
+    "B vitamins (primary)"                    = all_milk_components$bvit,
     "Human milk oligosaccharides (secondary)" = all_milk_components$hmo,
     "Bioactive proteins (secondary)"          = all_milk_components$protein,
     "Targeted metabolites (tertiary)"         = all_milk_components$metabolomics
@@ -113,7 +113,7 @@ box_plot("macro")
 box_plot("micro")
 ```
 
-### B-vitamins
+### B vitamins
 
 ```{r distributions-box-bvit, echo=FALSE, message=FALSE, warning=FALSE, results='asis', fig.width=14, fig.height=box_height("bvit")}
 box_plot("bvit")

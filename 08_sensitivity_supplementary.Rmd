@@ -13,7 +13,7 @@ class_tables <- function(res) {
   groups <- list(
     "Macronutrients"     = c(all_milk_components$macro, "total carbohydrate"),
     "Micronutrients"     = all_milk_components$micro,
-    "B-vitamins"         = all_milk_components$bvit,
+    "B vitamins"         = all_milk_components$bvit,
     "HMOs"               = all_milk_components$hmo,
     "Bioactive proteins" = all_milk_components$protein)
   out <- htmltools::tagList()
@@ -27,7 +27,7 @@ class_tables <- function(res) {
 
 ## Unadjusted intervention effects
 
-TMLE estimates without covariate adjustment, each randomized arm vs. control.
+Effects estimated by targeted maximum likelihood estimation without covariate adjustment, each randomized arm vs. control.
 
 ```{r sens-unadjusted, echo=FALSE, message=FALSE, warning=FALSE}
 res_unadj <- safe_readRDS(here::here("results/unadjusted_intervention_effects_results_clean.RDS"),
@@ -37,9 +37,9 @@ if (!is.null(res_unadj) && isTRUE(metadata_loaded))
                  dplyr::mutate(biomarker = stringr::str_to_lower(biomarker)))
 ```
 
-## Unscaled (natural-unit) intervention effects
+## Native-unit intervention effects
 
-Adjusted effects in each component's native units, for example g/100 mL for macronutrients, µg/L or mg/L for micronutrients, and nmol/mL for HMOs, pooled intervention vs. control.
+Adjusted effects in each component's native units, for example g/100 mL for macronutrients, µg/L or mg/L for micronutrients, and nmol/mL for human milk oligosaccharides, pooled intervention vs. control.
 
 ```{r sens-unscaled, echo=FALSE, message=FALSE, warning=FALSE}
 res_unscaled <- safe_readRDS(here::here("results/adjusted_combined_arms_intervention_effects_unscaled_results_clean.RDS"),
@@ -51,7 +51,7 @@ if (!is.null(res_unscaled) && isTRUE(metadata_loaded))
 
 ### Targeted metabolites (tertiary, native units) {#native-units-tertiary}
 
-For all 581 targeted metabolites, in µM: control and intervention means, the ATE and 95% CI, percent change, native-unit *P* and *Q*, and the standardized ATE and *Q* ([`targeted_metabolites_native_units.csv`](data-files/targeted_metabolites_native_units.csv)).
+For all 581 targeted metabolites, in µM: control and intervention means, the average treatment effect (ATE) and 95% CI, percent change, native-unit *P* and *Q*, and the standardized ATE and *Q* ([`targeted_metabolites_native_units.csv`](data-files/targeted_metabolites_native_units.csv)).
 
 ```{r sens-unscaled-tertiary, echo=FALSE, message=FALSE, warning=FALSE}
 nu <- safe_read_csv(here::here("data-files/targeted_metabolites_native_units.csv"))
@@ -73,7 +73,7 @@ if (!is.null(tab_s1)) nice_dt(tab_s1, caption = "Table S1.")
 
 ## Treatment-arm prediction
 
-Cross-validated AUC (CV-AUC) of SuperLearner models that predict randomized arm from each class of milk components, or from all classes together, by trial, arm, and visit; 0.5 is chance.
+Cross-validated area under the receiver operating characteristic curve (CV-AUC) of SuperLearner models that predict randomized arm from each class of milk components, or from all classes together, by trial, arm, and visit. A CV-AUC of 0.5 is chance.
 
 ```{r sens-sl, echo=FALSE, message=FALSE, warning=FALSE}
 sl <- safe_readRDS(here::here("figure-data/SL_vim_plot_data.RDS"), label = "SL_vim_plot_data.RDS")
@@ -114,7 +114,9 @@ if (!is.null(pca_strat) && is.data.frame(pca_strat)) {
     dplyr::mutate(panel = studytime_label(studytime)) %>%
     dplyr::select(panel, contrast, outcome_group, label_f, est, cil, ciu, chi_pval, chi_pval_adj, sig, sigFDR) %>%
     dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 3)))
-  nice_dt(out, caption = "PC1 effects, each randomized arm vs. control.")
+  nice_dt(out, caption = "PC1 effects, each randomized arm vs. control. P and Q are from the joint test across a trial's arms, so they repeat for every arm.",
+          labels = c(chi_pval = "P, joint test across arms", chi_pval_adj = "Q, joint test across arms",
+                     sig = "Joint P < 0.05", sigFDR = "Joint Q < 0.05"))
 }
 ```
 

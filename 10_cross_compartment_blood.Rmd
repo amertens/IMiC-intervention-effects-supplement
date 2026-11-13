@@ -1,8 +1,6 @@
 # Cross-compartment analyses in maternal and infant blood
 
-Intervention effects in the MISAME-III subset with maternal plasma, maternal and infant dried-blood microsample (VAMS) metabolomics, and maternal blood proteomics, and their comparison with milk. MISAME-III randomized prenatal and postnatal BEP in a 2 × 2 design: control (IFA/IFA), prenatal only (BEP/IFA), postnatal only (IFA/BEP), and both (BEP/BEP). Effects are covariate-adjusted TMLE estimates within each dataset (SD units). Because the platforms measure on different scales, compartments are compared only by the direction of their effects. Names of untargeted features are putative (mass-based, MSI level 3).
-
-Visit codes: `tri3` third trimester, `incl` enrollment, `acco` birth, `pn12` 1–2 months postpartum, `pn34` 3–4 months, `pn56` 5–6 months.
+Intervention effects in the MISAME-III subset with maternal plasma metabolomics, metabolomics of maternal and infant dried-blood microsamples collected by volumetric absorptive microsampling (VAMS), and maternal blood proteomics, and their comparison with milk. MISAME-III randomized prenatal and postnatal balanced energy-protein (BEP) supplementation in a 2 × 2 design, with iron–folic acid (IFA) as the comparator supplement: control (IFA/IFA), prenatal only (BEP/IFA), postnatal only (IFA/BEP), and both (BEP/BEP). Samples from enrollment, the third trimester, and birth are compared by prenatal arm (BEP/BEP and BEP/IFA versus IFA/BEP and IFA/IFA), and postnatal samples by postnatal arm (BEP/BEP and IFA/BEP versus BEP/IFA and IFA/IFA). Effects are covariate-adjusted estimates from targeted maximum likelihood estimation within each dataset, in SD units. Because the platforms measure on different scales, compartments are compared only by the direction of their effects. Names of untargeted features are putative (mass-based, Metabolomics Standards Initiative level 3).
 
 ```{r cc-setup, include=FALSE}
 library(tidyverse)
@@ -27,6 +25,7 @@ read_cc <- function(path) {
 cc_dt <- function(df, caption = NULL, page_length = 15, sci = NULL) {
   if (is.null(df)) return(invisible(NULL))
   if (!nrow(df))  return(htmltools::tags$em("No rows to display."))
+  df <- relabel_blood_codes(df)   # visit and dataset codes as words
   if (is.null(sci)) sci <- intersect(c("p","p_adj","q","pval","pval_adj","P-value","p-value","FDR","fdr",
                                        "pathway_FDR","sign_test_p","milk_pval","blood_pval","fisher_up_p",
                                        "wilcox_p_cor","wilcox_p_euclid","p_all","p_detected","gsea_up_p",
@@ -51,7 +50,8 @@ if (!is.null(ate) && nrow(ate)) {
                   arms = ifelse(arm_coding == "combined", "Pooled", "By arm")) %>%
     dplyr::count(arms, dataset, visit, contrast, direction) %>%
     tidyr::pivot_wider(names_from = direction, values_from = n, values_fill = 0) %>%
-    dplyr::arrange(dplyr::desc(arms), dataset, visit, contrast)
+    dplyr::arrange(dplyr::desc(arms), dataset,
+                   match(visit, c("incl", "tri3", "acco", "pn12", "pn34", "pn56")), contrast)
   cc_dt(counts, caption = "FDR-significant features, adjusted models.")
 }
 ```
@@ -63,7 +63,7 @@ cc_dt(read_cc("results/fdr_sig_putative_annotation.csv"),
 
 ## Concordance between compartments {#cc-concordance}
 
-Agreement in direction of BEP-responsive features between compartment pairs. Features were matched across platforms by mass within ionization mode, at ±25 ppm between the two measured masses; maternal and infant postnatal VAMS share one feature catalogue and are matched by identifier. Mass-only matches can pair different molecules of the same mass. The tables give agreement among significant features, rank-based measures that use all features (rank–rank hypergeometric overlap, weighted correlation, directional GSEA), and the sensitivity of the matching to its tolerance.
+Agreement in direction of BEP-responsive features between compartment pairs. Features were matched across platforms by mass within ionization mode, at ±25 ppm between the two measured masses. Maternal and infant postnatal VAMS share one feature catalog and are matched by identifier. Mass-only matches can pair different molecules of the same mass. The tables give agreement among significant features, rank-based measures that use all features (rank–rank hypergeometric overlap, weighted correlation, and directional gene set enrichment analysis), and the sensitivity of the matching to its tolerance.
 
 ```{r cc-arrow-summary, echo=FALSE, message=FALSE, warning=FALSE}
 cc_dt(read_cc("results/cross_compartment_arrow_contrast_summary.csv"), page_length = 20,
@@ -72,7 +72,7 @@ cc_dt(read_cc("results/cross_compartment_arrow_contrast_summary.csv"), page_leng
 
 ```{r cc-threshold-free, echo=FALSE, message=FALSE, warning=FALSE}
 cc_dt(read_cc("results/cross_compartment_threshold_free_panel.csv"), page_length = 20,
-      caption = "Rank-based concordance: weighted correlation (w_r), Deming slope, RRHO strength, directional GSEA (up) NES, and % concordant among features significant in both datasets.")
+      caption = "Rank-based concordance: weighted correlation (w_r), Deming regression slope, rank–rank hypergeometric overlap (RRHO) strength, normalized enrichment score (NES) of directional gene set enrichment analysis (GSEA) for up-regulated features, and % concordant among features significant in both datasets.")
 ```
 
 ```{r cc-matching-sens, echo=FALSE, message=FALSE, warning=FALSE}
@@ -119,11 +119,21 @@ cc_dt(read_cc("results/targeted_carnitine_crossvalidation.csv"),
 
 ## Features increased in two or more compartments {#cc-tracking}
 
-BEP-up features increased in at least two of milk, maternal blood, and infant blood, linked by shared feature identifier (maternal and infant postnatal VAMS), identical putative name, or same-mode mass (±25 ppm), with their effect in each compartment and visit and whether they were detected in the BEP supplement (18 replicates on the same platform, ±25 ppm).
+BEP-increased features in at least two of milk, maternal blood, and infant blood, linked by identical putative name (unannotated features by identical *m/z*), as in Fig. 6D, with their effect in each compartment and visit and whether they were detected in the BEP supplement (18 replicates on the same platform, ±25 ppm).
 
 ```{r cc-tracking-table, echo=FALSE, message=FALSE, warning=FALSE}
-cc_dt(read_cc("results/compartment_tracking/trenton_linked_crosscompartment.csv"), page_length = 15,
-      caption = "Features increased in two or more compartments.")
+trk <- read_cc("results/compartment_tracking/trenton_linked_crosscompartment.csv")
+if (!is.null(trk) && nrow(trk)) {
+  trk <- trk %>%
+    dplyr::filter(direction == "Upregulated") %>%
+    dplyr::select(dplyr::any_of(c("tracking_name", "compartment", "timepoint", "feature", "mz", "ion_mode",
+                                  "effect_size", "raw_p", "fdr", "putative_name", "n_candidates",
+                                  "supplement_label", "supplement_match_ppm"))) %>%
+    dplyr::arrange(tracking_name, compartment)
+  cc_dt(trk, page_length = 15, sci = c("raw_p", "fdr"),
+        caption = sprintf("The %d metabolites increased in two or more compartments (Fig. 6D).",
+                          dplyr::n_distinct(trk$tracking_name)))
+}
 ```
 
 ## Pathway direction and chemical classes {#cc-pathways}

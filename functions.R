@@ -341,8 +341,15 @@ volcano_plot <- function(tab, fdr_thresh = 0.05, interactive = TRUE, title = NUL
 }
 
 ## Render an estimates table with consistent column formatting and column filters.
-clean_tab <- function(tab, caption = NULL) {
+clean_tab <- function(tab, caption = NULL, joint_test = NA) {
   rownames(tab) <- NULL
+  ## A table that carries only chi_pval holds the joint test across a trial's arms:
+  ## in an arm-by-arm table it repeats for every arm, so say so in the header.
+  ## Callers that have already aliased chi_pval to pval pass joint_test = TRUE.
+  id_cols <- intersect(c("study", "visit", "biomarker", "label_f"), names(tab))
+  joint <- if (!is.na(joint_test)) isTRUE(joint_test) else
+    !"pval" %in% names(tab) && "chi_pval" %in% names(tab) && length(id_cols) > 0 &&
+    any(duplicated(tab[, id_cols, drop = FALSE]))
   tab <- .harmonize_factors(tab)
   if (!"perc_imp" %in% names(tab)) tab$perc_imp <- NA_real_
   ## Some upstream tables only carry chi_pval / chi_pval_adj; alias.
@@ -384,9 +391,11 @@ clean_tab <- function(tab, caption = NULL) {
   keep <- intersect(c("study","visit","contrast","label_f","perc_imp",
                       "ATE","ATE_unscaled","pval","pval_adj","pval_adj_global"), names(tab))
   tab <- tab[, keep, drop = FALSE]
+  override <- if (joint) c(pval = "P, joint test across arms", pval_adj = "Q, joint test across arms")
 
   DT::datatable(
     tab,
+    colnames = reader_names(keep, override),
     extensions = "FixedHeader",
     options = list(pageLength = 15, dom = "frtip", deferRender = TRUE,
                    fixedHeader = TRUE, scrollX = TRUE),
@@ -394,14 +403,83 @@ clean_tab <- function(tab, caption = NULL) {
   ) %>% DT::formatStyle(columns = keep, fontSize = "11px")
 }
 
+## Column headers as readers see them. The result files keep the analysis code's
+## column names; every table on the site shows these instead (DT's colnames, so
+## the data and the formatting calls keep the original names). A column not
+## listed keeps its own name. `override` replaces entries for one table.
+column_labels <- c(
+  study = "Study", studyid = "Study", visit = "Visit", timepoint = "Visit",
+  studytime = "Study and visit", panel = "Study and visit",
+  contrast = "Contrast", arms = "Arms", outcome_group = "Outcome group",
+  category = "Category", label_f = "Component", biomarker = "Feature ID",
+  feature = "Feature ID", uniprot = "UniProt", gene = "Gene",
+  est = "ATE", cil = "95% CI, lower", ciu = "95% CI, upper",
+  pval = "P", chi_pval = "P", pvalue = "P", raw_p = "P", p = "P", p_value = "P",
+  "P-value" = "P", "p-value" = "P",
+  pval_adj = "Q", chi_pval_adj = "Q", q = "Q", fdr = "Q", fdr_native = "Q",
+  FDR = "Q", p.adjust = "Q", pathway_FDR = "Q",
+  pval_adj_global = "Q, all trials and visits", qvalue = "Storey q",
+  sig = "P < 0.05", sigFDR = "Q < 0.05",
+  perc_imp = "Difference (%)", ATE = "ATE (95% CI)",
+  ATE_unscaled = "ATE (95% CI), native units",
+  N = "N", nY = "Deficient", ci.lb = "95% CI, lower", ci.ub = "95% CI, upper",
+  N_obs = "N", cvAUC = "CV-AUC", predictors = "Predictors", arm = "Arm",
+  subgroup = "BMI stratum", interaction_pvalue = "Interaction P",
+  interaction_pvalue_adj = "Interaction Q",
+  pathway = "Pathway", total = "Total", expected = "Expected", hits = "Hits",
+  enrichment_ratio = "Enrichment ratio", direction = "Direction",
+  platform = "Platform", dataset = "Compartment", compartment = "Compartment",
+  mode = "Ionization mode", ion_mode = "Ionization mode", mz = "m/z",
+  effect_size = "ATE", putative_name = "Putative name",
+  n_candidates = "Candidate names (n)", putative_candidates = "Candidate names",
+  best_annotation = "Best annotation", curated_name = "Curated name",
+  sapient_name = "Vendor annotation", tracking_name = "Metabolite",
+  supplement_label = "BEP supplement", supplement_match_ppm = "Supplement match (ppm)",
+  klass = "Set library", class = "Chemical class", n_class = "Features in class",
+  n_fg = "Responsive features in class", gene_ratio = "Gene ratio",
+  fold_enrichment = "Fold enrichment", signed_fold_enrichment = "Signed fold enrichment",
+  regulation = "Direction", ID = "GO term", geneID = "UniProt accessions",
+  description_sentence = "Summary")
+reader_names <- function(x, override = NULL) {
+  lab <- column_labels
+  if (length(override)) lab[names(override)] <- override
+  y <- unname(lab[x])
+  ifelse(is.na(y), x, y)
+}
+
+## Blood-compartment codes (Section 10) as words: visit codes anywhere in a cell
+## ("pn12", "Infant VAMS pn12"), and dataset codes as whole cells.
+blood_visit_labels <- c(incl = "Enrollment", tri3 = "Third trimester", acco = "Birth",
+                        pn12 = "1-2 mo.", pn34 = "3-4 mo.", pn56 = "5-6 mo.",
+                        "1421d" = "14-21 days")
+blood_dataset_labels <- c(MaternalPlasma = "Maternal plasma",
+                          VamsPrenatal = "Maternal VAMS, prenatal",
+                          VamsPostnatalMaternal = "Maternal VAMS, postnatal",
+                          VamsPostnatalInfant = "Infant VAMS",
+                          ProteomicsDepleted = "Maternal blood proteome, immunodepleted",
+                          ProteomicsNaive = "Maternal blood proteome, untreated")
+relabel_blood_codes <- function(df) {
+  for (cc in names(df)) {
+    if (!(is.character(df[[cc]]) || is.factor(df[[cc]]))) next
+    v <- as.character(df[[cc]])
+    hit <- !is.na(v) & v %in% names(blood_dataset_labels)
+    v[hit] <- unname(blood_dataset_labels[v[hit]])
+    for (k in names(blood_visit_labels))
+      v <- gsub(paste0("\\b", k, "\\b"), blood_visit_labels[[k]], v, perl = TRUE)
+    df[[cc]] <- v
+  }
+  df
+}
+
 ## Generic DT renderer with column filters. Use for any tabular result.
-nice_dt <- function(df, caption = NULL, page_length = 15, round_digits = 3) {
+nice_dt <- function(df, caption = NULL, page_length = 15, round_digits = 3, labels = NULL) {
   if (is.null(df) || nrow(df) == 0) {
     return(htmltools::tags$em("No rows to display."))
   }
   num_cols <- names(df)[vapply(df, is.numeric, logical(1))]
   dt <- DT::datatable(
     df,
+    colnames = reader_names(names(df), labels),
     extensions = "FixedHeader",
     options = list(pageLength = page_length, dom = "frtip", deferRender = TRUE,
                    fixedHeader = TRUE, scrollX = TRUE),
@@ -579,7 +657,7 @@ linked_volcano_table <- function(df, fdr_thresh = 0.05,
     plotly::highlight(on = "plotly_selected", off = "plotly_deselect", persistent = FALSE)
 
   hide_idx <- which(names(df) %in% c("neglog10p", "point_type", "tooltip")) - 1
-  dt <- DT::datatable(sd, extensions = "FixedHeader",
+  dt <- DT::datatable(sd, colnames = reader_names(names(df)), extensions = "FixedHeader",
                       options = list(pageLength = 10, dom = "frtip",
                                      fixedHeader = TRUE, scrollX = TRUE,
                                      columnDefs = list(list(visible = FALSE, targets = hide_idx))),
@@ -588,7 +666,7 @@ linked_volcano_table <- function(df, fdr_thresh = 0.05,
 
   fcols <- intersect(filter_cols, names(df))
   filt  <- lapply(fcols, function(cc)
-    crosstalk::filter_select(cc, cc, sd, stats::as.formula(paste0("~", cc))))
+    crosstalk::filter_select(cc, reader_names(cc), sd, stats::as.formula(paste0("~", cc))))
   htmltools::tagList(
     if (length(filt)) do.call(crosstalk::bscols, filt) else NULL,
     p, dt)

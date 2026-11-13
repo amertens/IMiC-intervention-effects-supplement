@@ -1,6 +1,6 @@
 # Effects on human milk nutrient deficiency
 
-Relative risks (RRs) of nutrient deficiency, pooled intervention vs. control, estimated by TMLE within each trial and visit. A sample is deficient when its concentration is below the 10th percentile of the age-specific reference distribution from the Mothers, Infants, and Lactation Quality (MILQ) study; RR < 1 means less deficiency with the intervention. `nY` of `N` samples were deficient. Components with fewer than five deficient samples in a trial and visit were not analyzed. *Q* (`pval_adj`) is FDR-adjusted within visit and outcome group.
+Relative risks (RRs) of nutrient deficiency, pooled intervention vs. control, estimated by targeted maximum likelihood estimation within each trial and visit. A sample is deficient when its concentration is below the 10th percentile of the age-specific reference distribution from the Mothers, Infants, and Lactation Quality (MILQ) study, so an RR below 1 means less deficiency with the intervention. The table gives the number of samples (N) and the number deficient. Components with fewer than five deficient samples in a trial and visit were not analyzed. *Q* is adjusted for the false discovery rate within visit and outcome group.
 
 ```{r milq-table, echo=FALSE, message=FALSE, warning=FALSE}
 suppressPackageStartupMessages({ library(dplyr); library(here) })

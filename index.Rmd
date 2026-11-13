@@ -4,7 +4,7 @@ site: bookdown::bookdown_site
 documentclass: book
 bibliography: [book.bib, packages.bib]
 description: |
-  Online resource for "Nutritional interventions' impacts on human milk: three trials in low-resource settings" (Dailey-Chwalibóg, Mertens et al., 2026).
+  Online resource for "Nutritional interventions' impacts on human milk: Three trials in low-resource settings" (Dailey-Chwalibóg, Mertens et al., 2026).
 link-citations: yes
 github-repo: amertens/IMiC-intervention-effects-supplement
 url: https://amertens.github.io/IMiC-intervention-effects-supplement/
@@ -12,7 +12,7 @@ url: https://amertens.github.io/IMiC-intervention-effects-supplement/
 
 # Overview {-}
 
-This online resource accompanies Dailey-Chwalibóg, Mertens *et al.* (2026), "Nutritional interventions' impacts on human milk: three trials in low-resource settings", from the International Milk Composition (IMiC) Consortium. It holds the full results tables, interactive views of the estimates, and analyses that are not in the article.
+This online resource accompanies Dailey-Chwalibóg, Mertens *et al.* (2026), "Nutritional interventions' impacts on human milk: Three trials in low-resource settings", from the International Milk Composition (IMiC) Consortium. It holds the full results tables, interactive views of the estimates, and analyses that are not in the article.
 
 | Section | Contents |
 |---|---|
@@ -29,9 +29,11 @@ This online resource accompanies Dailey-Chwalibóg, Mertens *et al.* (2026), "Nu
 
 ## Estimates and plots {-}
 
-Effects are average treatment effects (ATEs) estimated by targeted maximum likelihood estimation (TMLE) with adjustment for baseline covariates, in standard deviations of each component's study- and visit-specific z-score unless a table gives native units. *Q* is the Benjamini–Hochberg FDR-adjusted *P* value, computed within outcome group, study, and visit.
+Effects are average treatment effects (ATEs) estimated by targeted maximum likelihood estimation (TMLE) with adjustment for baseline covariates, in standard deviations of each component's study- and visit-specific z-score unless a table gives native units. *Q* is the *P* value adjusted for the false discovery rate (FDR) by the Benjamini–Hochberg method, computed within outcome group, study, and visit.
 
-In volcano plots, points with *Q* ≥ 0.05 are black (squares if *P* < 0.05), and points with *Q* < 0.05 take the color and symbol of their component category; the gray line marks *P* = 0.05 and the green line the FDR threshold of each panel. In forest plots of randomized arms, each arm has its own color and the symbol marks significance: open circle *P* ≥ 0.05, open triangle *P* < 0.05, filled circle *Q* < 0.05. Hover over a point for its values. Tables can be searched, sorted, and filtered by column.
+Pooled comparisons combine the arms that received each trial's maternal intervention. In ELICIT, the nicotinamide and nicotinamide plus azithromycin arms are compared with the control arm. In Mumta-LW, the balanced energy-protein (BEP) arms with and without infant azithromycin are compared with the control arm, which received breastfeeding counseling alone. In MISAME-III, where the comparator supplement was iron–folic acid (IFA), the two arms that received postnatal BEP, BEP/BEP and IFA/BEP, are compared with the two that did not, BEP/IFA and IFA/IFA. Pooled tables label these contrasts Nico in ELICIT and BEP in the other two trials. Arm-by-arm tables compare each randomized arm with its trial's control arm. The ELICIT arms are Nico (nicotinamide), Az. (azithromycin with nitazoxanide), and Nico+Az. (both). The Mumta-LW arms are BEP+ExBf and BEP+ExBf+AZT, the BEP arms without and with infant azithromycin (AZT). The MISAME-III arms are named by their prenatal and postnatal supplement, BEP/BEP, BEP/IFA, and IFA/BEP, and compared with IFA/IFA.
+
+In volcano plots, points with *Q* ≥ 0.05 are black (squares if *P* < 0.05), and points with *Q* < 0.05 take the color and symbol of their component category. The gray line marks *P* = 0.05, and the green line marks the FDR threshold of each panel. In forest plots of randomized arms, each arm has its own color and the symbol marks significance: open circle *P* ≥ 0.05, open triangle *P* < 0.05, filled circle *Q* < 0.05. Hover over a point for its values. Tables can be searched, sorted, and filtered by column.
 
 ## Data files {#data-files .unnumbered}
 

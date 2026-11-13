@@ -42,7 +42,8 @@ if (!is.null(df)) clean_tab(df, caption = "Pooled intervention vs. control.")
 
 ```{r microbiome-div-strat, echo=FALSE, message=FALSE, warning=FALSE}
 df <- prep_explor("results/microbiome_diversity_intervention_effects_results_arm_strat.RDS")
-if (!is.null(df)) clean_tab(df, caption = "Each randomized arm vs. control.")
+if (!is.null(df)) clean_tab(df, caption = "Each randomized arm vs. control. P and Q are from the joint test across a trial's arms, so they repeat for every arm.",
+                            joint_test = TRUE)
 ```
 
 ### Individual microbial features
@@ -60,7 +61,7 @@ if (!is.null(df)) {
 
 ## Untargeted proteomics
 
-Per-protein effects, pooled intervention vs. control, in the dyads with proteomics. ELICIT is not included because its proteome samples came only from the control and azithromycin arms.
+Per-protein effects in the dyads with proteomics, pooled intervention vs. control and then each randomized arm vs. control. ELICIT is not included because its proteome samples came only from the control and azithromycin arms.
 
 ```{r prot-vol, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7, results='asis'}
 df <- prep_explor("results/adjusted_combined_arms_intervention_effects_proteomics_results_clean.RDS")
@@ -76,9 +77,30 @@ if (!is.null(df)) {
 }
 ```
 
+```{r prot-armstrat, echo=FALSE, message=FALSE, warning=FALSE}
+## Arm-by-arm per-protein effects; the article's protein counts for Mumta-LW come
+## from the BEP arm without azithromycin (BEP+ExBf), so they are shown here.
+dfa <- safe_readRDS(here::here("results/proteomics_intervention_effects_results_arm_strat.RDS"),
+                    label = "proteomics_intervention_effects_results_arm_strat.RDS")
+if (!is.null(dfa) && nrow(dfa)) {
+  dfa <- .harmonize_factors(as.data.frame(dfa))
+  n_tab <- dfa %>% dplyr::group_by(study, contrast) %>%
+    dplyr::summarise(n = dplyr::n(), k = sum(pval_adj < 0.05, na.rm = TRUE), .groups = "drop")
+  counts <- paste(sprintf("%s %s, %s of %s", n_tab$study, n_tab$contrast,
+                          formatC(n_tab$k, format = "d", big.mark = ","),
+                          formatC(n_tab$n, format = "d", big.mark = ",")),
+                  collapse = "; ")
+  nice_dt(dfa %>% dplyr::select(dplyr::any_of(c("study","visit","contrast","label_f","biomarker",
+                                                "est","cil","ciu","pval","pval_adj","sigFDR"))) %>%
+            dplyr::mutate(dplyr::across(where(is.numeric), ~ signif(.x, 3))),
+          caption = paste0("Per-protein effects, each randomized arm vs. control. Proteins with Q < 0.05: ",
+                           counts, "."))
+}
+```
+
 ## Untargeted metabolomics
 
-Per-feature effects, pooled intervention vs. control, for about 97,000 features across trials, visits, and ionization modes.
+Per-feature effects, pooled intervention vs. control, across trials, visits, and ionization modes.
 
 ```{r met-vol, echo=FALSE, message=FALSE, warning=FALSE, fig.height=7, results='asis'}
 df <- prep_explor("results/adjusted_combined_arms_intervention_effects_untargeted_results_clean.RDS")

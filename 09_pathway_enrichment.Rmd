@@ -50,7 +50,7 @@ if (knitr::is_html_output()) {
 
 ## Targeted-metabolome enrichment (Table S3) {#path-tertiary-msea}
 
-Table S3 in full: over-representation of the SMPDB small-molecule and lipid metabolite sets among the targeted metabolites, computed in MetaboAnalystR against the whole measured human metabolome as background ([`table_s3_tertiary_msea_full.csv`](data-files/table_s3_tertiary_msea_full.csv)). `fdr_native` is the Benjamini–Hochberg FDR that MetaboAnalystR reports for each run.
+Table S3 in full: over-representation of the Small Molecule Pathway Database (SMPDB) small-molecule and lipid metabolite sets among the targeted metabolites, computed in MetaboAnalystR against the whole measured human metabolome as background ([`table_s3_tertiary_msea_full.csv`](data-files/table_s3_tertiary_msea_full.csv)). *Q* is the Benjamini–Hochberg false discovery rate (FDR) that MetaboAnalystR reports for each run.
 
 ```{r path-tertiary-msea-dual, echo=FALSE, message=FALSE, warning=FALSE}
 enrich_dt(read_enrich("results/metaboanalyst/tertiary_msea/tertiary_msea_dual.csv"),
@@ -81,7 +81,7 @@ if (!is.null(t3) && !is.null(u5) && nrow(t3) && nrow(u5)) {
 
 ## Untargeted-metabolome Mummichog enrichment (Table S6) {#path-mummichog}
 
-Table S6 in full: Mummichog pathway enrichment of the untargeted milk features, matched to the `human_mfn` network at 10 ppm, by trial, visit, contrast, direction, and ionization mode, for the pathways with *P* < 0.05 ([`table_s6_mummichog_full.csv`](data-files/table_s6_mummichog_full.csv)). `FDR` is Benjamini–Hochberg-adjusted within each run.
+Table S6 in full: Mummichog pathway enrichment of the untargeted milk features, matched to the MetaboAnalyst human metabolic network (human_mfn) at 10 ppm, by trial, visit, contrast, direction, and ionization mode, for the pathways with *P* < 0.05 ([`table_s6_mummichog_full.csv`](data-files/table_s6_mummichog_full.csv)). *Q* is adjusted by the Benjamini–Hochberg method within each run.
 
 ```{r path-mummichog-tab, echo=FALSE, message=FALSE, warning=FALSE}
 mum <- read_enrich("results/metaboanalyst/mummichog_s5/milk_mummichog_tableS5.csv")
@@ -92,7 +92,7 @@ if (!is.null(mum) && nrow(mum))
 
 ### Putative feature annotations {#path-mummichog-annotation}
 
-Mass-based putative names (MSI level 3) of the FDR-significant untargeted milk features.
+Mass-based putative names (Metabolomics Standards Initiative level 3) of the FDR-significant untargeted milk features.
 
 ```{r path-mummichog-annot-full, echo=FALSE, message=FALSE, warning=FALSE}
 annot <- read_enrich("results/metaboanalyst/mummichog_s5/milk_mummichog_annotation_finalized.csv")
@@ -102,7 +102,7 @@ if (!is.null(annot) && nrow(annot))
 
 ## Proteome Gene Ontology enrichment (Table S7) {#path-go}
 
-Table S7 in full: over-representation of Gene Ontology Biological Process terms among the proteins with *P* < 0.05, using `clusterProfiler::enricher` with each measured UniProt protein counted once and all proteins measured in the trial and contrast as background, for the terms with *P* < 0.05 and Storey *q* < 0.20 ([`table_s7_proteomics_go_full.csv`](data-files/table_s7_proteomics_go_full.csv)). `fdr` is Benjamini–Hochberg-adjusted. The second table repeats the terms with *Q* < 0.05 with the contributing UniProt accessions.
+Table S7 in full: over-representation of Gene Ontology (GO) Biological Process terms among the proteins with *P* < 0.05, using clusterProfiler::enricher with each measured UniProt protein counted once and all proteins measured in the trial and contrast as background, for the terms with *P* < 0.05 and Storey *q* < 0.20 ([`table_s7_proteomics_go_full.csv`](data-files/table_s7_proteomics_go_full.csv)). *Q* is adjusted by the Benjamini–Hochberg method. The GO annotations are those of the Bioconductor org.Hs.eg.db and GO.db 3.20 packages (annotations dated 20 September 2024), and later releases give different term counts. The second table repeats the terms with *Q* < 0.05, with the UniProt accessions of the proteins in each term.
 
 ```{r path-go-table-s7, echo=FALSE, message=FALSE, warning=FALSE}
 enrich_dt(read_enrich("results/metaboanalyst/proteomics_go/proteomics_go_tableS6.csv"),

@@ -277,6 +277,27 @@ dedupe_arm_strat <- function() {
 }
 dedupe_arm_strat()
 
+## ---- arm-by-arm per-protein effects (Section 4.2) ----------------------------
+## The article's protein counts for Mumta-LW come from the BEP arm without
+## azithromycin, so Section 4.2 shows the arm-by-arm estimates beside the pooled
+## ones. Only the milk proteome rows of the stratified results are kept.
+port_proteomics_arm_strat <- function() {
+  src_rel <- "results/combined_intervention_effects_results_stratified_arms.RDS"
+  src <- file.path(upstream, src_rel)
+  if (!file.exists(src)) { cat(sprintf("[skip ] %s (missing upstream)\n", src_rel)); return(invisible(FALSE)) }
+  d <- as.data.frame(readRDS(src))
+  d <- d[d$description %in% "Proteomics" & d$measure %in% "ATE", , drop = FALSE]
+  keep <- intersect(c("study", "visit", "studytime", "contrast", "biomarker", "label_f",
+                      "est", "cil", "ciu", "pval", "pval_adj", "sig", "sigFDR"), names(d))
+  dst_rel <- "results/proteomics_intervention_effects_results_arm_strat.RDS"
+  dst <- file.path(dest, dst_rel)
+  if (!dir.exists(dirname(dst))) dir.create(dirname(dst), recursive = TRUE)
+  saveRDS(d[, keep, drop = FALSE], dst)
+  cat(sprintf("[prot ] %s -> %s (%d rows)\n", src_rel, dst_rel, nrow(d)))
+  invisible(TRUE)
+}
+port_proteomics_arm_strat()
+
 ## The earlier "pathway_enrichment_*.RDS genuinely missing upstream" footer has
 ## been removed: the pathway/enrichment chapter (Section 9) is now built from the
 ## scripted MetaboAnalystR CSV outputs under results/metaboanalyst/ (copied by

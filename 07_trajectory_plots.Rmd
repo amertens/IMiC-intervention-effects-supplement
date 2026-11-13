@@ -1,6 +1,6 @@
 # Trajectory analyses of human milk component change across lactation
 
-Effects on the change in each milk component between consecutive visits (the later value minus the earlier one, within each mother), standardized and estimated by TMLE, by trial and visit interval.
+Effects on the change in each milk component between consecutive visits (the later value minus the earlier one, within each mother), standardized and estimated by targeted maximum likelihood estimation, by trial and visit interval. In the tables, the visit is the later visit of each interval.
 
 ```{r traj-setup, include=FALSE}
 library(tidyverse)
@@ -28,6 +28,17 @@ if (is.data.frame(traj_primary)  && "measure" %in% names(traj_primary))
   traj_primary  <- traj_primary  %>% dplyr::filter(measure == "ATE")
 if (is.data.frame(traj_combined) && "measure" %in% names(traj_combined))
   traj_combined <- traj_combined %>% dplyr::filter(measure == "ATE")
+
+## The two upstream file names do not match their contents: the "combined_arms"
+## file holds the per-arm contrasts, and the other file the pooled ones. Assign
+## them by content instead: the pooled results carry only the pooled contrasts,
+## Nico (ELICIT) and BEP (MISAME-III and Mumta-LW). traj_combined (pooled) feeds
+## the volcano plots and the pooled table, traj_primary the per-arm table.
+.is_pooled <- function(d) is.data.frame(d) && "contrast" %in% names(d) &&
+  all(unique(as.character(d$contrast)) %in% c("Nico", "BEP"))
+if (.is_pooled(traj_primary) && !.is_pooled(traj_combined)) {
+  .tmp <- traj_primary; traj_primary <- traj_combined; traj_combined <- .tmp; rm(.tmp)
+}
 
 ## Each estimate is the effect on the change from the preceding visit, so panels
 ## are titled by visit interval ("MISAME-III (14-21 days to 1-2 mo.)").
@@ -64,8 +75,13 @@ make_traj_volcano(traj_combined,
 ### Per-arm contrasts
 
 ```{r traj-table-armstrat, echo=FALSE, message=FALSE, warning=FALSE}
+## The estimate columns only; the results files also carry the joint test across
+## arms (chi_pval), which would sit beside the per-contrast P under the same name.
+traj_cols <- c("study","visit","contrast","outcome_group","label_f",
+               "est","cil","ciu","pval","pval_adj","sigFDR")
 if (!is.null(traj_primary) && is.data.frame(traj_primary)) {
-  nice_dt(traj_primary %>% dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 3))),
+  nice_dt(.harmonize_factors(traj_primary) %>% dplyr::select(dplyr::any_of(traj_cols)) %>%
+            dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 3))),
           caption = "Adjusted trajectory ATEs, per randomized arm vs. control.")
 }
 ```
@@ -74,7 +90,8 @@ if (!is.null(traj_primary) && is.data.frame(traj_primary)) {
 
 ```{r traj-table-combined, echo=FALSE, message=FALSE, warning=FALSE}
 if (!is.null(traj_combined) && is.data.frame(traj_combined)) {
-  nice_dt(traj_combined %>% dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 3))),
+  nice_dt(.harmonize_factors(traj_combined) %>% dplyr::select(dplyr::any_of(traj_cols)) %>%
+            dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 3))),
           caption = "Adjusted trajectory ATEs, pooled intervention arms vs. control.")
 }
 ```

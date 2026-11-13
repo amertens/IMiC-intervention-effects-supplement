@@ -1,6 +1,6 @@
 # IMiC intervention effects on human milk: online resource
 
-Source of the online resource for Dailey-Chwalibóg, Mertens *et al.* (2026), *Nutritional interventions' impacts on human milk: three trials in low-resource settings*, from the International Milk Composition (IMiC) Consortium. The site is a bookdown gitbook published at <https://amertens.github.io/IMiC-intervention-effects-supplement/>.
+Source of the online resource for Dailey-Chwalibóg, Mertens *et al.* (2026), *Nutritional interventions' impacts on human milk: Three trials in low-resource settings*, from the International Milk Composition (IMiC) Consortium. The site is a bookdown gitbook published at <https://amertens.github.io/IMiC-intervention-effects-supplement/>.
 
 ## Sections
 
@@ -19,7 +19,7 @@ Source of the online resource for Dailey-Chwalibóg, Mertens *et al.* (2026), *N
 | 10 | Maternal and infant blood in MISAME-III | `10_cross_compartment_blood.Rmd` |
 | – | R session | `99_session_info.Rmd` |
 
-The article cites Sections 1–5 by number, so those numbers must not change. The site does not reproduce the article's figures; it holds the tables behind them, the interactive views, and results the article does not print.
+The article cites Sections 1–5 by number, and the supplementary materials cite Sections 4, 8.2.2 (Table S1), and 10.1 (counts of FDR-significant blood features), so those numbers must not change. The site does not reproduce the article's figures. It holds the tables behind them, the interactive views, and results the article does not print.
 
 ## Building the site
 
@@ -30,7 +30,7 @@ bookdown::render_book(".", "bookdown::gitbook")        # render the book into do
 source("build_apps.R")                                  # export the two shinylive apps into docs/apps/
 ```
 
-`port_results.R` copies the files the chapters read from the analysis repository, by default `../imic_intervention_effects`; set `options(imic.upstream = "path/to/analysis/repo")` to use another location. The analysis code is at <https://github.com/amertens/IMiC-intervention-effects-public>. GitHub Pages serves `docs/` from `main`; do not edit `docs/` by hand.
+`port_results.R` copies the files the chapters read from the analysis repository, by default `../imic_intervention_effects`. Set `options(imic.upstream = "path/to/analysis/repo")` to use another location. The analysis code is at <https://github.com/amertens/IMiC-intervention-effects-public>. GitHub Pages serves `docs/` from `main`, so do not edit `docs/` by hand.
 
 A chapter whose input file is missing prints a note naming the file instead of its output.
 
