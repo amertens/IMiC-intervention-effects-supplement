@@ -449,7 +449,7 @@ reader_names <- function(x, override = NULL) {
 
 ## Blood-compartment codes (Section 10) as words: visit codes anywhere in a cell
 ## ("pn12", "Infant VAMS pn12"), and dataset codes as whole cells.
-blood_visit_labels <- c(incl = "Enrollment", tri3 = "Third trimester", acco = "Birth",
+blood_visit_labels <- c(incl = "Second trimester", tri3 = "Third trimester", acco = "Birth",
                         pn12 = "1-2 mo.", pn34 = "3-4 mo.", pn56 = "5-6 mo.",
                         "1421d" = "14-21 days")
 blood_dataset_labels <- c(MaternalPlasma = "Maternal plasma",
